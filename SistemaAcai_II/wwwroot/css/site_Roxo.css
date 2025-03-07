@@ -1,0 +1,106 @@
+html {
+    font-size: 14px;
+}
+
+@media (min-width: 768px) {
+    html {
+        font-size: 16px;
+    }
+}
+
+.btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
+    box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
+}
+
+html {
+    position: relative;
+    min-height: 100%;
+}
+
+body {
+    margin-bottom: 60px;
+    background-color: #DDA0DD;
+    color: #f4f4f4;
+}
+border-top footer text-muted {
+    background-color: #DDA0DD;
+}
+a {
+    color: #DDA0DD;
+}
+.fw-bold {
+    color: #6a0dad;
+}
+.navbar .navbar-expand-sm .navbar-toggleable-sm .navbar-light .bg-white .border-bottom .box-shadow .mb-3 {
+    /* background: #015701;*/
+    background: #6a0dad;
+}
+.card {
+    background: #DDA0DD;
+}
+table td {
+    border: none !important;
+}
+.navbar-light .navbar-brand:focus, .navbar-light .navbar-brand:hover {
+    color: #CDDC39;
+}
+.navbar-light .navbar-nav .nav-link {
+    color: rgb(255 255 255 / 55%);
+}
+.navbar-light .navbar-nav .nav-link:focus, .navbar-light .navbar-nav .nav-link:hover {
+    color: #CDDC39;
+}
+@media (prefers-reduced-motion: reduce) {
+    .nav-link {
+        transition: none;
+        color: #ffff;
+    }
+}
+.nav-link:hover {
+    color: #CDDC39;
+}
+.btn-primary {
+    color: #fff;
+    background-color: #000000;
+    border-color: #030E03;
+}
+.btn-secondary {
+    color: #fff;
+    background-color: #016201ff;
+    border-color: #6c757d;
+}
+.container-fluid {
+    background: #6a0dadff;
+}
+
+.bg-white {
+    background: #6a0dadff !important;
+}
+
+.text-muted {
+    --bs-text-opacity: 1;
+    color: #f4f4f4 !important;
+}
+
+.text-dark {
+    --bs-text-opacity: 1;
+    color: #fff !important;
+}
+
+.navbar-light .navbar-brand {
+    color: #fff;
+}
+
+.table {
+    color: #fff;
+    --bs-table-hover-color: #fff;
+}
+    .table > :not(caption) > * > * {
+        padding: .5rem .5rem;
+        background-color: var(--bs-table-bg);
+        border-bottom-width: 0px;
+        box-shadow: inset 0 0 0 9999px var(--bs-table-accent-bg);
+    }
+.diminuir {
+    display:inline;
+}

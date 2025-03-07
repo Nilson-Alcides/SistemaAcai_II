@@ -1,0 +1,184 @@
+﻿@using SistemaAcai_II.Models.Constants
+@inject SistemaAcai_II.Libraries.Login.LoginColaborador _colaborador
+
+
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="Nilson Jose Alcides">
+    
+    <title>@ViewBag.Title</title>
+
+    <link href="~/css/StyleSheet.css" rel="stylesheet" type="text/css" />
+
+
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>@ViewData["Title"] - Sistema Açai </title>
+        <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+        <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+        <link rel="stylesheet" href="~/css/dashboard/dashboard.css" asp-append-version="true" />
+        <link rel="stylesheet" href="~/css/" asp-append-version="true" />
+        <link rel="stylesheet" href="~/css/pagedlist/PagedList.css" rel="stylesheet" type="text/css" />
+        <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+        
+    </head>
+
+
+@* 
+    <!-- Bootstrap core CSS -->
+    <link rel="stylesheet" href="~/resources/lib/bootstrap-4.2.1-dist/css/bootstrap.min.css" />
+   
+        
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.min.css" />
+ *@
+    @*  <link href="~/resources/lib/pagedlist/PagedList.css" rel="stylesheet" type="text/css" /> *@ 
+
+    <style>
+        .bd-placeholder-img {
+            font-size: 1.125rem;
+            text-anchor: middle;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+        }
+
+        @@media (min-width: 768px) {
+            .bd-placeholder-img-lg {
+                font-size: 3.5rem;
+            }
+        }
+    </style>
+    <!-- Custom styles for this template -->
+   
+</head>
+<body>
+    <nav class="navbar navbar-dark fixed-top bg-dark flex-md-nowrap p-0 shadow">
+                    <a class="navbar-brand col-sm-3 col-md-2 mr-0" href="#">Painel</a>
+                    <input class="form-control form-control-dark w-100" type="hidden" placeholder="" aria-label="Search">
+        
+        <ul class="navbar-nav px-3">
+          <li class="nav-item text-nowrap">
+               <a class="nav-link" asp-area="Admin" asp-action="Logout" asp-controller="Home"><span>@_colaborador.GetColaborador().Nome </span> Sair</a>
+            </li>
+        </ul> 
+    </nav>
+
+    <div class="container-fluid">
+        <div class="row">
+            <nav class="col-md-2 d-none d-md-block bg-light sidebar">
+                <div class="sidebar-sticky">
+                    <ul class="nav flex-column">
+                        <li class="nav-item">
+                            <a class="nav-link active" asp-action="Painel">
+                                <i class="fa-solid fa-house"></i>
+                                Painel de Controle
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" asp-action="Index" asp-controller="Vendas">
+                                <i class="fa-solid fa-cart-circle-check"></i>                                
+                                Vendas
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" asp-controller="Produto" asp-action="Index">
+                                <i class="fa-solid fa-cart-shopping"></i>
+                                Produto
+                            </a>
+                        </li>
+
+                        @if (_colaborador.GetColaborador() != null && _colaborador.GetColaborador().Tipo == ColaboradorTipoConstant.Gerente)
+                        { 
+                            <li class="nav-item">
+                                <a class="nav-link" asp-controller="Colaborador" asp-action="Index">
+                                    <i class="fa-solid fa-users"></i>
+                                    Colaborador 
+                                </a>
+                            </li>
+                        } 
+                        
+                        <li class="nav-item">
+                            <a class="nav-link" asp-controller="Cliente" asp-action="Index">
+                                <i class="fa-solid fa-users"></i>
+                                Cliente
+                            </a>
+                        </li>
+
+                        <li class="nav-item">
+                            <a class="nav-link" asp-controller="Pedido" asp-action="Index">
+                                <i class="fa-solid fa-file"></i>
+                                Pedidos
+                            </a>
+                        </li>
+
+                        <li class="nav-item">
+                            <a class="nav-link" asp-controller="Relatorios" asp-action="Index">
+                                <i class="fa-solid fa-chart-bar"></i>                                
+                                Relatórios
+                            </a>
+                        </li>
+                    </ul>
+
+                    <h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted">
+                        <span>Saved reports</span>
+                        <a class="d-flex align-items-center text-muted" href="#">
+                            <span data-feather="plus-circle"></span>
+                        </a>
+                    </h6>
+                    <ul class="nav flex-column mb-2">
+                        <li class="nav-item">
+                            <a class="nav-link" href="#">
+                                <span data-feather="file-text"></span>
+                                Current month
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#">
+                                <span data-feather="file-text"></span>
+                                Last quarter
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#">
+                                <span data-feather="file-text"></span>
+                                Social engagement
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#">
+                                <span data-feather="file-text"></span>
+                                Year-end sale
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </nav>
+
+             
+            <main role="main" class="offset-sm-2 col-md-9 ml-sm-auto col-lg-10 px-4">
+
+                @RenderBody()
+            </main>
+        </div>
+    </div>
+    <script src="~/js/charts/charts.js"></script>
+    <script src="~/js/dashboard/dashboard.js"></script>
+    <script src="~/js/feather/feather.js"></script>
+    <script src="~/js/mask/jquery.mask.min.js"></script>
+
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    <script src="~/js/CarrinhoCompras.js" asp-append-version="true"></script>
+    <script src="~//lib/jquery/dist/jquery.js"></script>
+    <script>window.jQuery || document.write('<script src="/lib/jquery/dist/jquery.js"><\/script>')</script>
+ 
+
+    @RenderSection("Scripts", required: false)
+</body>
+</html>
+

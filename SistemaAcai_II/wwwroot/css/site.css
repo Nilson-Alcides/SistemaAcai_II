@@ -1,0 +1,41 @@
+/* Definição de cores personalizadas */
+.bg-primary-purple {
+    background-color: #6A0DAD !important; /* Roxo intenso */
+}
+
+.bg-dark-purple {
+    background-color: #4B0082 !important; /* Roxo escuro */
+}
+
+.text-purple {
+    color: #6A0DAD !important;
+}
+
+.text-dark-purple {
+    color: #4B0082 !important;
+}
+
+/* Botões personalizados */
+.btn-purple {
+    background-color: #6A0DAD;
+    color: white;
+    border: none;
+}
+
+    .btn-purple:hover {
+        background-color: #4B0082;
+        color: white;
+    }
+
+/* Estilização do corpo */
+body {
+    background-color: #f4f2ff; /* Roxo bem claro */
+    font-family: 'Arial', sans-serif;
+}
+
+/* Estilização do rodapé */
+.footer {
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+}
