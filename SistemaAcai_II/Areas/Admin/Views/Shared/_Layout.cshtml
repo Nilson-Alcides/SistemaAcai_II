@@ -54,7 +54,7 @@
         
         <ul class="navbar-nav px-3 bg-primary-purple">
           <li class="nav-item text-nowrap">
-               <a class="nav-link" asp-area="Admin" asp-action="Logout" asp-controller="Home"><span>@_colaborador.GetColaborador().Nome </span> Sair</a>
+                <a class="nav-link text-white" asp-area="Admin" asp-action="Logout" asp-controller="Home"><span>@_colaborador.GetColaborador().Nome </span> Sair</a>
             </li>
         </ul> 
     </nav>
@@ -62,34 +62,34 @@
     <div class="container-fluid">
         <div class="row">
             <nav class="col-md-2 d-none d-md-block bg-light sidebar">
-                <div class="sidebar-sticky">
+                <div class="sidebar-sticky text-white">
                     <ul class="nav flex-column">
                         <li class="nav-item">
-                            <a class="nav-link active" asp-action="Painel">
+                            <a class="nav-link active text-white" asp-action="Painel">
                                 <i class="fa-solid fa-house"></i>
                                 Painel de Controle
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" asp-action="Index" asp-controller="Caixa">                              
+                            <a class="nav-link text-white" asp-action="Index" asp-controller="Caixa">
                                 <i class="fa-solid fa-file"></i>
                                 Caixa
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" asp-action="Index" asp-controller="Vendas">                              
+                            <a class="nav-link text-white" asp-action="Index" asp-controller="Vendas">
                                 <i class="fa-solid fa-cart-shopping"></i>
                                 Vendas
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" asp-controller="Produto" asp-action="Index">
+                            <a class="nav-link text-white" asp-controller="Produto" asp-action="Index">
                                 <i class="fa-solid fa-cart-shopping"></i>
                                 Produto
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" asp-controller="Produto" asp-action="Motoboy">
+                            <a class="nav-link text-white" asp-controller="Produto" asp-action="Motoboy">
                                 <i class="fa-solid fa-motorcycle"></i>
                                
                                 Motoboy
@@ -99,7 +99,7 @@
                         @if (_colaborador.GetColaborador() != null && _colaborador.GetColaborador().Tipo == ColaboradorTipoConstant.Gerente)
                         { 
                             <li class="nav-item">
-                                <a class="nav-link" asp-controller="Colaborador" asp-action="Index">
+                                <a class="nav-link text-white" asp-controller="Colaborador" asp-action="Index">
                                     <i class="fa-solid fa-users"></i>
                                     Colaborador 
                                 </a>
@@ -107,21 +107,21 @@
                         } 
                         
                         <li class="nav-item">
-                            <a class="nav-link" asp-controller="Cliente" asp-action="Index">
+                            <a class="nav-link text-white" asp-controller="Cliente" asp-action="Index">
                                 <i class="fa-solid fa-users"></i>
                                 Cliente
                             </a>
                         </li>
 
                         <li class="nav-item">
-                            <a class="nav-link" asp-controller="Pedido" asp-action="Index">
+                            <a class="nav-link text-white" asp-controller="Pedido" asp-action="Index">
                                 <i class="fa-solid fa-file"></i>
                                 Pedidos
                             </a>
                         </li>
 
                         <li class="nav-item">
-                            <a class="nav-link" asp-controller="Relatorios" asp-action="Index">
+                            <a class="nav-link text-white" asp-controller="Relatorios" asp-action="Index">
                                 <i class="fa-solid fa-chart-bar"></i>                                
                                 Relatórios
                             </a>

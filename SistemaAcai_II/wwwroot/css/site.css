@@ -32,7 +32,10 @@ body {
     background-color: #f4f2ff; /* Roxo bem claro */
     font-family: 'Arial', sans-serif;
 }
-
+.sidebar-sticky {
+    background-color: #4f0a82 !important;
+    color:white;
+}
 /* Estilização do rodapé */
 .footer {
     position: fixed;
