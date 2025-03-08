@@ -1,11 +1,12 @@
-﻿@{
+﻿@inject SistemaAcai_II.Libraries.Login.LoginColaborador _colaborador
+@{
     ViewData["Title"] = "Painel";
 }
 
-<h1 class="text-center text-md-left">Bem-vindo, Admin!</h1>
 
 <div class="d-flex flex-column flex-md-row justify-content-between align-items-center pt-3 pb-2 mb-3 border-bottom">
-    <h1 class="h2 text-center text-md-left">Administrador</h1>
+    
+    <h1 class="h2 text-center text-md-left">Bem-vindo, <span>@_colaborador.GetColaborador().Nome!<span /></h1>
     <div class="btn-toolbar mb-2 mb-md-0 d-flex flex-wrap justify-content-center">
         <div class="btn-group mr-2 mb-2">
             <button type="button" class="btn btn-sm btn-outline-secondary" title="Compartilhar">Share</button>
