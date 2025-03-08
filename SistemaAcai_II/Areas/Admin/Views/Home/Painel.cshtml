@@ -1,30 +1,31 @@
-﻿
-@{
+﻿@{
     ViewData["Title"] = "Painel";
 }
 
-<h1>Bem-vindo, Admin!l</h1>
+<h1 class="text-center text-md-left">Bem-vindo, Admin!</h1>
 
-
-<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-    <h1 class="h2">Admistrador</h1>
-    <div class="btn-toolbar mb-2 mb-md-0">
-        <div class="btn-group mr-2">
-            <button type="button" class="btn btn-sm btn-outline-secondary">Share</button>
-            <button type="button" class="btn btn-sm btn-outline-secondary">Export</button>
+<div class="d-flex flex-column flex-md-row justify-content-between align-items-center pt-3 pb-2 mb-3 border-bottom">
+    <h1 class="h2 text-center text-md-left">Administrador</h1>
+    <div class="btn-toolbar mb-2 mb-md-0 d-flex flex-wrap justify-content-center">
+        <div class="btn-group mr-2 mb-2">
+            <button type="button" class="btn btn-sm btn-outline-secondary" title="Compartilhar">Share</button>
+            <button type="button" class="btn btn-sm btn-outline-secondary" title="Exportar">Export</button>
         </div>
-        <button type="button" class="btn btn-sm btn-outline-secondary dropdown-toggle">
-            <span data-feather="calendar"></span>
-            This week
+        <button type="button" class="btn btn-sm btn-outline-secondary dropdown-toggle mb-2">
+            <span data-feather="calendar"></span> Esta semana
         </button>
     </div>
 </div>
 
-<canvas class="my-4 w-100" id="myChart" width="900" height="380"></canvas>
+<!-- Gráfico responsivo -->
+<div class="w-100" style="overflow-x: auto;">
+    <canvas class="my-4" id="myChart" style="max-width: 100%; height: auto;"></canvas>
+</div>
 
-<h2>Ultimas Vendas</h2>
+<h2 class="text-center text-md-left">Últimas Vendas</h2>
+
 <div class="table-responsive">
-    <table class="table table-striped table-sm">
+    <table class="table table-striped table-bordered table-hover table-sm">
         <thead>
             <tr>
                 <th>#Codigo</th>
@@ -32,6 +33,7 @@
                 <th>Valor Total</th>
                 <th>Data</th>
                 <th>Filial</th>
+                <th>Status</th>
             </tr>
         </thead>
         <tbody>
@@ -41,6 +43,7 @@
                 <td>R$50,00</td>
                 <td>25/01/2025</td>
                 <td>Açai Tocantins</td>
+                <td>Em preparação</td>
             </tr>
             <tr>
                 <td>#2001</td>
@@ -48,6 +51,7 @@
                 <td>R$50,00</td>
                 <td>25/01/2025</td>
                 <td>Açai Viçosa</td>
+                <td>Em preparação</td>
             </tr>
             <tr>
                 <td>#1002</td>
@@ -55,6 +59,7 @@
                 <td>R$50,00</td>
                 <td>25/01/2025</td>
                 <td>Açai Tocantins</td>
+                <td>Em preparação</td>
             </tr>
             <tr>
                 <td>#2002</td>
@@ -62,6 +67,7 @@
                 <td>R$50,00</td>
                 <td>25/01/2025</td>
                 <td>Açai Viçosa</td>
+                <td>Completo</td>
             </tr>
             <tr>
                 <td>#1003</td>
@@ -69,6 +75,7 @@
                 <td>R$50,00</td>
                 <td>25/01/2025</td>
                 <td>Açai Tocantins</td>
+                <td>Completo</td>
             </tr>
             <tr>
                 <td>#2003</td>
@@ -76,8 +83,12 @@
                 <td>R$50,00</td>
                 <td>25/01/2025</td>
                 <td>Açai Viçosa</td>
+                <td>Pendente</td>
             </tr>
            
         </tbody>
     </table>
 </div>
+
+
+

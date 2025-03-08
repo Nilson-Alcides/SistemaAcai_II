@@ -58,7 +58,7 @@
    
 </head>
 <body>
-    <nav class="navbar navbar-dark fixed-top bg-dark flex-md-nowrap p-0 shadow">
+    <nav class="navbar navbar-dark fixed-top bg-dark flex-md-nowrap bg-primary-purple p-0 shadow">
                     <a class="navbar-brand col-sm-3 col-md-2 mr-0" href="#">Painel</a>
                     <input class="form-control form-control-dark w-100" type="hidden" placeholder="" aria-label="Search">
         
@@ -81,8 +81,14 @@
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" asp-action="Index" asp-controller="Vendas">
-                                <i class="fa-solid fa-cart-circle-check"></i>                                
+                            <a class="nav-link" asp-action="Index" asp-controller="Caixa">                              
+                                <i class="fa-solid fa-file"></i>
+                                Caixa
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" asp-action="Index" asp-controller="Vendas">                              
+                                <i class="fa-solid fa-cart-shopping"></i>
                                 Vendas
                             </a>
                         </li>
@@ -92,7 +98,14 @@
                                 Produto
                             </a>
                         </li>
-
+                        <li class="nav-item">
+                            <a class="nav-link" asp-controller="Produto" asp-action="Motoboy">
+                                <i class="fa-solid fa-motorcycle"></i>
+                               
+                                Motoboy
+                            </a>
+                        </li>
+                      
                         @if (_colaborador.GetColaborador() != null && _colaborador.GetColaborador().Tipo == ColaboradorTipoConstant.Gerente)
                         { 
                             <li class="nav-item">
@@ -125,7 +138,7 @@
                         </li>
                     </ul>
 
-                    <h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted">
+                    @* <h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted">
                         <span>Saved reports</span>
                         <a class="d-flex align-items-center text-muted" href="#">
                             <span data-feather="plus-circle"></span>
@@ -156,7 +169,7 @@
                                 Year-end sale
                             </a>
                         </li>
-                    </ul>
+                    </ul> *@
                 </div>
             </nav>
 
