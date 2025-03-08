@@ -1,0 +1,62 @@
+﻿@model IPagedList<SistemaAcai_II.Models.Colaborador>
+
+@{
+    ViewData["Title"] = "Colaboradores";
+    var pesquisa = Context.Request.Query["pesquisa"];
+}
+
+<h1>Colaboradores</h1>
+
+
+<form method="get">
+    <div class="form-group">
+        <label for="pesquisa"></label>
+        <input type="text" name="pesquisa" id="pesquisa" value="@pesquisa" class="form-control" placeholder="Digite o nome ou e-mail do colaborador">
+    </div>
+    <button type="submit" class="btn btn-primary">Pesquisar</button>
+</form>
+<br />
+<br />
+
+@if (Model.Count > 0)
+{
+<a class="btn btn-primary" asp-action="Cadastrar">Cadastrar</a>
+
+<div class="table-responsive">
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th scope="col">@Html.DisplayNameFor(model => model.First().Id)</th>
+                <th scope="col">@Html.DisplayNameFor(model => model.First().Nome)</th>
+                <th scope="col">@Html.DisplayNameFor(model => model.First().Email)</th>
+                <th scope="col">@Html.DisplayNameFor(model => model.First().Senha)</th>
+
+                <th scope="col">Ações</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (Colaborador colaborador in Model)
+            {
+                <tr>
+                    <th scope="row">@colaborador.Id</th>
+                    <td>@colaborador.Nome</td>
+                    <td>@colaborador.Email</td>
+                    <td>@colaborador.Senha</td>
+
+                    <td>
+                        <a asp-action="Atualizar" asp-route-id="@colaborador.Id" class="btn btn-secondary">Atualizar</a>
+                        <a asp-action="Excluir" asp-route-id="@colaborador.Id" class="btn btn-danger"
+                           onclick="return confirm('Deseja realmente excluir?')">Excluir</a>
+
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+    @Html.PagedListPager((IPagedList)Model, pagina => Url.Action("Index", new { pagina }))
+}
+else
+{
+    <span>Nenhum registro cadastrado!</span>
+}

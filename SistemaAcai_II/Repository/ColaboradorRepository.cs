@@ -206,7 +206,7 @@ namespace SistemaAcai_II.Repository
             }
         }
 
-        public IPagedList<Colaborador> ObterTodosColaboradores(int? pagina)
+        public IPagedList<Colaborador> ObterTodosColaboradores(int? pagina, string pesquisa)
         {
             int RegistroPorPagina = _config.GetValue<int>("RegistroPorPagina");
 
@@ -223,8 +223,12 @@ namespace SistemaAcai_II.Repository
             using (var conexao = new MySqlConnection(_conexaoMySQL))
             {
                 conexao.Open();
-                MySqlCommand cmd = new MySqlCommand("SELECT * FROM CLIENTE", conexao);
+                MySqlCommand cmd = new MySqlCommand("SELECT * FROM COLABORADOR", conexao);
 
+                if (!string.IsNullOrEmpty(pesquisa))
+                {
+                    cmd = new MySqlCommand("select * from COLABORADOR where Nome like '%" + pesquisa + "%' ", conexao);
+                }
                 MySqlDataAdapter da = new MySqlDataAdapter(cmd);
 
                 DataTable dt = new DataTable();

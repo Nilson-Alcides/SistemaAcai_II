@@ -34,6 +34,6 @@ namespace SistemaAcai_II.Repositories.Contracts
         IEnumerable<Colaborador> ObterTodosColaboradores();
 
         // Obter todos colaborador com paginação 
-        IPagedList<Colaborador> ObterTodosColaboradores(int? pagina);
+        IPagedList<Colaborador> ObterTodosColaboradores(int? pagina, string pesquisa);
     }
 }
