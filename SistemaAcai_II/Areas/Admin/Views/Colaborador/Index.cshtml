@@ -1,4 +1,6 @@
 ﻿@model IPagedList<SistemaAcai_II.Models.Colaborador>
+@using SistemaAcai_II.Models.Constants
+@inject SistemaAcai_II.Libraries.Login.LoginColaborador _colaborador
 
 @{
     ViewData["Title"] = "Colaboradores";
@@ -7,53 +9,88 @@
 
 <h1>Colaboradores</h1>
 
-
 <form method="get">
-    <div class="form-group">
-        <label for="pesquisa"></label>
-        <input type="text" name="pesquisa" id="pesquisa" value="@pesquisa" class="form-control" placeholder="Digite o nome ou e-mail do colaborador">
+    <div class="form-group row">
+        <label for="pesquisa" class="col-sm-2 col-form-label">Faça a pesquisa</label>
+        <div class="col-sm-6">
+            <input type="text" name="pesquisa" id="pesquisa" value="@pesquisa" class="form-control" placeholder="Digite o nome ou e-mail do colaborador">
+        </div>
+        <div class="col-sm-4">
+            <button type="submit" class="btn btn-primary">Pesquisar</button>
+        </div>
     </div>
-    <button type="submit" class="btn btn-primary">Pesquisar</button>
 </form>
 <br />
 <br />
 
 @if (Model.Count > 0)
 {
-<a class="btn btn-primary" asp-action="Cadastrar">Cadastrar</a>
-
-<div class="table-responsive">
-    <table class="table table-bordered">
-        <thead>
-            <tr>
-                <th scope="col">@Html.DisplayNameFor(model => model.First().Id)</th>
-                <th scope="col">@Html.DisplayNameFor(model => model.First().Nome)</th>
-                <th scope="col">@Html.DisplayNameFor(model => model.First().Email)</th>
-                <th scope="col">@Html.DisplayNameFor(model => model.First().Senha)</th>
-
-                <th scope="col">Ações</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (Colaborador colaborador in Model)
-            {
+    <div class="table-responsive">
+        <table class="table table-bordered">
+            <thead>
                 <tr>
-                    <th scope="row">@colaborador.Id</th>
-                    <td>@colaborador.Nome</td>
-                    <td>@colaborador.Email</td>
-                    <td>@colaborador.Senha</td>
+                    <th scope="col">@Html.DisplayNameFor(model => model.First().Id)</th>
+                    <th scope="col">@Html.DisplayNameFor(model => model.First().Nome)</th>
+                    <th scope="col">@Html.DisplayNameFor(model => model.First().Email)</th>
+                   @*  <th scope="col">@Html.DisplayNameFor(model => model.First().Situacao)</th>*@
+                    <th scope="col">@Html.DisplayNameFor(model => model.First().Senha)</th>
 
-                    <td>
-                        <a asp-action="Atualizar" asp-route-id="@colaborador.Id" class="btn btn-secondary">Atualizar</a>
-                        <a asp-action="Excluir" asp-route-id="@colaborador.Id" class="btn btn-danger"
-                           onclick="return confirm('Deseja realmente excluir?')">Excluir</a>
-
-                    </td>
+                    <th scope="col">Ações</th>
                 </tr>
-            }
-        </tbody>
-    </table>
-</div>
+            </thead>
+            <tbody>
+                @foreach (Colaborador colaborador in Model)
+                {
+                    <tr>
+                        <th scope="row">@colaborador.Id</th>
+                        <td>@colaborador.Nome</td>
+                        <td>@colaborador.Email</td>
+                     @*    <td>@colaborador.Situacao</td> *@
+                        <td>@colaborador.Senha</td>
+                        <td>
+                            @if (colaborador.Situacao == "A" && colaborador.Id != _colaborador.GetColaborador().Id)
+                            {
+                                <a asp-action="Desativar" asp-route-id="@colaborador.Id" class="btn btn-danger"
+                                   onclick="return confirm('Deseja realmente Desativar?')">Desativar</a>
+                            }
+                            else if (colaborador.Situacao == "D" && colaborador.Id != _colaborador.GetColaborador().Id)
+                            {
+                                <a asp-action="Ativar" asp-route-id="@colaborador.Id" class="btn btn-primary"
+                                   onclick="return confirm('Deseja realmente Ativar?')">Ativar</a>
+                                
+                            }
+                            @if (colaborador.Tipo == "G" && colaborador.Id != _colaborador.GetColaborador().Id)
+                            {
+                                <a asp-action="Rebaixar" asp-route-id="@colaborador.Id" class="btn btn-danger"
+                                   onclick="return confirm('Deseja realmente Rebaixar?')">Rebaixar</a>
+                            }
+                            else if (colaborador.Tipo == "C" && colaborador.Id != _colaborador.GetColaborador().Id)
+                            {
+                                <a asp-action="Promover" asp-route-id="@colaborador.Id" class="btn btn-primary"
+                                   onclick="return confirm('Deseja realmente Promover?')">Promover</a>
+
+                            }
+                            @if (colaborador.Id == _colaborador.GetColaborador().Id)
+                            {
+                               
+                                <button class="btn btn-danger" disabled>Desativar</button>
+                                <button class="btn btn-primary" disabled>Promover</button>
+                                <button class="btn btn-secondary" disabled>Atualizar</button>
+                                <button class="btn btn-danger" disabled>Excluir</button>
+                            }
+                            else
+                            {
+                                <a asp-action="Atualizar" asp-route-id="@colaborador.Id" class="btn btn-secondary">Atualizar</a>
+                                <a asp-action="Excluir" asp-route-id="@colaborador.Id" class="btn btn-danger"
+                                   onclick="return confirm('Deseja realmente excluir?')">Excluir</a>
+                            }                            
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+    <a class="btn btn-primary" asp-action="Cadastrar">Cadastrar</a>
     @Html.PagedListPager((IPagedList)Model, pagina => Url.Action("Index", new { pagina }))
 }
 else

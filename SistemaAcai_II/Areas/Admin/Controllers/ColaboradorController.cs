@@ -67,5 +67,29 @@ namespace SistemaAcai_II.Areas.Colaborador.Controllers
             _colaboradorRepository.Excluir(id);
             return RedirectToAction(nameof(Index));
         }
+        //[ValidateHttpReferer]
+        public IActionResult Ativar(int id)
+        {
+            _colaboradorRepository.Ativar(id);
+            return RedirectToAction(nameof(Index));
+        }
+        //  [ValidateHttpReferer]
+        public IActionResult Desativar(int id)
+        {
+            _colaboradorRepository.Desativar(id);
+            return RedirectToAction(nameof(Index));
+        }
+        //  [ValidateHttpReferer]
+        public IActionResult Promover(int id)
+        {
+            _colaboradorRepository.Promover(id);
+            return RedirectToAction(nameof(Index));
+        }
+        //  [ValidateHttpReferer]
+        public IActionResult Rebaixar(int id)
+        {
+            _colaboradorRepository.Rebaixar(id);
+            return RedirectToAction(nameof(Index));
+        }
     }
 }

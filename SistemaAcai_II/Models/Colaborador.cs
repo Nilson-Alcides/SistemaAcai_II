@@ -24,6 +24,9 @@ namespace SistemaAcai_II.Models
         [RegularExpression(".+\\@.+\\..+", ErrorMessage = "Informe um email válido...")]
         public string Email { get; set; }
 
+        [Display(Name = "Situação")]
+        public string? Situacao { get; set; }
+
         [Display(Name = "Senha")]
         [DataType(DataType.Password)]
         [Required(ErrorMessage = "O senha é obrigatorio")]

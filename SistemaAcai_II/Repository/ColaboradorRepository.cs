@@ -71,19 +71,79 @@ namespace SistemaAcai_II.Repository
         {
             throw new NotImplementedException();
         }
-        public void Cadastrar(Colaborador colaborador)
+
+        public void Ativar(int Id)
+        {
+            string Situacao = SituacaoConstant.Ativo;
+            using (var conexao = new MySqlConnection(_conexaoMySQL))
+            {
+                conexao.Open();
+                MySqlCommand cmd = new MySqlCommand("update Colaborador set Situacao=@Situacao WHERE Id=@Id ", conexao);
+
+                cmd.Parameters.Add("@Id", MySqlDbType.VarChar).Value = Id;
+                cmd.Parameters.Add("@Situacao", MySqlDbType.VarChar).Value = Situacao;
+                cmd.ExecuteNonQuery();
+                conexao.Close();
+            }
+        }
+
+        public void Desativar(int Id)
+        {
+            string Situacao = SituacaoConstant.Desativado;
+            using (var conexao = new MySqlConnection(_conexaoMySQL))
+            {
+                conexao.Open();
+                MySqlCommand cmd = new MySqlCommand("update Colaborador set Situacao=@Situacao WHERE Id=@Id ", conexao);
+
+                cmd.Parameters.Add("@Id", MySqlDbType.VarChar).Value = Id;
+                cmd.Parameters.Add("@Situacao", MySqlDbType.VarChar).Value = Situacao;
+                cmd.ExecuteNonQuery();
+                conexao.Close();
+            }
+        }
+        public void Promover(int Id)
+        {
+            string Gerente = ColaboradorTipoConstant.Gerente;
+            using (var conexao = new MySqlConnection(_conexaoMySQL))
+            {
+                conexao.Open();
+                MySqlCommand cmd = new MySqlCommand("update Colaborador set Tipo=@Tipo WHERE Id=@Id ", conexao);
+
+                cmd.Parameters.Add("@Id", MySqlDbType.VarChar).Value = Id;
+                cmd.Parameters.Add("@Tipo", MySqlDbType.VarChar).Value = Gerente;
+                cmd.ExecuteNonQuery();
+                conexao.Close();
+            }
+        }
+        public void Rebaixar(int Id)
         {
             string Comum = ColaboradorTipoConstant.Comum;
             using (var conexao = new MySqlConnection(_conexaoMySQL))
             {
                 conexao.Open();
+                MySqlCommand cmd = new MySqlCommand("update Colaborador set Tipo=@Tipo WHERE Id=@Id ", conexao);
 
-                MySqlCommand cmd = new MySqlCommand("insert into Colaborador(Nome, Email, Senha, Tipo) " +
-                                                     " values (@Nome, @Email, @Senha, @Tipo)", conexao); // @: PARAMETRO
+                cmd.Parameters.Add("@Id", MySqlDbType.VarChar).Value = Id;
+                cmd.Parameters.Add("@Tipo", MySqlDbType.VarChar).Value = Comum;
+                cmd.ExecuteNonQuery();
+                conexao.Close();
+            }
+        }
+        public void Cadastrar(Colaborador colaborador)
+        {
+            string Comum = ColaboradorTipoConstant.Comum;
+            string Ativo = SituacaoConstant.Ativo;
+            using (var conexao = new MySqlConnection(_conexaoMySQL))
+            {
+                conexao.Open();
+
+                MySqlCommand cmd = new MySqlCommand("insert into Colaborador(Nome, Email, Senha,Ativo, Tipo) " +
+                                                     " values (@Nome, @Email, @Senha,@Ativo, @Tipo)", conexao); // @: PARAMETRO
 
                 cmd.Parameters.Add("@Nome", MySqlDbType.VarChar).Value = colaborador.Nome;
                 cmd.Parameters.Add("@Email", MySqlDbType.VarChar).Value = colaborador.Email;
                 cmd.Parameters.Add("@Senha", MySqlDbType.VarChar).Value = colaborador.Senha;
+                cmd.Parameters.Add("@Ativo", MySqlDbType.VarChar).Value = Ativo;
                 cmd.Parameters.Add("@Tipo", MySqlDbType.VarChar).Value = Comum;
 
                 cmd.ExecuteNonQuery();
@@ -114,6 +174,7 @@ namespace SistemaAcai_II.Repository
                             Nome = (string)(dr["Nome"]),
                             Email = (string)(dr["Email"]),
                             Senha = (string)(dr["Senha"]),
+                            Situacao = (string)(dr["Situacao"]),
                             Tipo = (string)(dr["Tipo"])
                         });
                 }
@@ -167,9 +228,10 @@ namespace SistemaAcai_II.Repository
                         {
                             Id = Convert.ToInt32(dr["Id"]),
                             Nome = (string)(dr["Nome"]),
-                            Senha = (string)(dr["Senha"]),
                             Email = (string)(dr["Email"]),
-                            Tipo = (string)(dr["Senha"])
+                            Senha = (string)(dr["Senha"]),
+                            Situacao = (string)(dr["Situacao"]),
+                            Tipo = (string)(dr["Tipo"])
                         });
                 }
                 return colabList;
@@ -212,13 +274,6 @@ namespace SistemaAcai_II.Repository
 
             int NumeroPagina = pagina ?? 1;
 
-            // var clientePesquisadoEmail = BuscaEmailCliente(pesquisa);
-
-            //if (!string.IsNullOrEmpty(pesquisa))
-            //{
-            //    clientePesquisadoEmail = clientePesquisadoEmail.Where(a => a.Email == pesquisa);
-            //}           
-
             List<Colaborador> colabList = new List<Colaborador>();
             using (var conexao = new MySqlConnection(_conexaoMySQL))
             {
@@ -243,10 +298,11 @@ namespace SistemaAcai_II.Repository
                         new Colaborador
                         {
                             Id = Convert.ToInt32(dr["Id"]),
-                            Nome = (string)(dr["Nome"]),
-                            Senha = (string)(dr["Senha"]),
+                            Nome = (string)(dr["Nome"]),                            
                             Email = (string)(dr["Email"]),
-                            Tipo = (string)(dr["Senha"])
+                            Senha = (string)(dr["Senha"]),
+                            Situacao = (string)(dr["Situacao"]),
+                            Tipo = (string)(dr["Tipo"])
 
                         });
                 };

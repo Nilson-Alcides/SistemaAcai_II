@@ -18,6 +18,18 @@ namespace SistemaAcai_II.Repositories.Contracts
         //Atualizar colaborador
         void Atualizar(Colaborador colaborador);
         
+        //ativar colaborador
+        void Ativar(int id);
+        
+        //Desativar colaborador
+        void Desativar(int id);
+      
+        //Promover colaborador
+        void Promover(int id);
+
+        //Promover colaborador
+        void Rebaixar(int id);
+
         //Atualizar senha Colaborador
         void AtualizarSenha(Colaborador colaborador);
         
