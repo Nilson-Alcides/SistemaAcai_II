@@ -137,13 +137,13 @@ namespace SistemaAcai_II.Repository
             {
                 conexao.Open();
 
-                MySqlCommand cmd = new MySqlCommand("insert into Colaborador(Nome, Email, Senha,Ativo, Tipo) " +
-                                                     " values (@Nome, @Email, @Senha,@Ativo, @Tipo)", conexao); // @: PARAMETRO
+                MySqlCommand cmd = new MySqlCommand("insert into Colaborador(Nome, Email, Senha, Situacao, Tipo) " +
+                                                     " values (@Nome, @Email, @Senha, @Situacao, @Tipo )", conexao); // @: PARAMETRO
 
                 cmd.Parameters.Add("@Nome", MySqlDbType.VarChar).Value = colaborador.Nome;
                 cmd.Parameters.Add("@Email", MySqlDbType.VarChar).Value = colaborador.Email;
                 cmd.Parameters.Add("@Senha", MySqlDbType.VarChar).Value = colaborador.Senha;
-                cmd.Parameters.Add("@Ativo", MySqlDbType.VarChar).Value = Ativo;
+                cmd.Parameters.Add("@Situacao", MySqlDbType.VarChar).Value = Ativo;
                 cmd.Parameters.Add("@Tipo", MySqlDbType.VarChar).Value = Comum;
 
                 cmd.ExecuteNonQuery();

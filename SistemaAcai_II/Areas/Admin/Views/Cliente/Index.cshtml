@@ -24,7 +24,7 @@
 @if (Model.Count > 0)
 {
     <a class="btn btn-primary" asp-action="Cadastrar">Cadastrar</a>
-
+    <br />
     <div class="table-responsive">
         <table class="table table-bordered">
             <thead>
@@ -36,7 +36,7 @@
                     <th scope="col">@Html.DisplayNameFor(model => model.First().Telefone)</th>
                     <th scope="col">@Html.DisplayNameFor(model => model.First().Email)</th>
                     @* <th scope="col">@Html.DisplayNameFor(model => model.First().Senha)</th> *@
-                    <th scope="col">@Html.DisplayNameFor(model => model.First().Situacao)</th>
+                    @* <th scope="col">@Html.DisplayNameFor(model => model.First().Situacao)</th> *@
                     <th scope="col">Ações</th>
                 </tr>
             </thead>
@@ -47,25 +47,21 @@
                         <th scope="row">@cliente.Id</th>
                         <td>@cliente.Nome</td>
                         <td>@cliente.CPF</td>
-                        <td>@cliente.Nascimento</td>
+                        <td>@cliente.Nascimento.ToString("dd/MM/yyyy")</td>
                         <td>@cliente.Telefone</td>
                         <td>@cliente.Email</td>
                         @* <td>@cliente.Senha</td> *@
-                        <td>@cliente.Situacao</td>
+                        @* <td>@cliente.Situacao</td> *@
                         <td>
                             @if (cliente.Situacao == "A")
                             {
-                                <button type="button" class="btn btn-danger">
-                                    @Html.ActionLink("Desativar", "Desativar", new { id = cliente.Id },
-                                             new { onclick = "return confirm('Deseja realmente desativar?');" })
-                                </button>
+                                <a asp-action="Desativar" asp-route-id="@cliente.Id" class="btn btn-danger"
+                                   onclick="return confirm('Deseja realmente Desativar?')">Desativar</a>
                             }
                             else if (cliente.Situacao == "D")
                             {
-                                <button type="button" class="btn btn-secondary">
-                                    @Html.ActionLink("Ativar", "Ativar", new { id = cliente.Id },
-                                             new { onclick = "return confirm('Deseja realmente ativar?');" })
-                                </button>
+                                <a asp-action="Ativar" asp-route-id="@cliente.Id" class="btn btn-primary"
+                                   onclick="return confirm('Deseja realmente Ativar?')">Ativar</a>
                             }
                         </td>
                     </tr>
@@ -73,7 +69,7 @@
             </tbody>
         </table>
     </div>
-    <a class="btn btn-primary" asp-action="Cadastrar">Cadastrar</a>
+    
     @Html.PagedListPager((IPagedList)Model, pagina => Url.Action("Index", new { pagina }))
 }
 else

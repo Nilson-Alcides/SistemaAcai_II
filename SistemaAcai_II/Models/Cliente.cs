@@ -57,20 +57,18 @@ namespace SistemaAcai_II.Models
         [Required(ErrorMessage = "A Cidade é obrigatório.")]
         public string Cidade { get; set; }
 
-        [Display(Name = "Bairro", Description = "Bairro.")]
-        [Required(ErrorMessage = "O Bairro é obrigatório.")]
-        public string Bairro { get; set; }
+        [Display(Name = "Bairro", Description = "Bairro.")]        
+        public string? Bairro { get; set; }
 
         [Display(Name = "Endereco", Description = "Endereco.")]
         [Required(ErrorMessage = "O Endereco é obrigatório.")]
         public string Logradouro { get; set; }
 
-        [Display(Name = "Complemento", Description = "Complemento.")]
-        [Required(ErrorMessage = "O Complemento é obrigatório.")]
-        public string Complemento { get; set; }
+        [Display(Name = "Complemento", Description = "Complemento.")]        
+        public string? Complemento { get; set; }
 
         [Display(Name = "Número", Description = "Complemento.")]
-        public string Numero { get; set; }
+        public string? Numero { get; set; }
 
     }
 }

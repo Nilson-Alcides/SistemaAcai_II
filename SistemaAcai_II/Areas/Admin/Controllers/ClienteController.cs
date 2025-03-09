@@ -1,7 +1,6 @@
 ﻿using SistemaAcai_II.Libraries.Filtro;
 using SistemaAcai_II.Models;
 using SistemaAcai_II.Repositories.Contract;
-using SistemaAcai_II.Libraries.Filtro;
 using Microsoft.AspNetCore.Mvc;
 using MySqlX.XDevAPI;
 
@@ -35,7 +34,10 @@ namespace SistemaAcai_II.Areas.Colaborador.Controllers
         [HttpPost]
         public IActionResult Cadastrar(Cliente cliente)
         {
-            _clienteRepository.Cadastrar(cliente);
+            if(ModelState.IsValid){
+                _clienteRepository.Cadastrar(cliente);
+                return RedirectToAction("Painel", "Home");
+            }
             return View();
         }
       

@@ -25,6 +25,8 @@
 
 @if (Model.Count > 0)
 {
+    <a class="btn btn-primary" asp-action="Cadastrar">Cadastrar</a>
+
     <div class="table-responsive">
         <table class="table table-bordered">
             <thead>
@@ -90,10 +92,12 @@
             </tbody>
         </table>
     </div>
-    <a class="btn btn-primary" asp-action="Cadastrar">Cadastrar</a>
+   
     @Html.PagedListPager((IPagedList)Model, pagina => Url.Action("Index", new { pagina }))
 }
 else
 {
     <span>Nenhum registro cadastrado!</span>
+    <br />
+    <a class="btn btn-primary" asp-action="Cadastrar">Cadastrar</a>
 }
