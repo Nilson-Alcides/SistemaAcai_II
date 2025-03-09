@@ -9,7 +9,6 @@ namespace SistemaAcai_II.Areas.Colaborador.Controllers
     public class HomeController : Controller
     {
 
-
         private IColaboradorRepository _repositoryColaborador;
         private LoginColaborador _loginColaborador;
 

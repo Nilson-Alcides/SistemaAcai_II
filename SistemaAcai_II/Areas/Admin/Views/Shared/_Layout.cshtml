@@ -12,9 +12,6 @@
     
     <title>@ViewBag.Title</title>
 
-    <link href="~/css/StyleSheet.css" rel="stylesheet" type="text/css" />
-
-
     <head>
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -65,7 +62,7 @@
                 <div class="sidebar-sticky text-white">
                     <ul class="nav flex-column">
                         <li class="nav-item">
-                            <a class="nav-link active text-white" asp-action="Painel">
+                            <a class="nav-link active text-white" asp-area="Admin" asp-controller="Home" asp-action="Painel">
                                 <i class="fa-solid fa-house"></i>
                                 Painel de Controle
                             </a>
