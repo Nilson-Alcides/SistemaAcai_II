@@ -18,7 +18,7 @@ values("Nilson - Admin", "admin@sistemaacai.com",SHA2('123456', 256),"G");
 insert into	Colaborador (Nome,Email,Senha,Tipo, Situacao) 
 values("Admin - Admin", "admin@sistemaacai.com",'123456',"G", "A");
 select * from colaborador;
-
+-- Tabela de Cliente
 create table Cliente(
 Id int auto_increment primary key,
 Nome Varchar(50) not null,
@@ -30,6 +30,17 @@ Email Varchar(50) not null,
 Senha Varchar(255) not null,
 Situacao char(1) not null
 );
+-- Tabela de Filiais
+CREATE TABLE Filiais (
+    Id INT AUTO_INCREMENT PRIMARY KEY,
+    RazaoSocial VARCHAR(100),
+    NomeFantasia VARCHAR(100),
+    Email VARCHAR(100),
+    CNPJ VARCHAR(14),
+    telefone VARCHAR(20),    
+    status ENUM('Ativa', 'Inativa') NOT NULL DEFAULT 'Ativa'
+);
+-- Tabela de Endereco
 create table Endereco(
 Id int auto_increment primary key,
 IdCli int,
