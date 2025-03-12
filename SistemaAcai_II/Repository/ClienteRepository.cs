@@ -156,8 +156,7 @@ namespace SistemaAcai_II.Repository
                 MySqlCommand cmd = new MySqlCommand("update Cliente set Nome=@Nome, Nascimento=@Nascimento, Sexo=@Sexo,  CPF=@CPF, " +
                     " Telefone=@Telefone, Email=@Email, Senha=@Senha, Situacao=@Situacao WHERE Id=@Id ", conexao);
 
-                cmd.Parameters.Add("@Id", MySqlDbType.VarChar).Value = cliente.Id;
-                cmd.Parameters.Add("@Nome", MySqlDbType.VarChar).Value = cliente.Nome;
+                cmd.Parameters.Add("@Id", MySqlDbType.VarChar).Value = cliente.Id;  
                 cmd.Parameters.Add("@Nascimento", MySqlDbType.DateTime).Value = cliente.Nascimento.ToString("yyyy/MM/dd");
                 cmd.Parameters.Add("@Sexo", MySqlDbType.VarChar).Value = cliente.Sexo;
                 cmd.Parameters.Add("@CPF", MySqlDbType.VarChar).Value = cliente.CPF;

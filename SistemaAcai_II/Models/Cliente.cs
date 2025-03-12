@@ -42,8 +42,8 @@ namespace SistemaAcai_II.Models
         
         [Display(Name = "Situação")]       
         public string? Situacao { get; set; }
-
-        // Endereço cliente 
+        
+        // Endereço cliente
         [Display(Name = "CEP", Description = "CEP.")]
         [MaxLength(10, ErrorMessage = "A senha deve ter entre 6 e 10 caracteres")]
         [Required(ErrorMessage = "O CEP é obrigatório.")]
@@ -57,14 +57,14 @@ namespace SistemaAcai_II.Models
         [Required(ErrorMessage = "A Cidade é obrigatório.")]
         public string Cidade { get; set; }
 
-        [Display(Name = "Bairro", Description = "Bairro.")]        
+        [Display(Name = "Bairro", Description = "Bairro.")]
         public string? Bairro { get; set; }
 
         [Display(Name = "Endereco", Description = "Endereco.")]
         [Required(ErrorMessage = "O Endereco é obrigatório.")]
         public string Logradouro { get; set; }
 
-        [Display(Name = "Complemento", Description = "Complemento.")]        
+        [Display(Name = "Complemento", Description = "Complemento.")]
         public string? Complemento { get; set; }
 
         [Display(Name = "Número", Description = "Complemento.")]

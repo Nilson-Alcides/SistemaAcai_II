@@ -18,6 +18,7 @@ builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<SistemaAcai_II.Libraries.Sessao.Sessao>();
 builder.Services.AddScoped<IColaboradorRepository, ColaboradorRepository>();
 builder.Services.AddScoped<IClienteRepository, ClienteRepository>();
+builder.Services.AddScoped<IFiliaisRepository, FiliaisRepository>();
 
 builder.Services.AddScoped<LoginColaborador>();
 builder.Services.AddScoped<LoginCliente>();

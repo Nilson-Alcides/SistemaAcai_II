@@ -1,0 +1,79 @@
+﻿@model IPagedList<SistemaAcai_II.Models.Filiais>
+
+@{
+    ViewData["Title"] = "Clentes";
+    var pesquisa = Context.Request.Query["pesquisa"];
+}
+<h1>Filiais</h1>
+
+<form method="get">
+    <div class="form-group row">
+        <label for="pesquisa" class="col-sm-2 col-form-label">Faça a pesquisa</label>
+        <div class="col-sm-6">
+            <input type="text" name="pesquisa" id="pesquisa" value="@pesquisa" class="form-control" placeholder="Digite a Razão Social">
+        </div>
+        <div class="col-sm-4">
+            <button type="submit" class="btn btn-primary">Pesquisar</button>
+        </div>
+    </div>
+</form>
+<br />
+<br />
+@if (Model.Count > 0)
+{
+    <a class="btn btn-primary" asp-action="Cadastrar">Cadastrar</a>
+    <br />
+    <div class="table-responsive">
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th scope="col">@Html.DisplayNameFor(model => model.First().Id)</th>
+                    <th scope="col">@Html.DisplayNameFor(model => model.First().RazaoSocial)</th>
+                    <th scope="col">@Html.DisplayNameFor(model => model.First().NomeFantasia)</th>
+                    <th scope="col">@Html.DisplayNameFor(model => model.First().Email)</th>
+                    <th scope="col">@Html.DisplayNameFor(model => model.First().CNPJ)</th>
+                    <th scope="col">@Html.DisplayNameFor(model => model.First().Telefone)</th>
+                    <th scope="col">Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (Filiais filiais in Model)
+                {
+                    <tr>
+                        <th scope="row">@filiais.Id</th>
+                        <td>@filiais.RazaoSocial</td>
+                        <td>@filiais.NomeFantasia</td>
+                        <td>@filiais.Email</td>
+                        <td>@filiais.CNPJ</td>
+                        <td>@filiais.Telefone</td>
+                      
+                        <td>
+                            @if (filiais.Status == "Ativa")
+                            {
+                                <a asp-action="Desativar" asp-route-id="@filiais.Id" class="btn btn-danger"
+                                   onclick="return confirm('Deseja realmente Desativar?')">Desativar</a>
+                            }
+                            else if (filiais.Status == "Inativa")
+                            {
+                                <a asp-action="Ativar" asp-route-id="@filiais.Id" class="btn btn-primary"
+                                   onclick="return confirm('Deseja realmente Ativar?')">Ativar</a>
+                            }
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    @Html.PagedListPager((IPagedList)Model, pagina => Url.Action("Index", new { pagina }))
+}
+else
+{
+    <span>Nenhum registro cadastrado!</span>
+    <br />
+    <a class="btn btn-primary" asp-action="Cadastrar">Cadastrar</a>
+}
+
+
+
+

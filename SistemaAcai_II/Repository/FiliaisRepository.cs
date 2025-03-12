@@ -56,8 +56,7 @@ namespace SistemaAcai_II.Repository
             }
         }
         public void Cadastrar(Filiais filiais)
-        {
-            string Status = SituacaoConstant.Ativo;
+        {          
             string retorno;
             try
             {
@@ -65,27 +64,23 @@ namespace SistemaAcai_II.Repository
                 {
                     conexao.Open();
 
-                    MySqlCommand cmd = new MySqlCommand("insert into Filiais(RazaoSocial, NomeFantasia, Email, CNPJ, Telefone, Email, Status) " +
-                                    "values (@RazaoSocial, @NomeFantasia, @Email, @CNPJ, @Telefone, @Email, @Status); SELECT LAST_INSERT_ID();", conexao); // @: PARAMETRO
-
+                    MySqlCommand cmd = new MySqlCommand("insert into Filiais(RazaoSocial, NomeFantasia, Email, CNPJ, Telefone) " +
+                                    "values (@RazaoSocial, @NomeFantasia, @Email, @CNPJ, @Telefone); SELECT LAST_INSERT_ID();", conexao); // @: PARAMETRO
                     
-
-                    // MySqlCommand cmd = new MySqlCommand("CALL (@Nome, @Nascimento, @Sexo, @CPF, @Telefone, @Email, @Senha, @Situacao) " , conexao); // @: PARAMETRO
-
                     cmd.Parameters.Add("@RazaoSocial", MySqlDbType.VarChar).Value = filiais.RazaoSocial;
-                    cmd.Parameters.Add("@NomeFantasia", MySqlDbType.DateTime).Value = filiais.NomeFantasia;
+                    cmd.Parameters.Add("@NomeFantasia", MySqlDbType.VarChar).Value = filiais.NomeFantasia;
                     cmd.Parameters.Add("@Email", MySqlDbType.VarChar).Value = filiais.Email;                   
                     cmd.Parameters.Add("@CNPJ", MySqlDbType.VarChar).Value = filiais.CNPJ.Replace(".", "").Replace("/", "").Replace("-", "");
                     cmd.Parameters.Add("@Telefone", MySqlDbType.VarChar).Value = filiais.Telefone;                    
-                    cmd.Parameters.Add("@Status", MySqlDbType.VarChar).Value = Status;
+                   
 
                     retorno =  Convert.ToString(cmd.ExecuteScalar());
 
-                    MySqlCommand cmd1 = new MySqlCommand("insert into Endereco(IdCli, CEP, Estado, Cidade, Bairro, Endereco, Complemento, Numero) " +
-                                                         " values (@IdCli, @CEP, @Estado,@Cidade, @Bairro,@Logradouro, @Complemento, @Numero)", conexao); // @: PARAMETRO
+                    MySqlCommand cmd1 = new MySqlCommand("insert into Endereco(Idfilial, CEP, Estado, Cidade, Bairro, Endereco, Complemento, Numero) " +
+                                                         " values (@Idfilial, @CEP, @Estado,@Cidade, @Bairro,@Logradouro, @Complemento, @Numero)", conexao); // @: PARAMETRO
 
-                    cmd1.Parameters.Add("@Idfilial", MySqlDbType.VarChar).Value = retorno;
-                    cmd1.Parameters.Add("@CEP", MySqlDbType.VarChar).Value = filiais.CEP.Replace(".", "").Replace("-","");
+                    cmd1.Parameters.Add("@Idfilial", MySqlDbType.VarChar).Value = retorno;                    
+                    cmd1.Parameters.Add("@CEP", MySqlDbType.VarChar).Value = filiais.CEP.Replace(".", "").Replace("-", "");
                     cmd1.Parameters.Add("@Estado", MySqlDbType.VarChar).Value = filiais.Estado;
                     cmd1.Parameters.Add("@Cidade", MySqlDbType.VarChar).Value = filiais.Cidade;
                     cmd1.Parameters.Add("@Bairro", MySqlDbType.VarChar).Value = filiais.Bairro;
@@ -99,11 +94,11 @@ namespace SistemaAcai_II.Repository
             }
             catch (MySqlException ex)
             {
-                throw new Exception("Erro no banco em cadastro cliente" + ex.Message);
+                throw new Exception("Erro no banco em cadastro filiais" + ex.Message);
             }
             catch (Exception ex)
             {
-                throw new Exception("Erro na aplicação em cadastro cliente" + ex.Message);
+                throw new Exception("Erro na aplicação em cadastro filiais" + ex.Message);
             }
         }
         public void Atualizar(Filiais filiais)
