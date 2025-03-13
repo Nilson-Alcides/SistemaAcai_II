@@ -19,6 +19,7 @@ namespace SistemaAcai_II.Repositories.Contract
 
         void Excluir(int Id);
         Filiais ObterFiliais(int Id);
+        Filiais ObterFiliaisDetalhes(int Id);
         IEnumerable<Filiais> ObterTodosFiliais();
         IPagedList<Filiais> ObterTodosFiliais(int? pagina, string pesquisa);
     }

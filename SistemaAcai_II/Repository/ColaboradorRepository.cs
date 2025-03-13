@@ -58,7 +58,7 @@ namespace SistemaAcai_II.Repository
 
                 while (dr.Read())
                 {
-                    colaborador.Id = (Int32)(dr["Id"]);
+                    colaborador.Id = (Int32)(dr["IdColab"]);
                     colaborador.Nome = (string)(dr["Nome"]);
                     colaborador.Email = (string)(dr["Email"]);
                     colaborador.Senha = (string)(dr["Senha"]);
@@ -78,9 +78,9 @@ namespace SistemaAcai_II.Repository
             using (var conexao = new MySqlConnection(_conexaoMySQL))
             {
                 conexao.Open();
-                MySqlCommand cmd = new MySqlCommand("update Colaborador set Situacao=@Situacao WHERE Id=@Id ", conexao);
+                MySqlCommand cmd = new MySqlCommand("update Colaborador set Situacao=@Situacao WHERE IdColab=@IdColab ", conexao);
 
-                cmd.Parameters.Add("@Id", MySqlDbType.VarChar).Value = Id;
+                cmd.Parameters.Add("@IdColab", MySqlDbType.VarChar).Value = Id;
                 cmd.Parameters.Add("@Situacao", MySqlDbType.VarChar).Value = Situacao;
                 cmd.ExecuteNonQuery();
                 conexao.Close();
@@ -93,9 +93,9 @@ namespace SistemaAcai_II.Repository
             using (var conexao = new MySqlConnection(_conexaoMySQL))
             {
                 conexao.Open();
-                MySqlCommand cmd = new MySqlCommand("update Colaborador set Situacao=@Situacao WHERE Id=@Id ", conexao);
+                MySqlCommand cmd = new MySqlCommand("update Colaborador set Situacao=@Situacao WHERE IdColab=@IdColab ", conexao);
 
-                cmd.Parameters.Add("@Id", MySqlDbType.VarChar).Value = Id;
+                cmd.Parameters.Add("@IdColab", MySqlDbType.VarChar).Value = Id;
                 cmd.Parameters.Add("@Situacao", MySqlDbType.VarChar).Value = Situacao;
                 cmd.ExecuteNonQuery();
                 conexao.Close();
@@ -107,9 +107,9 @@ namespace SistemaAcai_II.Repository
             using (var conexao = new MySqlConnection(_conexaoMySQL))
             {
                 conexao.Open();
-                MySqlCommand cmd = new MySqlCommand("update Colaborador set Tipo=@Tipo WHERE Id=@Id ", conexao);
+                MySqlCommand cmd = new MySqlCommand("update Colaborador set Tipo=@Tipo WHERE IdColab=@IdColab ", conexao);
 
-                cmd.Parameters.Add("@Id", MySqlDbType.VarChar).Value = Id;
+                cmd.Parameters.Add("@IdColab", MySqlDbType.VarChar).Value = Id;
                 cmd.Parameters.Add("@Tipo", MySqlDbType.VarChar).Value = Gerente;
                 cmd.ExecuteNonQuery();
                 conexao.Close();
@@ -121,9 +121,9 @@ namespace SistemaAcai_II.Repository
             using (var conexao = new MySqlConnection(_conexaoMySQL))
             {
                 conexao.Open();
-                MySqlCommand cmd = new MySqlCommand("update Colaborador set Tipo=@Tipo WHERE Id=@Id ", conexao);
+                MySqlCommand cmd = new MySqlCommand("update Colaborador set Tipo=@Tipo WHERE IdColab=@IdColab ", conexao);
 
-                cmd.Parameters.Add("@Id", MySqlDbType.VarChar).Value = Id;
+                cmd.Parameters.Add("@IdColab", MySqlDbType.VarChar).Value = Id;
                 cmd.Parameters.Add("@Tipo", MySqlDbType.VarChar).Value = Comum;
                 cmd.ExecuteNonQuery();
                 conexao.Close();
@@ -170,7 +170,7 @@ namespace SistemaAcai_II.Repository
                     colabList.Add(
                         new Colaborador
                         {
-                            Id = Convert.ToInt32(dr["Id"]),
+                            Id = Convert.ToInt32(dr["IdColab"]),
                             Nome = (string)(dr["Nome"]),
                             Email = (string)(dr["Email"]),
                             Senha = (string)(dr["Senha"]),
@@ -186,8 +186,8 @@ namespace SistemaAcai_II.Repository
             using (var conexao = new MySqlConnection(_conexaoMySQL))
             {
                 conexao.Open();
-                MySqlCommand cmd = new MySqlCommand("select * from Colaborador WHERE Id=@Id ", conexao);
-                cmd.Parameters.AddWithValue("@Id", Id);
+                MySqlCommand cmd = new MySqlCommand("select * from Colaborador WHERE IdColab=@IdColab ", conexao);
+                cmd.Parameters.AddWithValue("@IdColab", Id);
 
                 MySqlDataAdapter da = new MySqlDataAdapter(cmd);
                 MySqlDataReader dr;
@@ -196,7 +196,7 @@ namespace SistemaAcai_II.Repository
                 dr = cmd.ExecuteReader(CommandBehavior.CloseConnection);
                 while (dr.Read())
                 {
-                    colaborador.Id = (Int32)(dr["Id"]);
+                    colaborador.Id = (Int32)(dr["IdColab"]);
                     colaborador.Nome = (string)(dr["Nome"]);
                     colaborador.Email = (string)(dr["Email"]);
                     colaborador.Senha = (string)(dr["Senha"]);
@@ -212,7 +212,7 @@ namespace SistemaAcai_II.Repository
             {
                 conexao.Open();
                 MySqlCommand cmd = new MySqlCommand("select * from Colaborador WHERE email=@email ", conexao);
-                cmd.Parameters.AddWithValue("@Id", email);
+                cmd.Parameters.AddWithValue("@IdColab", email);
 
                 MySqlDataAdapter da = new MySqlDataAdapter(cmd);
 
@@ -226,7 +226,7 @@ namespace SistemaAcai_II.Repository
                     colabList.Add(
                         new Colaborador
                         {
-                            Id = Convert.ToInt32(dr["Id"]),
+                            Id = Convert.ToInt32(dr["IdColab"]),
                             Nome = (string)(dr["Nome"]),
                             Email = (string)(dr["Email"]),
                             Senha = (string)(dr["Senha"]),
@@ -243,8 +243,8 @@ namespace SistemaAcai_II.Repository
             using (var conexao = new MySqlConnection(_conexaoMySQL))
             {
                 conexao.Open();
-                MySqlCommand cmd = new MySqlCommand("delete from Colaborador WHERE Id=@Id ", conexao);
-                cmd.Parameters.AddWithValue("@Id", Id);
+                MySqlCommand cmd = new MySqlCommand("delete from Colaborador WHERE IdColab=@IdColab ", conexao);
+                cmd.Parameters.AddWithValue("@IdColab", Id);
                 int i = cmd.ExecuteNonQuery();
                 conexao.Close();
             }
@@ -256,9 +256,9 @@ namespace SistemaAcai_II.Repository
             {
                 conexao.Open();
                 MySqlCommand cmd = new MySqlCommand("update Colaborador set Nome=@Nome, " +
-                    " Email=@Email, Senha=@Senha, Tipo=@Tipo Where Id=@Id ", conexao);
+                    " Email=@Email, Senha=@Senha, Tipo=@Tipo Where IdColab=@IdColab ", conexao);
 
-                cmd.Parameters.Add("@Id", MySqlDbType.VarChar).Value = colaborador.Id;
+                cmd.Parameters.Add("@IdColab", MySqlDbType.VarChar).Value = colaborador.Id;
                 cmd.Parameters.Add("@Nome", MySqlDbType.VarChar).Value = colaborador.Nome;
                 cmd.Parameters.Add("@Email", MySqlDbType.VarChar).Value = colaborador.Email;
                 cmd.Parameters.Add("@Senha", MySqlDbType.VarChar).Value = colaborador.Senha;
@@ -297,7 +297,7 @@ namespace SistemaAcai_II.Repository
                     colabList.Add(
                         new Colaborador
                         {
-                            Id = Convert.ToInt32(dr["Id"]),
+                            Id = Convert.ToInt32(dr["IdColab"]),
                             Nome = (string)(dr["Nome"]),                            
                             Email = (string)(dr["Email"]),
                             Senha = (string)(dr["Senha"]),

@@ -43,7 +43,7 @@ namespace SistemaAcai_II.Repository
 
                 while (dr.Read())
                 {
-                    cliente.Id = Convert.ToInt32(dr["Id"]);
+                    cliente.Id = Convert.ToInt32(dr["IdCli"]);
                     cliente.Nome = Convert.ToString(dr["Nome"]);
                     cliente.Nascimento = Convert.ToDateTime(dr["Nascimento"]);
 
@@ -80,7 +80,7 @@ namespace SistemaAcai_II.Repository
                     cliList.Add(
                         new Cliente
                         {
-                            Id = Convert.ToInt32(dr["Id"]),
+                            Id = Convert.ToInt32(dr["IdCli"]),
                             Nome = (string)(dr["Nome"]),
                             Nascimento = Convert.ToDateTime(dr["Nascimento"]),
                             Sexo = Convert.ToString(dr["Sexo"]),
@@ -154,9 +154,9 @@ namespace SistemaAcai_II.Repository
             {
                 conexao.Open();
                 MySqlCommand cmd = new MySqlCommand("update Cliente set Nome=@Nome, Nascimento=@Nascimento, Sexo=@Sexo,  CPF=@CPF, " +
-                    " Telefone=@Telefone, Email=@Email, Senha=@Senha, Situacao=@Situacao WHERE Id=@Id ", conexao);
+                    " Telefone=@Telefone, Email=@Email, Senha=@Senha, Situacao=@Situacao WHERE IdCli=@IdCli ", conexao);
 
-                cmd.Parameters.Add("@Id", MySqlDbType.VarChar).Value = cliente.Id;  
+                cmd.Parameters.Add("@IdCli", MySqlDbType.VarChar).Value = cliente.Id;  
                 cmd.Parameters.Add("@Nascimento", MySqlDbType.DateTime).Value = cliente.Nascimento.ToString("yyyy/MM/dd");
                 cmd.Parameters.Add("@Sexo", MySqlDbType.VarChar).Value = cliente.Sexo;
                 cmd.Parameters.Add("@CPF", MySqlDbType.VarChar).Value = cliente.CPF;
@@ -173,8 +173,8 @@ namespace SistemaAcai_II.Repository
             using (var conexao = new MySqlConnection(_conexaoMySQL))
             {
                 conexao.Open();
-                MySqlCommand cmd = new MySqlCommand("delete from Cliente WHERE Id=@Id ", conexao);
-                cmd.Parameters.AddWithValue("@Id", Id);
+                MySqlCommand cmd = new MySqlCommand("delete from Cliente WHERE IdCli=@IdCli ", conexao);
+                cmd.Parameters.AddWithValue("@IdCli", Id);
                 int i = cmd.ExecuteNonQuery();
                 conexao.Close();
             }
@@ -184,8 +184,8 @@ namespace SistemaAcai_II.Repository
             using (var conexao = new MySqlConnection(_conexaoMySQL))
             {
                 conexao.Open();
-                MySqlCommand cmd = new MySqlCommand("select * from Cliente WHERE Id=@Id ", conexao);
-                cmd.Parameters.AddWithValue("@Id", Id);
+                MySqlCommand cmd = new MySqlCommand("select * from Cliente WHERE IdCli=@IdCli ", conexao);
+                cmd.Parameters.AddWithValue("@IdCli", Id);
 
                 MySqlDataAdapter da = new MySqlDataAdapter(cmd);
                 MySqlDataReader dr;
@@ -194,7 +194,7 @@ namespace SistemaAcai_II.Repository
                 dr = cmd.ExecuteReader(CommandBehavior.CloseConnection);
                 while (dr.Read())
                 {
-                    cliente.Id = (Int32)(dr["Id"]);
+                    cliente.Id = (Int32)(dr["IdCli"]);
                     cliente.Nome = (string)(dr["Nome"]);
                     cliente.Nascimento = (DateTime)(dr["Nascimento"]);
                     cliente.Sexo = (string)(dr["Sexo"]);
@@ -215,9 +215,9 @@ namespace SistemaAcai_II.Repository
             using (var conexao = new MySqlConnection(_conexaoMySQL))
             {
                 conexao.Open();
-                MySqlCommand cmd = new MySqlCommand("update Cliente set Situacao=@Situacao WHERE Id=@Id ", conexao);
+                MySqlCommand cmd = new MySqlCommand("update Cliente set Situacao=@Situacao WHERE IdCli=@IdCli ", conexao);
 
-                cmd.Parameters.Add("@Id", MySqlDbType.VarChar).Value = Id;
+                cmd.Parameters.Add("@IdCli", MySqlDbType.VarChar).Value = Id;
                 cmd.Parameters.Add("@Situacao", MySqlDbType.VarChar).Value = Situacao;
                 cmd.ExecuteNonQuery();
                 conexao.Close();
@@ -230,9 +230,9 @@ namespace SistemaAcai_II.Repository
             using (var conexao = new MySqlConnection(_conexaoMySQL))
             {
                 conexao.Open();
-                MySqlCommand cmd = new MySqlCommand("update Cliente set Situacao=@Situacao WHERE Id=@Id ", conexao);
+                MySqlCommand cmd = new MySqlCommand("update Cliente set Situacao=@Situacao WHERE IdCli=@IdCli ", conexao);
 
-                cmd.Parameters.Add("@Id", MySqlDbType.VarChar).Value = Id;
+                cmd.Parameters.Add("@IdCli", MySqlDbType.VarChar).Value = Id;
                 cmd.Parameters.Add("@Situacao", MySqlDbType.VarChar).Value = Situacao;
                 cmd.ExecuteNonQuery();
                 conexao.Close();
@@ -309,7 +309,7 @@ namespace SistemaAcai_II.Repository
                     ListCli.Add(
                        new Cliente
                        {
-                           Id = Convert.ToInt32(dr["Id"]),
+                           Id = Convert.ToInt32(dr["IdCli"]),
                            Nome = (string)(dr["Nome"]),
                            Nascimento = Convert.ToDateTime(dr["Nascimento"]),
                            Sexo = Convert.ToString(dr["Sexo"]),

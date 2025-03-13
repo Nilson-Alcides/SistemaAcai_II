@@ -31,7 +31,8 @@
                     <th scope="col">@Html.DisplayNameFor(model => model.First().RazaoSocial)</th>
                     <th scope="col">@Html.DisplayNameFor(model => model.First().NomeFantasia)</th>
                     <th scope="col">@Html.DisplayNameFor(model => model.First().Email)</th>
-                    <th scope="col">@Html.DisplayNameFor(model => model.First().CNPJ)</th>
+                    <th scope="col">@Html.DisplayNameFor(model => model.First().CNPJ)</th>                   
+                    <th scope="col">@Html.DisplayNameFor(model => model.First().IE)</th>
                     <th scope="col">@Html.DisplayNameFor(model => model.First().Telefone)</th>
                     <th scope="col">Ações</th>
                 </tr>
@@ -43,8 +44,28 @@
                         <th scope="row">@filiais.Id</th>
                         <td>@filiais.RazaoSocial</td>
                         <td>@filiais.NomeFantasia</td>
-                        <td>@filiais.Email</td>
-                        <td>@filiais.CNPJ</td>
+                        
+                        <td>
+                            <button type="button" class="btn btn-secondary btn-sm" data-container="body"
+                                    data-bs-toggle="popover" data-bs-placement="top"
+                                    data-bs-content="@filiais.Email">
+                                <span class="fas fa-eye" title="Visualizar" aria-hidden="true"></span>
+                            </button>
+                        </td>
+                        <td>
+                            <button type="button" class="btn btn-secondary btn-sm" data-container="body"
+                                    data-bs-toggle="popover" data-bs-placement="top"
+                                    data-bs-content="@filiais.CNPJ">
+                                <span class="fas fa-eye" title="Visualizar" aria-hidden="true"></span>
+                            </button>
+                        </td>
+                        <td>
+                            <button type="button" class="btn btn-secondary btn-sm" data-container="body"
+                                    data-bs-toggle="popover" data-bs-placement="top"
+                                    data-bs-content="@filiais.IE">
+                                <span class="fas fa-eye" title="Visualizar" aria-hidden="true"></span>
+                            </button>
+                        </td>                        
                         <td>@filiais.Telefone</td>
                       
                         <td>
@@ -58,6 +79,8 @@
                                 <a asp-action="Ativar" asp-route-id="@filiais.Id" class="btn btn-primary"
                                    onclick="return confirm('Deseja realmente Ativar?')">Ativar</a>
                             }
+                            <a asp-action="Atualizar" asp-route-id="@filiais.Id" class="btn btn-secondary">Atualizar</a>
+                            <a asp-action="Detalhes" asp-route-id="@filiais.Id" class="btn btn-warning">Detalhes</a>
                         </td>
                     </tr>
                 }

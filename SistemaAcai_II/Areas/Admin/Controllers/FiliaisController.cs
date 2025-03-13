@@ -2,6 +2,7 @@
 using SistemaAcai_II.Libraries.Filtro;
 using SistemaAcai_II.Models;
 using SistemaAcai_II.Repositories.Contract;
+using SistemaAcai_II.Repositories.Contracts;
 using SistemaAcai_II.Repository;
 
 namespace SistemaAcai_II.Areas.Admin.Controllers
@@ -40,5 +41,47 @@ namespace SistemaAcai_II.Areas.Admin.Controllers
             }
             return View();
         }
+        //[ValidateHttpReferer]
+        public IActionResult Ativar(int id)
+        {
+            _filiaisRepository.Ativar(id);
+            return RedirectToAction(nameof(Index));
+        }
+        //  [ValidateHttpReferer]
+        public IActionResult Desativar(int id)
+        {
+            _filiaisRepository.Desativar(id);
+            return RedirectToAction(nameof(Index));
+        }
+        //[ValidateHttpReferer]
+        public IActionResult Atualizar(int id)
+        {
+            Models.Filiais filiais = _filiaisRepository.ObterFiliais(id);
+            return View(filiais);
+        }
+
+        [HttpPost]
+        public IActionResult Atualizar([FromForm] Models.Filiais filiais)
+        {
+            
+                _filiaisRepository.Atualizar(filiais);
+
+                TempData["MSG_S"] = "Registro salvo com sucesso!";
+
+                return RedirectToAction(nameof(Index));
+            
+          
+        }
+        public IActionResult Detalhes(int id)
+        {
+            Models.Filiais filiais = _filiaisRepository.ObterFiliaisDetalhes(id);
+            return View(filiais);
+        }
+        [HttpPost]
+        public IActionResult Detalhes(Filiais filiais)
+        {
+            return View();
+        }
+
     }
 }

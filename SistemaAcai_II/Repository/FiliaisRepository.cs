@@ -43,11 +43,12 @@ namespace SistemaAcai_II.Repository
                     filList.Add(
                         new Filiais
                         {
-                            Id = Convert.ToInt32(dr["Id"]),
+                            Id = Convert.ToInt32(dr["Idfilial"]),
                             RazaoSocial = (string)(dr["RazaoSocial"]),
                             NomeFantasia = (string)(dr["NomeFantasia"]),
                             Email = Convert.ToString(dr["Email"]),
                             CNPJ = Convert.ToString(dr["CNPJ"]),
+                            IE = Convert.ToString(dr["InscricaEstadual"]),                            
                             Telefone = Convert.ToString(dr["Telefone"]),                            
                             Status = Convert.ToString(dr["Status"])
                         });
@@ -64,13 +65,14 @@ namespace SistemaAcai_II.Repository
                 {
                     conexao.Open();
 
-                    MySqlCommand cmd = new MySqlCommand("insert into Filiais(RazaoSocial, NomeFantasia, Email, CNPJ, Telefone) " +
-                                    "values (@RazaoSocial, @NomeFantasia, @Email, @CNPJ, @Telefone); SELECT LAST_INSERT_ID();", conexao); // @: PARAMETRO
+                    MySqlCommand cmd = new MySqlCommand("insert into Filiais(RazaoSocial, NomeFantasia, Email, CNPJ,InscricaEstadual, Telefone) " +
+                                    "values (@RazaoSocial, @NomeFantasia, @Email, @CNPJ,@InscricaEstadual, @Telefone); SELECT LAST_INSERT_Id();", conexao); // @: PARAMETRO
                     
                     cmd.Parameters.Add("@RazaoSocial", MySqlDbType.VarChar).Value = filiais.RazaoSocial;
                     cmd.Parameters.Add("@NomeFantasia", MySqlDbType.VarChar).Value = filiais.NomeFantasia;
                     cmd.Parameters.Add("@Email", MySqlDbType.VarChar).Value = filiais.Email;                   
                     cmd.Parameters.Add("@CNPJ", MySqlDbType.VarChar).Value = filiais.CNPJ.Replace(".", "").Replace("/", "").Replace("-", "");
+                    cmd.Parameters.Add("@InscricaEstadual", MySqlDbType.VarChar).Value = filiais.IE.Replace(".", "").Replace("/", "");
                     cmd.Parameters.Add("@Telefone", MySqlDbType.VarChar).Value = filiais.Telefone;                    
                    
 
@@ -108,15 +110,16 @@ namespace SistemaAcai_II.Repository
             {
                 conexao.Open();
                 MySqlCommand cmd = new MySqlCommand("update Filiais set RazaoSocial=@RazaoSocial, NomeFantasia=@NomeFantasia, " +
-                    " Telefone=@Telefone, Email=@Email, CNPJ=@CNPJ, Status=@Status WHERE Id=@Id ", conexao);
+                    " Email=@Email, CNPJ=@CNPJ, InscricaEstadual=@InscricaEstadual, Telefone=@Telefone WHERE Idfilial=@Idfilial ", conexao);
 
-                cmd.Parameters.Add("@Id", MySqlDbType.VarChar).Value = filiais.Id;
+                cmd.Parameters.Add("@Idfilial", MySqlDbType.VarChar).Value = filiais.Id;
                 cmd.Parameters.Add("@RazaoSocial", MySqlDbType.VarChar).Value = filiais.RazaoSocial;
-                cmd.Parameters.Add("@NomeFantasia", MySqlDbType.DateTime).Value = filiais.NomeFantasia;
+                cmd.Parameters.Add("@NomeFantasia", MySqlDbType.VarChar).Value = filiais.NomeFantasia;
                 cmd.Parameters.Add("@Email", MySqlDbType.VarChar).Value = filiais.Email;
                 cmd.Parameters.Add("@CNPJ", MySqlDbType.VarChar).Value = filiais.CNPJ.Replace(".", "").Replace("/", "").Replace("-", "");
+                cmd.Parameters.Add("@InscricaEstadual", MySqlDbType.VarChar).Value = filiais.IE.Replace(".", "").Replace("/", "");
                 cmd.Parameters.Add("@Telefone", MySqlDbType.VarChar).Value = filiais.Telefone;
-                cmd.Parameters.Add("@Status", MySqlDbType.VarChar).Value = Status;
+                
                 cmd.ExecuteNonQuery();
                 conexao.Close();
             }
@@ -126,8 +129,8 @@ namespace SistemaAcai_II.Repository
             using (var conexao = new MySqlConnection(_conexaoMySQL))
             {
                 conexao.Open();
-                MySqlCommand cmd = new MySqlCommand("delete from Filiais WHERE Id=@Id ", conexao);
-                cmd.Parameters.AddWithValue("@Id", Id);
+                MySqlCommand cmd = new MySqlCommand("delete from Filiais WHERE Idfilial=@Idfilial ", conexao);
+                cmd.Parameters.AddWithValue("@Idfilial", Id);
                 int i = cmd.ExecuteNonQuery();
                 conexao.Close();
             }
@@ -137,8 +140,8 @@ namespace SistemaAcai_II.Repository
             using (var conexao = new MySqlConnection(_conexaoMySQL))
             {
                 conexao.Open();
-                MySqlCommand cmd = new MySqlCommand("select * from Filiais WHERE Id=@Id ", conexao);
-                cmd.Parameters.AddWithValue("@Id", Id);
+                MySqlCommand cmd = new MySqlCommand("select * from Filiais WHERE Idfilial=@Idfilial ", conexao);
+                cmd.Parameters.AddWithValue("@Idfilial", Id);
 
                 MySqlDataAdapter da = new MySqlDataAdapter(cmd);
                 MySqlDataReader dr;
@@ -147,11 +150,12 @@ namespace SistemaAcai_II.Repository
                 dr = cmd.ExecuteReader(CommandBehavior.CloseConnection);
                 while (dr.Read())
                 {
-                    filiais.Id = (Int32)(dr["Id"]);
-                    filiais.RazaoSocial = (string)(dr["Nome"]);                   
-                    filiais.NomeFantasia = (string)(dr["Sexo"]);
+                    filiais.Id = (Int32)(dr["Idfilial"]);
+                    filiais.RazaoSocial = (string)(dr["RazaoSocial"]);                   
+                    filiais.NomeFantasia = (string)(dr["NomeFantasia"]);
                     filiais.Email = (string)(dr["Email"]);
                     filiais.CNPJ = (string)(dr["CNPJ"]);
+                    filiais.IE = (string)(dr["InscricaEstadual"]);
                     filiais.Telefone = (string)(dr["Telefone"]);  
                     filiais.Status = (string)(dr["Status"]);
                 }
@@ -159,15 +163,49 @@ namespace SistemaAcai_II.Repository
             }
         }
 
-        public void Ativar(int Id)
+        public Filiais ObterFiliaisDetalhes(int Id)
         {
-            string Status = SituacaoConstant.Ativo;
             using (var conexao = new MySqlConnection(_conexaoMySQL))
             {
                 conexao.Open();
-                MySqlCommand cmd = new MySqlCommand("update Filiais set Status=@Status WHERE Id=@Id ", conexao);
+                MySqlCommand cmd = new MySqlCommand("Select * from filiais as t1 inner join  endereco as t2 on t1.Idfilial = t2.Idfilial where t1.Idfilial = t1.Idfilial; ", conexao);
+                cmd.Parameters.AddWithValue("@Idfilial", Id);
 
-                cmd.Parameters.Add("@Id", MySqlDbType.VarChar).Value = Id;
+                MySqlDataAdapter da = new MySqlDataAdapter(cmd);
+                MySqlDataReader dr;
+
+                Filiais filiais = new Filiais();
+                dr = cmd.ExecuteReader(CommandBehavior.CloseConnection);
+                while (dr.Read())
+                {
+                    filiais.Id = Convert.ToInt32(dr["Idfilial"]);
+                    filiais.RazaoSocial = Convert.ToString(dr["RazaoSocial"]);
+                    filiais.NomeFantasia = Convert.ToString(dr["NomeFantasia"]);
+                    filiais.Email = Convert.ToString(dr["Email"]);
+                    filiais.CNPJ = Convert.ToString(dr["CNPJ"]);
+                    filiais.IE = Convert.ToString(dr["InscricaEstadual"]); 
+                    filiais.Telefone = Convert.ToString(dr["Telefone"]);
+                    filiais.CEP = Convert.ToString(dr["CEP"]);
+                    filiais.Estado = Convert.ToString(dr["Estado"]);
+                    filiais.Cidade = Convert.ToString(dr["Cidade"]);
+                    filiais.Bairro = Convert.ToString(dr["Bairro"]);
+                    filiais.Complemento = Convert.ToString(dr["Complemento"]);
+                    filiais.Numero = Convert.ToString(dr["Numero"]);
+                    filiais.Status = Convert.ToString(dr["Status"]);
+                }
+                return filiais;
+            }
+        }
+
+        public void Ativar(int Id)
+        {
+            string Status = "Ativa";
+            using (var conexao = new MySqlConnection(_conexaoMySQL))
+            {
+                conexao.Open();
+                MySqlCommand cmd = new MySqlCommand("update Filiais set Status=@Status WHERE Idfilial=@Idfilial ", conexao);
+
+                cmd.Parameters.Add("@Idfilial", MySqlDbType.VarChar).Value = Id;
                 cmd.Parameters.Add("@Status", MySqlDbType.VarChar).Value = Status;
                 cmd.ExecuteNonQuery();
                 conexao.Close();
@@ -175,13 +213,13 @@ namespace SistemaAcai_II.Repository
         }
         public void Desativar(int Id)
         {
-            string Status = SituacaoConstant.Desativado;
+            string Status = "Inativa";
             using (var conexao = new MySqlConnection(_conexaoMySQL))
             {
                 conexao.Open();
-                MySqlCommand cmd = new MySqlCommand("update Filiais set Status=@Status WHERE Id=@Id ", conexao);
+                MySqlCommand cmd = new MySqlCommand("update Filiais set Status=@Status WHERE Idfilial=@Idfilial ", conexao);
 
-                cmd.Parameters.Add("@Id", MySqlDbType.VarChar).Value = Id;
+                cmd.Parameters.Add("@Idfilial", MySqlDbType.VarChar).Value = Id;
                 cmd.Parameters.Add("@Status", MySqlDbType.VarChar).Value = Status;
                 cmd.ExecuteNonQuery();
                 conexao.Close();
@@ -216,11 +254,12 @@ namespace SistemaAcai_II.Repository
                     filList.Add(
                         new Filiais
                         {
-                            Id = Convert.ToInt32(dr["Id"]),
+                            Id = Convert.ToInt32(dr["Idfilial"]),
                             RazaoSocial = (string)(dr["RazaoSocial"]),
                             NomeFantasia = (string)(dr["NomeFantasia"]),
                             Email = Convert.ToString(dr["Email"]),
                             CNPJ = Convert.ToString(dr["CNPJ"]),
+                            IE = Convert.ToString(dr["InscricaEstadual"]),
                             Telefone = Convert.ToString(dr["Telefone"]),
                             Status = Convert.ToString(dr["Status"])
                         });

@@ -4,8 +4,18 @@
     $('.dineiro').mask("#.##0,00", { reverse: true });
     $('.cpf').mask('000.000.000-00', { reverse: true });
     $('.cnpj').mask('00.000.000/0000-00', { reverse: true });
+    $('.ie').mask('000.000.000/0000', { reverse: true });
 });
 
+$(document).ready(function () {
+    $('[data-toggle="popover"]').popover();
+});
+document.addEventListener("DOMContentLoaded", function () {
+    var popoverTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="popover"]'));
+    var popoverList = popoverTriggerList.map(function (popoverTriggerEl) {
+        return new bootstrap.Popover(popoverTriggerEl);
+    });
+});
 $(document).ready(function () {
 
     function limpa_formulário_cep() {
