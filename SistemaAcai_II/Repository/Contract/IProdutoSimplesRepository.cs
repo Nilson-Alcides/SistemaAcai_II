@@ -9,8 +9,12 @@ namespace SistemaAcai_II.Repository.Contract
         void Cadastrar(ProdutoSimples produtoSimples);
         void Atualizar(ProdutoSimples produtoSimples);
         ProdutoSimples ObterProduto(int Id);
+        List<ProdutoSimples> ListarTodos();
+        ProdutoSimples ObterPorId(int id);
+
         IEnumerable<ProdutoSimples> ObterTodosProdutos();
         IPagedList<ProdutoSimples> ObterTodosProdutos(int? pagina, string pesquisa);
         void Excluir(int Id);
     }
+
 }

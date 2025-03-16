@@ -2,6 +2,8 @@ using SistemaAcai_II.Repository;
 using SistemaAcai_II.Libraries.Login;
 using SistemaAcai_II.Repositories.Contracts;
 using SistemaAcai_II.Repositories.Contract;
+using SistemaAcai_II.Repository.Contract;
+using AppQuinta6.Repository;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -19,6 +21,7 @@ builder.Services.AddScoped<SistemaAcai_II.Libraries.Sessao.Sessao>();
 builder.Services.AddScoped<IColaboradorRepository, ColaboradorRepository>();
 builder.Services.AddScoped<IClienteRepository, ClienteRepository>();
 builder.Services.AddScoped<IFiliaisRepository, FiliaisRepository>();
+builder.Services.AddScoped<IProdutoSimplesRepository, ProdutoSimplesRepository>();
 
 builder.Services.AddScoped<LoginColaborador>();
 builder.Services.AddScoped<LoginCliente>();

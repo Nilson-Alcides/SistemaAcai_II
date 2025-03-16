@@ -23,6 +23,8 @@ namespace AppQuinta6.Repository
             _conexaoMySQL = conf.GetConnectionString("ConexaoMySQL");
             _config = conf;
         }
+
+
         public IPagedList<ProdutoSimples> ObterTodosProdutoSimples(int? pagina, string pesquisa)
         {
             int RegistroPorPagina = _config.GetValue<int>("RegistroPorPagina");
@@ -131,12 +133,13 @@ namespace AppQuinta6.Repository
             using (var conexao = new MySqlConnection(_conexaoMySQL))
             {
                 conexao.Open();
-                MySqlCommand cmd = new MySqlCommand("update ProdutoSimples set Nome=@Nome, Descricao=@Descricao, PrecoUn=@PrecoUn, " +
-                                                  "  IdCat=@IdCat WHERE Id=@Id ", conexao);
+                MySqlCommand cmd = new MySqlCommand("update ProdutoSimples set Descricao=@Descricao, PrecoUn=@PrecoUn " +
+                                                  "   WHERE IdProd=@Id ", conexao);
 
                 cmd.Parameters.Add("@Descricao", MySqlDbType.VarChar).Value = ProdutoSimples.Descricao;
-                cmd.Parameters.Add("@PrecoUn", MySqlDbType.VarChar).Value = ProdutoSimples.PrecoUn;
-               
+                cmd.Parameters.Add("@PrecoUn", MySqlDbType.Decimal).Value = ProdutoSimples.PrecoUn;
+                cmd.Parameters.Add("@Id", MySqlDbType.Int32).Value = ProdutoSimples.Id; // <- ESTA LINHA FALTAVA
+
                 cmd.ExecuteNonQuery();
                 conexao.Close();
             }
@@ -153,5 +156,74 @@ namespace AppQuinta6.Repository
             }
         }
 
+        public ProdutoSimples ObterPorId(int id)
+        {
+            ProdutoSimples produto = null;
+
+            using (var conexao = new MySqlConnection(_conexaoMySQL))
+            {
+                conexao.Open();
+                string query = "SELECT * FROM ProdutoSimples WHERE IdProd = @id";
+                MySqlCommand cmd = new MySqlCommand(query, conexao);
+                cmd.Parameters.AddWithValue("@id", id);
+
+                using (var reader = cmd.ExecuteReader())
+                {
+                    if (reader.Read())
+                    {
+                        produto = new ProdutoSimples
+                        {
+                            
+                            Id= Convert.ToInt32(reader["IdProd"]),
+                            Descricao = reader["Descricao"].ToString(),
+                            PrecoUn = Convert.ToDecimal(reader["PrecoUn"])
+                        };
+                    }
+                }
+            }
+
+            return produto;
+        }
+
+        public ProdutoSimples ObterProduto(int Id)
+        {
+            throw new NotImplementedException();
+        }
+
+        public List<ProdutoSimples> ListarTodos()
+        {
+            var lista = new List<ProdutoSimples>();
+
+            using (var conexao = new MySqlConnection(_conexaoMySQL))
+            {
+                conexao.Open();
+                string query = "SELECT * FROM ProdutoSimples";
+                MySqlCommand cmd = new MySqlCommand(query, conexao);
+                using (var reader = cmd.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        lista.Add(new ProdutoSimples
+                        {
+                            Id = Convert.ToInt32(reader["IdProd"]),
+                            Descricao = reader["Descricao"].ToString(),
+                            PrecoUn = Convert.ToDecimal(reader["PrecoUn"])
+                        });
+                    }
+                }
+            }
+
+            return lista;
+        }
+
+        public IEnumerable<ProdutoSimples> ObterTodosProdutos()
+        {
+            throw new NotImplementedException();
+        }
+
+        public IPagedList<ProdutoSimples> ObterTodosProdutos(int? pagina, string pesquisa)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
