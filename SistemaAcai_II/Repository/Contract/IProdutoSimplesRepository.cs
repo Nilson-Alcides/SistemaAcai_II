@@ -16,5 +16,6 @@ namespace SistemaAcai_II.Repository.Contract
         IPagedList<ProdutoSimples> ObterTodosProdutos(int? pagina, string pesquisa);
         void Excluir(int Id);
     }
-
 }
+
+

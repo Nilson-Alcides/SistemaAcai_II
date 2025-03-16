@@ -7,6 +7,7 @@ using static Org.BouncyCastle.Math.EC.ECCurve;
 using X.PagedList.Extensions;
 using static System.Net.Mime.MediaTypeNames;
 using MySqlX.XDevAPI;
+using System.Globalization;
 
 namespace AppQuinta6.Repository
 {
@@ -99,8 +100,8 @@ namespace AppQuinta6.Repository
                 MySqlCommand cmd = new MySqlCommand("insert into ProdutoSimples(Descricao, PrecoUn)  " +
                                                    " values(@Descricao, @PrecoUn)", conexao);
 
-                cmd.Parameters.Add("@Descricao", MySqlDbType.VarChar).Value = produtoSimples.Descricao;
-                cmd.Parameters.Add("@PrecoUn", MySqlDbType.VarChar).Value = produtoSimples.PrecoUn;
+                cmd.Parameters.Add("@Descricao", MySqlDbType.VarChar).Value = produtoSimples.Descricao;             
+                cmd.Parameters.Add("@PrecoUn", MySqlDbType.Decimal).Value = Convert.ToDecimal(produtoSimples.PrecoUn, CultureInfo.InvariantCulture); 
                 cmd.ExecuteNonQuery();
                 conexao.Close();
             }
@@ -172,9 +173,8 @@ namespace AppQuinta6.Repository
                     if (reader.Read())
                     {
                         produto = new ProdutoSimples
-                        {
-
-                            Id = Convert.ToInt32(reader["IdProd"]),
+                        {                            
+                            Id= Convert.ToInt32(reader["IdProd"]),
                             Descricao = reader["Descricao"].ToString(),
                             PrecoUn = Convert.ToDecimal(reader["PrecoUn"])
                         };
