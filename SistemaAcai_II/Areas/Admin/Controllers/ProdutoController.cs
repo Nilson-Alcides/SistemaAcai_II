@@ -15,12 +15,6 @@ namespace SistemaAcai_II.Areas.Admin.Controllers
             _produtoRepository = produtoRepository;
         }
 
-        // Ação para listar todos os produtos
-        public IActionResult Index()
-        {
-            var lista = _produtoRepository.ListarTodos();
-            return View(lista);
-        }
 
         // GET - Exibe o formulário para cadastrar um novo produto
         public IActionResult Cadastrar()
@@ -38,6 +32,22 @@ namespace SistemaAcai_II.Areas.Admin.Controllers
             _produtoRepository.Cadastrar(produto);
             return RedirectToAction("Index");
         }
+
+        public IActionResult Index(string busca)
+        {
+            var lista = _produtoRepository.ListarTodos();
+
+            if (!string.IsNullOrEmpty(busca))
+            {
+                lista = lista
+                    .Where(p => p.Descricao.ToLower().Contains(busca.ToLower()))
+                    .ToList();
+            }
+
+            ViewBag.Busca = busca; // Para manter o valor digitado na view
+            return View(lista);
+        }
+
 
         // GET - Exibe formulário com dados preenchidos para edição
         public IActionResult Atualizar(int id)

@@ -1,14 +1,29 @@
 ﻿@model List<SistemaAcai_II.Models.ProdutoSimples>
-
 @{
     ViewData["Title"] = "Produtos";
 }
 
 <h2>Lista de Produtos</h2>
 
-<a class="btn btn-primary" href="/Admin/Produto/Cadastrar">Cadastrar Novo Produto</a>
+<form method="get" asp-action="Index" >
+    <div class="form-group row">
+        <label for="pesquisa" class="col-sm-2 col-form-label">Faça a pesquisa</label>
+        <div class="col-sm-6">
+            <input type="text" name="busca" value="@ViewBag.Busca" placeholder="Buscar por descrição..." class="form-control" />
+            </div>
+        <div class="col-sm-4">
+        <button type="submit" class="btn btn-primary ms-2">Buscar</button>
+        
+        <a href="/Admin/Produto" class="btn btn-secondary ms-2">Limpar</a>
+        </div>
+    </div>
+</form>
 
-<table class="table table-striped mt-3">
+
+
+<a class="btn btn-success mb-2" href="/Admin/Produto/Cadastrar">Cadastrar Novo Produto</a>
+
+<table class="table table-striped">
     <thead>
         <tr>
             <th>ID</th>
