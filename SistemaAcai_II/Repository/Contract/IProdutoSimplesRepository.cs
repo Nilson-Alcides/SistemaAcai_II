@@ -10,10 +10,11 @@ namespace SistemaAcai_II.Repository.Contract
         void Atualizar(ProdutoSimples produtoSimples);
         ProdutoSimples ObterProduto(int Id);
         List<ProdutoSimples> ListarTodos();
-        ProdutoSimples ObterPorId(int id);
-
+       
+         
         IEnumerable<ProdutoSimples> ObterTodosProdutos();
         IPagedList<ProdutoSimples> ObterTodosProdutos(int? pagina, string pesquisa);
+        IEnumerable<ProdutoSimples> BuscarPorNome(string nome);
         void Excluir(int Id);
     }
 }

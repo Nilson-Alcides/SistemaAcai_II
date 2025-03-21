@@ -5,6 +5,7 @@
     $('.cpf').mask('000.000.000-00', { reverse: true });
     $('.cnpj').mask('00.000.000/0000-00', { reverse: true });
     $('.ie').mask('000.000.000/0000', { reverse: true });
+    $('.peso').mask("#0.000", { reverse: true });
 });
 
 $(document).ready(function () {

@@ -14,7 +14,7 @@ namespace SistemaAcai_II.Areas.Admin.Controllers
         {
             _produtoRepository = produtoRepository;
         }
-
+         
 
         // GET - Exibe o formulário para cadastrar um novo produto
         public IActionResult Cadastrar()
@@ -52,7 +52,7 @@ namespace SistemaAcai_II.Areas.Admin.Controllers
         // GET - Exibe formulário com dados preenchidos para edição
         public IActionResult Atualizar(int id)
         {
-            var produto = _produtoRepository.ObterPorId(id);
+            var produto = _produtoRepository.ObterProduto(id);
             if (produto == null)
                 return NotFound();
 

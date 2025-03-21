@@ -50,7 +50,7 @@ namespace SistemaAcai_II.Repository
                             CNPJ = Convert.ToString(dr["CNPJ"]),
                             IE = Convert.ToString(dr["InscricaEstadual"]),                            
                             Telefone = Convert.ToString(dr["Telefone"]),                            
-                            Status = Convert.ToString(dr["Status"])
+                            Status = Convert.ToString(dr["StatusFiliais"])
                         });
                 }
                 return filList;
@@ -157,7 +157,7 @@ namespace SistemaAcai_II.Repository
                     filiais.CNPJ = (string)(dr["CNPJ"]);
                     filiais.IE = (string)(dr["InscricaEstadual"]);
                     filiais.Telefone = (string)(dr["Telefone"]);  
-                    filiais.Status = (string)(dr["Status"]);
+                    filiais.Status = (string)(dr["StatusFiliais"]);
                 }
                 return filiais;
             }
@@ -191,7 +191,7 @@ namespace SistemaAcai_II.Repository
                     filiais.Bairro = Convert.ToString(dr["Bairro"]);
                     filiais.Complemento = Convert.ToString(dr["Complemento"]);
                     filiais.Numero = Convert.ToString(dr["Numero"]);
-                    filiais.Status = Convert.ToString(dr["Status"]);
+                    filiais.Status = Convert.ToString(dr["StatusFiliais"]);
                 }
                 return filiais;
             }
@@ -203,10 +203,10 @@ namespace SistemaAcai_II.Repository
             using (var conexao = new MySqlConnection(_conexaoMySQL))
             {
                 conexao.Open();
-                MySqlCommand cmd = new MySqlCommand("update Filiais set Status=@Status WHERE Idfilial=@Idfilial ", conexao);
+                MySqlCommand cmd = new MySqlCommand("update Filiais set StatusFiliais=@StatusFiliais WHERE Idfilial=@Idfilial ", conexao);
 
                 cmd.Parameters.Add("@Idfilial", MySqlDbType.VarChar).Value = Id;
-                cmd.Parameters.Add("@Status", MySqlDbType.VarChar).Value = Status;
+                cmd.Parameters.Add("@StatusFiliais", MySqlDbType.VarChar).Value = Status;
                 cmd.ExecuteNonQuery();
                 conexao.Close();
             }
@@ -217,10 +217,10 @@ namespace SistemaAcai_II.Repository
             using (var conexao = new MySqlConnection(_conexaoMySQL))
             {
                 conexao.Open();
-                MySqlCommand cmd = new MySqlCommand("update Filiais set Status=@Status WHERE Idfilial=@Idfilial ", conexao);
+                MySqlCommand cmd = new MySqlCommand("update Filiais set StatusFiliais=@StatusFiliais WHERE Idfilial=@Idfilial ", conexao);
 
                 cmd.Parameters.Add("@Idfilial", MySqlDbType.VarChar).Value = Id;
-                cmd.Parameters.Add("@Status", MySqlDbType.VarChar).Value = Status;
+                cmd.Parameters.Add("@StatusFiliais", MySqlDbType.VarChar).Value = Status;
                 cmd.ExecuteNonQuery();
                 conexao.Close();
             }
@@ -261,7 +261,7 @@ namespace SistemaAcai_II.Repository
                             CNPJ = Convert.ToString(dr["CNPJ"]),
                             IE = Convert.ToString(dr["InscricaEstadual"]),
                             Telefone = Convert.ToString(dr["Telefone"]),
-                            Status = Convert.ToString(dr["Status"])
+                            Status = Convert.ToString(dr["StatusFiliais"])
                         });
                 }
                 return filList.ToPagedList<Filiais>(NumeroPagina, RegistroPorPagina);

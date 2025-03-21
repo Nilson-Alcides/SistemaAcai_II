@@ -9,7 +9,7 @@ using static System.Net.Mime.MediaTypeNames;
 using MySqlX.XDevAPI;
 using System.Globalization;
 
-namespace AppQuinta6.Repository
+namespace AppQuinta6.Repository 
 {
     public class ProdutoSimplesRepository : IProdutoSimplesRepository
     {
@@ -157,7 +157,7 @@ namespace AppQuinta6.Repository
             }
         }
 
-        public ProdutoSimples ObterPorId(int id)
+        public ProdutoSimples ObterProduto(int id)
         {
             ProdutoSimples produto = null;
 
@@ -185,11 +185,6 @@ namespace AppQuinta6.Repository
             return produto;
         }
 
-        public ProdutoSimples ObterProduto(int Id)
-        {
-            throw new NotImplementedException();
-        }
-
         public List<ProdutoSimples> ListarTodos()
         {
             var lista = new List<ProdutoSimples>();
@@ -215,7 +210,45 @@ namespace AppQuinta6.Repository
 
             return lista;
         }
+        public IEnumerable<ProdutoSimples> BuscarPorNome(string pesquisa)
+        {
+            var produtos = new List<ProdutoSimples>();
 
+            using (var conexao = new MySqlConnection(_conexaoMySQL))
+            {
+                conexao.Open();
+                string query = "SELECT * FROM ProdutoSimples WHERE Descricao LIKE @Nome OR IdProd = @IdProd";
+
+                using (var cmd = new MySqlCommand(query, conexao))
+                {
+                    cmd.Parameters.AddWithValue("@Nome", "%" + pesquisa + "%");
+
+                    // Verifica se o usuário digitou um número (pesquisa por ID) ou um nome
+                    if (int.TryParse(pesquisa, out int codigo))
+                    {
+                        cmd.Parameters.AddWithValue("@IdProd", codigo);
+                    }
+                    else
+                    {
+                        cmd.Parameters.AddWithValue("@IdProd", 0); // Define um valor padrão que não retorna nada
+                    }
+
+                    using (var reader = cmd.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            produtos.Add(new ProdutoSimples
+                            {
+                                Id = Convert.ToInt32(reader["IdProd"]),
+                                Descricao = reader["Descricao"].ToString(),
+                                PrecoUn = Convert.ToDecimal(reader["PrecoUn"])
+                            });
+                        }
+                    }
+                }
+            }
+            return produtos;
+        }
         public IEnumerable<ProdutoSimples> ObterTodosProdutos()
         {
             throw new NotImplementedException();
@@ -225,5 +258,30 @@ namespace AppQuinta6.Repository
         {
             throw new NotImplementedException();
         }
+        //public IEnumerable<ProdutoSimples> BuscarPorNome(string nome)
+        //{
+        //    var produtos = new List<ProdutoSimples>();
+        //    using (var conexao = new MySqlConnection(_conexaoMySQL))
+        //    {
+        //        conexao.Open();
+        //        string query = "SELECT * FROM Produto WHERE Descricao LIKE @Nome";
+        //        MySqlCommand cmd = new MySqlCommand(query, conexao);
+        //        cmd.Parameters.AddWithValue("@Nome", "%" + nome + "%");
+
+        //        using (var reader = cmd.ExecuteReader())
+        //        {
+        //            while (reader.Read())
+        //            {
+        //                produtos.Add(new ProdutoSimples
+        //                {
+        //                    Id = Convert.ToInt32(reader["Id"]),
+        //                    Descricao = reader["Descricao"].ToString(),
+        //                    PrecoUn = Convert.ToDecimal(reader["PrecoUn"])
+        //                });
+        //            }
+        //        }
+        //    }
+        //    return produtos;
+        //}
     }
 }

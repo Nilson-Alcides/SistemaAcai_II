@@ -74,7 +74,7 @@
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link text-white" asp-action="Index" asp-controller="Vendas">
+                            <a class="nav-link text-white" asp-action="Vendas" asp-controller="Comanda">
                                 <i class="fa-solid fa-cart-shopping"></i>
                                 Vendas
                             </a>
@@ -85,7 +85,7 @@
                                 Produto
                             </a>
                         </li>
-                      
+                       
                         @if (_colaborador.GetColaborador() != null && _colaborador.GetColaborador().Tipo == ColaboradorTipoConstant.Gerente)
                         { 
                             <li class="nav-item">

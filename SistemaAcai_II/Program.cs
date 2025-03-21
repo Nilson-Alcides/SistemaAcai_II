@@ -22,9 +22,14 @@ builder.Services.AddScoped<IColaboradorRepository, ColaboradorRepository>();
 builder.Services.AddScoped<IClienteRepository, ClienteRepository>();
 builder.Services.AddScoped<IFiliaisRepository, FiliaisRepository>();
 builder.Services.AddScoped<IProdutoSimplesRepository, ProdutoSimplesRepository>();
+builder.Services.AddScoped<IComandaRepository, ComandaRepository>();
+builder.Services.AddScoped<IItensComandaRepository, ItemComandaRepository>();
 
 builder.Services.AddScoped<LoginColaborador>();
 builder.Services.AddScoped<LoginCliente>();
+
+builder.Services.AddScoped<SistemaAcai_II.Libraries.Cookie.Cookie>();
+builder.Services.AddScoped<SistemaAcai_II.Libraries.PedidoCompra.CookiePedidoCompra>();
 
 // corrigir problema com TEMPDATA
 builder.Services.AddDistributedMemoryCache();
