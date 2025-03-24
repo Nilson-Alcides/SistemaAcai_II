@@ -52,8 +52,7 @@ namespace SistemaAcai_II.Libraries.PedidoCompra
                 }
                 else
                 {
-                    ItemLocalizado.peso = ItemLocalizado.peso + 1;
-
+                    ItemLocalizado.peso += item.peso;
                 }
             }
             else

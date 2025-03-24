@@ -33,8 +33,7 @@ namespace SistemaAcai_II.Repository
                 cmd.Parameters.Add("@IdProd", MySqlDbType.VarChar).Value = itemComanda.RefProduto.Id;
                 //cmd.Parameters.Add("@Peso", MySqlDbType.Decimal).Value = Convert.ToDecimal(itemComanda.Peso, CultureInfo.InvariantCulture);
                 cmd.Parameters.Add("@Peso", MySqlDbType.Decimal).Value = Convert.ToDecimal(string.Format(CultureInfo.InvariantCulture, "{0:0.000}", itemComanda.Peso),
-                CultureInfo.InvariantCulture
-);
+                CultureInfo.InvariantCulture) ;
                 cmd.Parameters.Add("@Quantidade", MySqlDbType.VarChar).Value = itemComanda.Quantidade;
                 cmd.Parameters.Add("@Subtotal", MySqlDbType.Decimal).Value = Convert.ToDecimal(itemComanda.Subtotal, CultureInfo.InvariantCulture);
                 cmd.ExecuteNonQuery();

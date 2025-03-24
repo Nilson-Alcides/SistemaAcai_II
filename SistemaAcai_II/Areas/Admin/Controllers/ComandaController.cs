@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using SistemaAcai_II.Libraries.Filtro;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using SistemaAcai_II.Libraries.Login;
+using System.Globalization;
 
 namespace SistemaAcai_II.Controllers
 {
@@ -49,14 +50,28 @@ namespace SistemaAcai_II.Controllers
         }
 
         [HttpPost]
-        public IActionResult AdicionarItem(int id, decimal peso)
+        public IActionResult AdicionarItem(int id, string pesoRcebido)
         {
+            // Converte o peso recebido para decimal, considerando separadores de decimal.
+            decimal peso;
+            try
+            {
+                peso = Convert.ToDecimal(pesoRcebido.Replace(".", ","), CultureInfo.CurrentCulture);
+            }
+            catch
+            {
+                TempData["Erro"] = "Peso inválido. Use números no formato 0,200.";
+                return RedirectToAction(nameof(Vendas));
+            }
+
+            // Valida se o peso é maior que zero
             if (peso <= 0)
             {
                 TempData["Erro"] = "O peso deve ser maior que zero.";
                 return RedirectToAction(nameof(Vendas));
             }
 
+            // Obtém o produto do repositório
             var produto = _produtoRepository.ObterProduto(id);
             if (produto == null)
             {
@@ -64,15 +79,20 @@ namespace SistemaAcai_II.Controllers
                 return RedirectToAction(nameof(Vendas));
             }
 
+            // Recupera a lista de itens do cookie
             var itensCarrinho = _cookiePedidoCompra.Consultar();
+
+            // Verifica se o item já existe na lista
             var itemExistente = itensCarrinho.FirstOrDefault(p => p.Id == id);
 
             if (itemExistente != null)
             {
+                // Atualiza o peso do item existente
                 itemExistente.peso += peso;
             }
             else
             {
+                // Adiciona um novo item à lista
                 var novoItem = new ProdutoSimples
                 {
                     Id = id,
@@ -80,9 +100,13 @@ namespace SistemaAcai_II.Controllers
                     peso = peso,
                     PrecoUn = produto.PrecoUn
                 };
-                _cookiePedidoCompra.Cadastrar(novoItem);
+                itensCarrinho.Add(novoItem);
             }
 
+            // Salva a lista atualizada no cookie
+            _cookiePedidoCompra.Salvar(itensCarrinho);
+
+            // Redireciona para a página de vendas
             return RedirectToAction(nameof(Vendas));
         }
         public IActionResult RemoverItem(int id)

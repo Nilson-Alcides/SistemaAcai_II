@@ -116,15 +116,15 @@ namespace SistemaAcai_II.Repository
             }
         }
         public void AtualizarValor(Comanda comanda)
-        {
-           
+        {           
             using (var conexao = new MySqlConnection(_conexaoMySQL))
             {
                 conexao.Open();
                     MySqlCommand cmd = new MySqlCommand("UPDATE Comanda SET ValorTotal = @ValorTotal WHERE IdComanda = @IdComanda", conexao);
-                    cmd.Parameters.AddWithValue("@ValorTotal", Convert.ToDecimal(comanda.ValorTotal, CultureInfo.InvariantCulture));                   
-                    cmd.Parameters.AddWithValue("@IdComanda", comanda.Id);
-                    cmd.ExecuteNonQuery();
+                cmd.Parameters.Add("@ValorTotal", MySqlDbType.Decimal).Value = Convert.ToDecimal(string.Format(CultureInfo.InvariantCulture, "{0:0.000}", comanda.ValorTotal),
+                                   CultureInfo.InvariantCulture);                                
+                cmd.Parameters.AddWithValue("@IdComanda", MySqlDbType.VarChar).Value = comanda.Id;
+                cmd.ExecuteNonQuery();
                 
                 conexao.Close();
             }            
@@ -161,7 +161,6 @@ namespace SistemaAcai_II.Repository
             using (var conexao = new MySqlConnection(_conexaoMySQL))
             {
                 conexao.Open();
-
                 MySqlCommand cmd = new MySqlCommand("SELECT LAST_INSERT_ID();", conexao);
 
                 // Obtém o último ID gerado

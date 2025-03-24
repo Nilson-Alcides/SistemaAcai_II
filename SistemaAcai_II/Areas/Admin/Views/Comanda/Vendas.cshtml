@@ -46,7 +46,8 @@
                         <form asp-action="AdicionarItem" method="post" class="d-flex">
                             <input type="hidden" name="id" value="@produto.Id" />
                             <!-- Campo de peso reduzido e alinhado com o botão -->
-                            <input type="number" name="peso" step="0.01" min="0.01" class="form-control-sm col-3 " required />
+
+                            <input type="text" name="pesoRcebido" step="0.01" min="0.01" class="form-control-sm col-3  peso" required />
                             @* <input type="number" id="peso" class="form-control" step="0.01" placeholder="Digite ou capture" /> *@
                             <button type="submit" class="btn btn-success btn-sm ms-2">Adicionar</button>
                         </form>
