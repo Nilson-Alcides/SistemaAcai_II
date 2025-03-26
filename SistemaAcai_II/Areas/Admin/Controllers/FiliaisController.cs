@@ -69,8 +69,6 @@ namespace SistemaAcai_II.Areas.Admin.Controllers
                 TempData["MSG_S"] = "Registro salvo com sucesso!";
 
                 return RedirectToAction(nameof(Index));
-            
-          
         }
         public IActionResult Detalhes(int id)
         {

@@ -1,0 +1,26 @@
+﻿@model SistemaAcai_II.Models.FormasPagamento
+@{
+    ViewData["Title"] = "Atualizar";
+}
+
+<h1>Atualizar</h1>
+
+
+<form method="post">
+    <section class="container" style="margin-top: 50px">
+        <div class="row">
+            <aside class="col-sm-6">
+                <div class="form-group">
+                    <input asp-for="Id" type="hidden" />
+
+                    <label asp-for="Nome"></label>
+                    <input asp-for="Nome" class="form-control" placeholder="Digite a razão social">
+                    <span asp-validation-for="Nome" class="text-danger"></span>
+                </div>                
+
+                <button type="submit" class="btn btn-primary">Salvar</button>
+                <a asp-action="Index" class="btn btn-info">Voltar</a>
+            </aside>
+        </div>
+    </section>
+</form>

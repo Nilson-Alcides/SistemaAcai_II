@@ -168,9 +168,5 @@ namespace SistemaAcai_II.Controllers
             return  new ContentResult() { Content = "Pagiina Localizada Comandas abertas." };
         }
 
-
-
-
-
     }
 }

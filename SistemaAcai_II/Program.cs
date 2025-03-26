@@ -24,6 +24,7 @@ builder.Services.AddScoped<IFiliaisRepository, FiliaisRepository>();
 builder.Services.AddScoped<IProdutoSimplesRepository, ProdutoSimplesRepository>();
 builder.Services.AddScoped<IComandaRepository, ComandaRepository>();
 builder.Services.AddScoped<IItensComandaRepository, ItemComandaRepository>();
+builder.Services.AddScoped<IFormasPagamentoRepository, FormasPagamentoRepository>();
 
 builder.Services.AddScoped<LoginColaborador>();
 builder.Services.AddScoped<LoginCliente>();
@@ -36,7 +37,7 @@ builder.Services.AddDistributedMemoryCache();
 builder.Services.AddSession(options =>
 {
     // Set a short timeout for easy testing. 
-    options.IdleTimeout = TimeSpan.FromSeconds(300);
+    options.IdleTimeout = TimeSpan.FromSeconds(3600);
     options.Cookie.HttpOnly = true;
     // Make the session cookie essential 
     options.Cookie.IsEssential = true;

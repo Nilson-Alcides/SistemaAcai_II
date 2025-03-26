@@ -43,7 +43,7 @@ CREATE TABLE Filiais (
     CNPJ VARCHAR(14) not null,
     InscricaEstadual VARCHAR(17),
     telefone VARCHAR(20) not null,    
-    status ENUM('Ativa', 'Inativa') NOT NULL DEFAULT 'Ativa'
+    StatusFiliais ENUM('Ativa', 'Inativa') NOT NULL DEFAULT 'Ativa'
 );
 
 select * from Filiais;
@@ -67,17 +67,43 @@ foreign key (Idfilial) references filiais(Idfilial)
 );
 select * from endereco;
 
--- Tabela de Categoria
-create table Categoria(
-Id int auto_increment primary key,
-Nome varchar(10) not null,
-Descricao varchar(70) not null
-);
+
 
 create table ProdutoSimples(
 IdProd int primary key auto_increment,
 Descricao varchar(75) not null,
 PrecoUn decimal(10,2)
 ); 
-
 Select * from filiais as t1 inner join  endereco as t2 on t1.Idfilial = t2.Idfilial where t1.Idfilial = t1.Idfilial;
+
+-- Tabela de Comanda (Nova)
+CREATE TABLE Comanda (
+    IdComanda INT AUTO_INCREMENT PRIMARY KEY,
+    IdColab int,
+    NomeCliente varchar(100) NOT NULL,    
+    DataAbertura DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    DataFechamento DATETIME NULL,
+    ValorTotal DECIMAL(10,2),    
+    Situacao ENUM('A', 'F') NOT NULL DEFAULT 'A',
+    foreign key (IdColab) references Colaborador(IdColab)
+);
+select * from comanda;
+-- Tabela de Itens da Comanda (Nova)
+CREATE TABLE ItemComanda (
+    IdItem INT AUTO_INCREMENT PRIMARY KEY,
+    IdComanda INT NOT NULL,
+    IdProd INT NOT NULL,
+    Peso float,
+    Quantidade int,
+    Subtotal DECIMAL(10,2) NOT NULL,
+    FOREIGN KEY (IdComanda) REFERENCES Comanda(IdComanda) ON DELETE CASCADE,
+    FOREIGN KEY (IdProd) REFERENCES ProdutoSimples(IdProd) ON DELETE CASCADE
+);
+-- SELECT IdComanda FROM Comanda ORDER BY IdComanda DESC limit 1;
+-- Exemplo de consulta para unir comandas e produtos
+SELECT * 
+FROM Comanda AS c
+INNER JOIN ItemComanda AS ic ON c.IdComanda = ic.IdComanda
+INNER JOIN ProdutoSimples AS p ON ic.IdProd = p.IdProd;
+SELECT * 
+FROM ItemComanda

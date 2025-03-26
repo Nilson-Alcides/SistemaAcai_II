@@ -1,0 +1,70 @@
+﻿@model IPagedList<SistemaAcai_II.Models.FormasPagamento>
+@using SistemaAcai_II.Models.Constants
+@inject SistemaAcai_II.Libraries.Login.LoginColaborador _colaborador
+
+@{
+    ViewData["Title"] = "Clentes";
+    var pesquisa = Context.Request.Query["pesquisa"];
+}
+<h2>Formas de pagamentos</h2>
+
+<form method="get">
+    <div class="form-group row">
+        <label for="pesquisa" class="col-sm-2 col-form-label">Faça a pesquisa</label>
+        <div class="col-sm-6">
+            <input type="text" name="pesquisa" id="pesquisa" value="@pesquisa" class="form-control" placeholder="Digite a forma de pagamento">
+        </div>
+        <div class="col-sm-4">
+            <button type="submit" class="btn btn-primary">Pesquisar</button>
+        </div>
+    </div>
+</form>
+<br />
+
+@if (Model.Count > 0)
+{
+    <a class="btn btn-success" asp-action="Cadastrar">Cadastrar</a>
+    <br />   
+    <!-- Paginação no topo -->
+    @Html.PagedListPager((IPagedList)Model, pagina => Url.Action("Index", new { pagina }))
+    <div class="table-responsive">
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th scope="col">@Html.DisplayNameFor(model => model.First().Id)</th>
+                    <th scope="col">@Html.DisplayNameFor(model => model.First().Nome)</th>             
+                    <th scope="col">Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (FormasPagamento pagamento in Model)
+                {
+                    <tr>
+                        <th scope="row">@pagamento.Id</th>
+                        <td>@pagamento.Nome</td>
+                        
+                        <td>
+                            <a asp-action="Atualizar" asp-route-id="@pagamento.Id" class="btn btn-warning">Editar</a>
+                            @if (_colaborador.GetColaborador() != null && _colaborador.GetColaborador().Tipo == ColaboradorTipoConstant.Gerente)
+                            {
+                                <a asp-action="Excluir" asp-route-id="@pagamento.Id" class="btn btn-danger"
+                                   onclick="return confirm('Deseja realmente Excluir?')">Excluir</a>
+                            }
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+       
+    </div>
+}
+else
+{
+    <span>Nenhum registro cadastrado!</span>
+    <br />
+    <a class="btn btn-primary" asp-action="Cadastrar">Cadastrar</a>
+}
+
+
+
+
