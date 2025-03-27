@@ -114,6 +114,7 @@ namespace SistemaAcai_II.Controllers
             _cookiePedidoCompra.Remover(new ProdutoSimples() { Id = id });
             return RedirectToAction(nameof(Vendas));
         }
+       
         DateTime data;
         [ColaboradorAutorizacao]
         public IActionResult SalvarComanda(Comanda comanda)
@@ -160,9 +161,14 @@ namespace SistemaAcai_II.Controllers
 
             _cookiePedidoCompra.RemoverTodos();
 
-            return RedirectToAction("ComandasAbertas");
+            return RedirectToAction("Index");
         }
-              
+       
+        public IActionResult Index(int? pagina, string pesquisa) 
+        {
+            return View(_comandaRepository.ObterTodasComandas(pagina, pesquisa));
+        }
+
         public IActionResult ComandasAbertas()
         {
             return  new ContentResult() { Content = "Pagiina Localizada Comandas abertas." };

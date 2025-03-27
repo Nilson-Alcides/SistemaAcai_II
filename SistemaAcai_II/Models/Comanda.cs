@@ -21,13 +21,13 @@ namespace SistemaAcai_II.Models
        
         [Display(Name = "Abertura")]
         [Required(ErrorMessage = "A data de abrtura do é obrigatório.")]
-        public DateTime? DataAbertura { get; set; } = DateTime.Now;
+        public DateTime DataAbertura { get; set; } = DateTime.Now;
 
         [Display(Name = "Fechamento")]
         public DateTime? DataFechamento { get; set; }
 
         [Display(Name = "Total Comanda")]
-        public decimal? ValorTotal { get; set; }
+        public decimal ValorTotal { get; set; }
 
         [Display(Name = "Status")]
         public string? Status { get; set; }

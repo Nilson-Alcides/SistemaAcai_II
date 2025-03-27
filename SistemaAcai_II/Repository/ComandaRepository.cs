@@ -6,16 +6,21 @@ using System.Collections.Generic;
 using System.Data;
 using SistemaAcai_II.Models.Contants;
 using System.Globalization;
+using static Org.BouncyCastle.Math.EC.ECCurve;
+using X.PagedList.Extensions;
+using X.PagedList;
 
 namespace SistemaAcai_II.Repository
 {
     public class ComandaRepository : IComandaRepository
     {
+        IConfiguration _config;
         private readonly string _conexaoMySQL;
 
         public ComandaRepository(IConfiguration conf)
         {
             _conexaoMySQL = conf.GetConnectionString("ConexaoMySQL");
+            _config = conf;
         }
 
         public void Cadastrar(Comanda comanda)
@@ -98,6 +103,43 @@ namespace SistemaAcai_II.Repository
                         });
                 }
                 return ListComanda;
+            }
+        }
+        public IPagedList<Comanda> ObterTodasComandas(int? pagina, string pesquisa)
+        {
+            int RegistroPorPagina = _config.GetValue<int>("RegistroPorPagina");
+
+            int NumeroPagina = pagina ?? 1;
+            List<Comanda> ListComanda = new List<Comanda>();
+            using (var conexao = new MySqlConnection(_conexaoMySQL))
+            {
+                conexao.Open();
+                MySqlCommand cmd = new MySqlCommand("SELECT * FROM Comanda WHERE SITUACAO = 'A' ORDER BY IdComanda DESC;;", conexao);
+
+                if (!string.IsNullOrEmpty(pesquisa))
+                {
+                    cmd = new MySqlCommand("select * from Comanda where SITUACAO = 'A' AND NomeCliente like '%" + pesquisa + "%' ORDER BY IdComanda DESC", conexao);
+                }
+
+                MySqlDataAdapter da = new MySqlDataAdapter(cmd);
+                DataTable dt = new DataTable();
+
+                da.Fill(dt);
+                conexao.Close();
+
+                foreach (DataRow dr in dt.Rows)
+                {
+                    ListComanda.Add(
+                        new Comanda
+                        {
+                            Id = (Int32)(dr["IdComanda"]),                          
+                            NomeCliente = Convert.ToString(dr["NomeCliente"]),
+                            DataAbertura = Convert.ToDateTime(dr["DataAbertura"]),
+                            ValorTotal = Convert.ToDecimal(dr["ValorTotal"]),
+                            
+                        });
+                }
+                return ListComanda.ToPagedList<Comanda>(NumeroPagina, RegistroPorPagina);
             }
         }
 
