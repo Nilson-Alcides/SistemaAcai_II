@@ -98,3 +98,26 @@ $(document).ready(function () {
         }
     });
 });
+
+document.addEventListener("DOMContentLoaded", function () {
+    const checkboxPeso = document.getElementById("checkboxPeso");
+    const checkboxUnidade = document.getElementById("checkboxUnidade");
+    const camposPeso = document.querySelectorAll(".campo-peso");
+    const camposQuantidade = document.querySelectorAll(".campo-quantidade");
+
+    function atualizarVisibilidade() {
+        if (checkboxPeso.checked) {
+            camposPeso.forEach(campo => campo.style.display = "inline");
+            camposQuantidade.forEach(campo => campo.style.display = "none");
+        } else if (checkboxUnidade.checked) {
+            camposPeso.forEach(campo => campo.style.display = "none");
+            camposQuantidade.forEach(campo => campo.style.display = "inline");
+        }
+    }
+
+    checkboxPeso.addEventListener("change", atualizarVisibilidade);
+    checkboxUnidade.addEventListener("change", atualizarVisibilidade);
+
+    // Chamada inicial para configurar a visibilidade correta
+    atualizarVisibilidade();
+});

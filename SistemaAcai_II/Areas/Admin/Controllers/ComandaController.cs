@@ -50,22 +50,25 @@ namespace SistemaAcai_II.Controllers
         }
 
         [HttpPost]
-        public IActionResult AdicionarItem(int id, string pesoRcebido)
+        public IActionResult AdicionarItem(int id, string? pesoRcebido, int? quantidade)
         {
             // Converte o peso recebido para decimal, considerando separadores de decimal.
-            decimal peso;
-            try
+            decimal peso = 0;            
+            if(pesoRcebido != null)
             {
-                peso = Convert.ToDecimal(pesoRcebido.Replace(".", ","), CultureInfo.CurrentCulture);
-            }
-            catch
-            {
-                TempData["Erro"] = "Peso inválido. Use números no formato 0,200.";
-                return RedirectToAction(nameof(Vendas));
-            }
+                try
+                {
+                    peso = Convert.ToDecimal(pesoRcebido.Replace(".", ","), CultureInfo.CurrentCulture);
 
+                }
+                catch
+                {
+                    TempData["Erro"] = "Peso inválido. Use números no formato 0,200.";
+                    return RedirectToAction(nameof(Vendas));
+                }
+            }
             // Valida se o peso é maior que zero
-            if (peso <= 0)
+            if (peso <= 0 && quantidade <=0)
             {
                 TempData["Erro"] = "O peso deve ser maior que zero.";
                 return RedirectToAction(nameof(Vendas));
@@ -87,8 +90,15 @@ namespace SistemaAcai_II.Controllers
 
             if (itemExistente != null)
             {
-                // Atualiza o peso do item existente
-                itemExistente.peso += peso;
+                if (itemExistente.peso > 0) 
+                {
+                    // Atualiza o peso do item existente
+                    itemExistente.peso += peso;
+                }
+                else if(itemExistente.Quantidade > 0)
+                {
+                    itemExistente.Quantidade += quantidade;
+                }
             }
             else
             {
@@ -98,6 +108,7 @@ namespace SistemaAcai_II.Controllers
                     Id = id,
                     Descricao = produto.Descricao,
                     peso = peso,
+                    Quantidade = quantidade,
                     PrecoUn = produto.PrecoUn
                 };
                 itensCarrinho.Add(novoItem);
@@ -142,12 +153,17 @@ namespace SistemaAcai_II.Controllers
             foreach (var item in carrinho)
             {
                 decimal subtotal = item.peso * item.PrecoUn;
+                if (item.peso == 0)
+                {
+                    subtotal = Convert.ToDecimal( item.Quantidade * item.PrecoUn);
+                }
 
                 ItemComanda novoItem = new ItemComanda
                 {
                     RefComanda = new Comanda { Id = novaComanda.Id },
                     RefProduto = new ProdutoSimples { Id = item.Id },
                     Peso = item.peso,
+                    Quantidade =  item.Quantidade,
                     Subtotal = subtotal
                 };
 

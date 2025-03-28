@@ -18,7 +18,7 @@ namespace SistemaAcai_II.Models
         public decimal? Peso { get; set; }
 
         [Display(Name = "Quantidade")]
-        public string? Quantidade { get; set; }       
+        public int? Quantidade { get; set; }       
 
         [Display(Name = "Subtotal")]
         public decimal? Subtotal { get; set; }

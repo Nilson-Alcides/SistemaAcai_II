@@ -25,7 +25,7 @@
     @Html.PagedListPager((IPagedList)Model, pagina => Url.Action("Index", new { pagina }))
     <div class="table-responsive">
         <table class="table table-bordered">
-            <thead>
+            <thead class="thead-dark">
                 <tr>
                     <th scope="col">@Html.DisplayNameFor(model => model.First().Id)</th>
                     <th scope="col">@Html.DisplayNameFor(model => model.First().NomeCliente)</th>

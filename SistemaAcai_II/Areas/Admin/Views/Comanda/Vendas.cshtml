@@ -9,8 +9,26 @@
     <div class="alert alert-danger">@TempData["Erro"]</div>
 }
 
-<!-- Campo de pesquisa -->
 <form method="get">
+    <div class="form-group row align-items-center">
+        <label class="col-sm-2 col-form-label">Selecione o Tipo:</label>
+        <div class="col-sm-6 d-flex align-items-center">
+            <div class="form-check me-3">
+                <input type="radio" class="form-check-input" id="checkboxPeso" name="tipo" value="peso" checked />
+                <label class="form-check-label" for="checkboxPeso">Peso</label>
+            </div>
+            <div class="form-check">
+                <input type="radio" class="form-check-input" id="checkboxUnidade" name="tipo" value="unidade" />
+                <label class="form-check-label" for="checkboxUnidade">Unidade</label>
+            </div>
+        </div>
+    </div>
+
+
+
+
+<!-- Campo de pesquisa -->
+
     <div class="form-group row">
         <label for="termo" class="col-sm-2 col-form-label">Pesquisar Produto</label>
         <div class="col-sm-6">
@@ -47,8 +65,11 @@
                             <input type="hidden" name="id" value="@produto.Id" />
                             <!-- Campo de peso reduzido e alinhado com o botão -->
 
-                            <input type="text" name="pesoRcebido" step="0.01" min="0.01" class="form-control-sm col-3  peso" required />
+                            <input type="text" name="pesoRcebido" step="0.01" min="0.01" class="form-control-sm col-3  peso campo-peso"/>
                             @* <input type="number" id="peso" class="form-control" step="0.01" placeholder="Digite ou capture" /> *@
+
+                            <input type="number" name="quantidade" step="1" min="1"
+                                   class="form-control-sm col-3 campo-quantidade" placeholder="Quantidade" style="display: none;" />
                             <button type="submit" class="btn btn-success btn-sm ms-2">Adicionar</button>
                         </form>
                     </td>
@@ -90,12 +111,25 @@
                 @foreach (var item in Model.ItensCarrinho)
                 {
                     var subtotal = item.peso * item.PrecoUn;
+                    @if (item.peso <= 0)
+                    {
+                        subtotal = Convert.ToDecimal( item.Quantidade * item.PrecoUn);
+                    }
+                        
                     ViewBag.TotalComanda = totalComanda += subtotal;
 
                     <tr>
                         <td>@item.Id</td>
                         <td>@item.Descricao</td>
-                        <td>@item.peso.ToString("N2") kg</td>
+                        @if (@item.peso > 0)
+                        {
+                            <td>@item.peso.ToString("N3") Kg</td>
+                        }
+                        else
+                        {
+                            <td>@item.Quantidade Un</td>
+                        }
+
                         <td>@item.PrecoUn.ToString("C")</td>
                         <td>@subtotal.ToString("C")</td>
                         @if (_colaborador.GetColaborador() != null && _colaborador.GetColaborador().Tipo == ColaboradorTipoConstant.Gerente)
@@ -128,3 +162,4 @@ else
 <div class="offset-md-4 col-md-4">
     <a asp-action="Index" class="btn btn-outline-primary">Comandas abertas</a>
 </div>
+

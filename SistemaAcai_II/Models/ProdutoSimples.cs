@@ -15,6 +15,8 @@ namespace SistemaAcai_II.Models
         [Required(ErrorMessage = "A valor é obrigatória")]
         public decimal PrecoUn { get; set; }
 
+        public int? Quantidade { get; set; }
+
         public decimal peso { get; set; }
     }
 }

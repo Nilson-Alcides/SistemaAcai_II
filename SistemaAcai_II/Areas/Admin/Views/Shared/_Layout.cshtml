@@ -18,8 +18,7 @@
         <title>@ViewData["Title"] - Sistema Açai </title>
         <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
         <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
-        <link rel="stylesheet" href="~/css/dashboard/dashboard.css" asp-append-version="true" />
-        <link rel="stylesheet" href="~/css/" asp-append-version="true" />
+        <link rel="stylesheet" href="~/css/dashboard/dashboard.css" asp-append-version="true" />        
         <link rel="stylesheet" href="~/css/pagedlist/PagedList.css" rel="stylesheet" type="text/css" />
         <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
         
@@ -107,13 +106,12 @@
                                     Formas de pagamento
                                 </a>
                             </li>
-
-                            <li class="nav-item">
-                                <a class="nav-link text-white" asp-controller="Cliente" asp-action="Index">
-                                    <i class="fa-solid fa-users"></i>
-                                    Cliente
-                                </a>
-                            </li>
+                             <li class="nav-item">
+                            <a class="nav-link text-white" asp-controller="Cliente" asp-action="Index">
+                                <i class="fa-solid fa-users"></i>
+                                Cliente
+                            </a>
+                        </li>
                         } 
                         
                        
@@ -144,9 +142,9 @@
         </div>
     </div>
 
-    <footer class="footer bg-dark-purple text-white text-center p-3">
+    @* <footer class="footer bg-dark-purple text-white text-center p-3">
         <p>© 2024 Sistema de Açaí - Todos os direitos reservados</p>
-    </footer>
+    </footer> *@
 
 
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
@@ -154,8 +152,7 @@
     <script src="~/js/site.js" asp-append-version="true"></script>
     <script src="~/js/CarrinhoCompras.js" asp-append-version="true"></script>
 
-    <script src="~/js/charts/charts.js"></script>
-    <script src="~/js/dashboard/dashboard.js"></script>
+    <script src="~/js/charts/charts.js"></script>  
     <script src="~/js/feather/feather.js"></script>
     <script src="~/js/mask/jquery.mask.min.js"></script>
     @await RenderSectionAsync("Scripts", required: false)
