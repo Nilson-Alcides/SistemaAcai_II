@@ -9,7 +9,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <meta name="description" content="">
     <meta name="author" content="Nilson Jose Alcides">
-    
+
     <title>@ViewBag.Title</title>
 
     <head>
@@ -18,12 +18,13 @@
         <title>@ViewData["Title"] - Sistema Açai </title>
         <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
         <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
-        <link rel="stylesheet" href="~/css/dashboard/dashboard.css" asp-append-version="true" />        
+        <link rel="stylesheet" href="~/css/dashboard/dashboard.css" asp-append-version="true" />
+        <link rel="stylesheet" href="~/css/" asp-append-version="true" />
         <link rel="stylesheet" href="~/css/pagedlist/PagedList.css" rel="stylesheet" type="text/css" />
         <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-        
+
     </head>
-   
+
     <style>
         .bd-placeholder-img {
             font-size: 1.125rem;
@@ -41,92 +42,85 @@
         }
     </style>
     <!-- Custom styles for this template -->
-   
+
 </head>
 <body>
     <nav class="navbar navbar-dark fixed-top bg-dark flex-md-nowrap bg-primary-purple p-0 shadow">
-                    <a class="navbar-brand col-sm-3 col-md-2 mr-0" href="#">Painel</a>
-                    <input class="form-control form-control-dark w-100" type="hidden" placeholder="" aria-label="Search">
-        
+        <a class="navbar-brand col-sm-3 col-md-2 mr-0" href="#">Painel</a>
+        <input class="form-control form-control-dark w-100" type="hidden" placeholder="" aria-label="Search">
+
         <ul class="navbar-nav px-3 bg-primary-purple">
-          <li class="nav-item text-nowrap">
+            <li class="nav-item text-nowrap">
                 <a class="nav-link text-white" asp-area="Admin" asp-action="Logout" asp-controller="Home"><span>@_colaborador.GetColaborador().Nome </span> Sair</a>
             </li>
-        </ul> 
+        </ul>
     </nav>
 
     <div class="container-fluid">
         <div class="row">
             <nav class="col-md-2 d-none d-md-block bg-light sidebar">
                 <div class="sidebar-sticky text-white">
-                    <ul class="nav flex-column">
+                    <ul class="nav flex-column" id="menuPainel">
                         <li class="nav-item">
-                            <a class="nav-link active text-white" asp-area="Admin" asp-controller="Home" asp-action="Painel">
+                            <a class="nav-link active text-white" asp-area="Admin" asp-controller="Home" asp-action="Painel" data-index="1">
                                 <i class="fa-solid fa-house"></i>
-                                Painel de Controle
+                                Painel de Controle (ALT + 1)
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link text-white" asp-action="Index" asp-controller="Caixa">
+                            <a class="nav-link text-white" asp-action="Index" asp-controller="Caixa" data-index="2">
                                 <i class="fa-solid fa-file"></i>
-                                Caixa
+                                Caixa (ALT + 2)
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link text-white" asp-action="Vendas" asp-controller="Comanda">
+                            <a class="nav-link text-white" asp-action="Vendas" asp-controller="Comanda" data-index="3">
                                 <i class="fa-solid fa-cart-shopping"></i>
-                                Vendas
+                                Vendas (ALT + 3)
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link text-white" asp-controller="Produto" asp-action="Index">
+                            <a class="nav-link text-white" asp-controller="Produto" asp-action="Index" data-index="4">
                                 <i class="fa-solid fa-cart-shopping"></i>
-                                Produto
+                                Produto (ALT + 4)
                             </a>
                         </li>
-                       
+
                         @if (_colaborador.GetColaborador() != null && _colaborador.GetColaborador().Tipo == ColaboradorTipoConstant.Gerente)
-                        { 
+                        {
                             <li class="nav-item">
-                                <a class="nav-link text-white" asp-controller="Colaborador" asp-action="Index">
+                                <a class="nav-link text-white" asp-controller="Colaborador" asp-action="Index" data-index="5">
                                     <i class="fa-solid fa-users"></i>
-                                    Colaborador 
+                                    Colaborador (ALT + 5)
                                 </a>
                             </li>
 
                             <li class="nav-item">
-                                <a class="nav-link text-white" asp-controller="Filiais" asp-action="Index">
+                                <a class="nav-link text-white" asp-controller="Filiais" asp-action="Index" data-index="6">
                                     <i class="fa-solid fa-users"></i>
-                                    Filiais
+                                    Filiais (ALT + 6)
                                 </a>
                             </li>
-                            <li class="nav-item">
-                                <a class="nav-link text-white" asp-controller="Pagamento" asp-action="Index">
-                                    <i class="fa-solid fa-money-check-dollar"></i>
-                                    Formas de pagamento
-                                </a>
-                            </li>
-                             <li class="nav-item">
-                            <a class="nav-link text-white" asp-controller="Cliente" asp-action="Index">
+                        }
+
+                        <li class="nav-item">
+                            <a class="nav-link text-white" asp-controller="Cliente" asp-action="Index" data-index="7">
                                 <i class="fa-solid fa-users"></i>
-                                Cliente
-                            </a>
-                        </li>
-                        } 
-                        
-                       
-                        
-                        <li class="nav-item">
-                            <a class="nav-link text-white" asp-controller="Comanda" asp-action="Index">
-                                <i class="fa-solid fa-file"></i>
-                                Comandas
+                                Cliente (ALT + 7)
                             </a>
                         </li>
 
                         <li class="nav-item">
-                            <a class="nav-link text-white" asp-controller="Relatorios" asp-action="Index">
-                                <i class="fa-solid fa-chart-bar"></i>                                
-                                Relatórios
+                            <a class="nav-link text-white" asp-controller="Comandas" asp-action="Index" data-index="8">
+                                <i class="fa-solid fa-file"></i>
+                                Comandas (ALT + 8)
+                            </a>
+                        </li>
+
+                        <li class="nav-item">
+                            <a class="nav-link text-white" asp-controller="Relatorios" asp-action="Index" data-index="9">
+                                <i class="fa-solid fa-chart-bar"></i>
+                                Relatórios (ALT + 9)
                             </a>
                         </li>
                     </ul>
@@ -134,7 +128,7 @@
                 </div>
             </nav>
 
-             
+
             <main role="main" class="offset-sm-2 col-md-9 ml-sm-auto col-lg-10 px-4">
 
                 @RenderBody()
@@ -142,9 +136,9 @@
         </div>
     </div>
 
-    @* <footer class="footer bg-dark-purple text-white text-center p-3">
+    <footer class="footer bg-dark-purple text-white text-center p-3">
         <p>© 2024 Sistema de Açaí - Todos os direitos reservados</p>
-    </footer> *@
+    </footer>
 
 
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
@@ -152,10 +146,28 @@
     <script src="~/js/site.js" asp-append-version="true"></script>
     <script src="~/js/CarrinhoCompras.js" asp-append-version="true"></script>
 
-    <script src="~/js/charts/charts.js"></script>  
+    <script src="~/js/charts/charts.js"></script>
+    <script src="~/js/dashboard/dashboard.js"></script>
     <script src="~/js/feather/feather.js"></script>
     <script src="~/js/mask/jquery.mask.min.js"></script>
+    <script>
+        document.addEventListener('keydown', function (e) {
+            if (e.altKey) {
+                const key = parseInt(e.key);
+                if (!isNaN(key) && key >= 1 && key <= 9) {
+                    const menuItem = document.querySelector('#menuPainel a[data-index="' + key + '"]');
+                    if (menuItem) {
+                        window.location.href = menuItem.href;
+                        e.preventDefault();
+                    }
+                }
+            }
+        });
+    </script>
     @await RenderSectionAsync("Scripts", required: false)
+
+
+
 </body>
 </html>
 
