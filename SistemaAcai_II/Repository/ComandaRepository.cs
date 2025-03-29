@@ -118,7 +118,7 @@ namespace SistemaAcai_II.Repository
 
                 if (!string.IsNullOrEmpty(pesquisa))
                 {
-                    cmd = new MySqlCommand("select * from Comanda where SITUACAO = 'A' AND NomeCliente like '%" + pesquisa + "%' ORDER BY IdComanda DESC", conexao);
+                    cmd = new MySqlCommand("select * from Comanda where SITUACAO = 'A' AND IdComanda like '%" + pesquisa + "%' ORDER BY IdComanda DESC", conexao);
                 }
 
                 MySqlDataAdapter da = new MySqlDataAdapter(cmd);

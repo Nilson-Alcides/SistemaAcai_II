@@ -217,20 +217,27 @@ namespace AppQuinta6.Repository
             using (var conexao = new MySqlConnection(_conexaoMySQL))
             {
                 conexao.Open();
-                string query = "SELECT * FROM ProdutoSimples WHERE Descricao LIKE @Nome OR IdProd = @IdProd";
+                string query;
+
+                // Verifica se o usuário digitou um número (pesquisa por código)
+                if (int.TryParse(pesquisa, out int codigo))
+                {
+                    query = "SELECT * FROM ProdutoSimples WHERE IdProd = @IdProd";
+                }
+                else
+                {
+                    query = "SELECT * FROM ProdutoSimples WHERE Descricao LIKE @Descricao";
+                }
 
                 using (var cmd = new MySqlCommand(query, conexao))
                 {
-                    cmd.Parameters.AddWithValue("@Nome", "%" + pesquisa + "%");
-
-                    // Verifica se o usuário digitou um número (pesquisa por ID) ou um nome
-                    if (int.TryParse(pesquisa, out int codigo))
+                    if (int.TryParse(pesquisa, out int codigoPesquisa))
                     {
-                        cmd.Parameters.AddWithValue("@IdProd", codigo);
+                        cmd.Parameters.AddWithValue("@IdProd", codigoPesquisa);
                     }
                     else
                     {
-                        cmd.Parameters.AddWithValue("@IdProd", 0); // Define um valor padrão que não retorna nada
+                        cmd.Parameters.AddWithValue("@Descricao", "%" + pesquisa + "%");
                     }
 
                     using (var reader = cmd.ExecuteReader())
@@ -247,6 +254,7 @@ namespace AppQuinta6.Repository
                     }
                 }
             }
+
             return produtos;
         }
         public IEnumerable<ProdutoSimples> ObterTodosProdutos()

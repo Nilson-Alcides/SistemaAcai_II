@@ -32,7 +32,7 @@
     <div class="form-group row">
         <label for="termo" class="col-sm-2 col-form-label">Pesquisar Produto</label>
         <div class="col-sm-6">
-            <input type="text" name="termo" id="termo" class="form-control" placeholder="Digite o nome ou código do produto..." />
+            <input type="text" name="termo" id="termo" class="form-control" placeholder="Digite o nome ou código do produto..." autofocus />
         </div>
         <div class="col-sm-4">
             <button type="submit" class="btn btn-primary">Buscar</button>
@@ -150,7 +150,9 @@
 
         <div class="offset-md-4 col-md-4">
             <button type="submit" class="btn btn-outline-primary">Salvar Comanda</button>
+            <button type="submit" class="btn btn-outline-success">Fechar Pedido</button>
         </div>
+        
         <br />
     </form>
     
@@ -159,7 +161,7 @@ else
 {
     <p>Nenhum item no carrinho.</p>
 }
-<div class="offset-md-4 col-md-4">
+@* <div class="offset-md-4 col-md-4">
     <a asp-action="Index" class="btn btn-outline-primary">Comandas abertas</a>
-</div>
+</div> *@
 
