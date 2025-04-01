@@ -18,7 +18,7 @@ Situacao char(1) not null
 */
 insert into	Colaborador (Nome,Email,Senha,Tipo, Situacao) 
 values("Admin - Admin", "admin@sistemaacai.com",'123456',"G", "A");
-select * from colaborador;
+-- select * from colaborador;
 
 -- Tabela de Cliente
 create table Cliente(
@@ -32,7 +32,7 @@ Email Varchar(50) not null,
 Senha Varchar(255) not null,
 Situacao char(1) not null
 );
-select * from cliente;
+-- select * from cliente;
 
 -- Tabela de Filiais
 CREATE TABLE Filiais (
@@ -45,8 +45,7 @@ CREATE TABLE Filiais (
     telefone VARCHAR(20) not null,    
     StatusFiliais ENUM('Ativa', 'Inativa') NOT NULL DEFAULT 'Ativa'
 );
-
-select * from Filiais;
+-- select * from Filiais;
 
 -- Tabela de Endereco
 create table Endereco(
@@ -65,29 +64,55 @@ foreign key (IdCli) references Cliente(IdCli),
 foreign key (IdColab) references Colaborador(IdColab),
 foreign key (Idfilial) references filiais(Idfilial)
 );
-select * from endereco;
-
-
-
+-- select * from endereco;
 create table ProdutoSimples(
 IdProd int primary key auto_increment,
 Descricao varchar(75) not null,
 PrecoUn decimal(10,2)
 ); 
-Select * from filiais as t1 inner join  endereco as t2 on t1.Idfilial = t2.Idfilial where t1.Idfilial = t1.Idfilial;
+Insert into ProdutoSimples (Descricao, PrecoUn ) values('Açai / Sorvete / Opcionais','59.99');
 
+-- Select * from ProdutoSimples;
+-- Select * from filiais as t1 inner join  endereco as t2 on t1.Idfilial = t2.Idfilial where t1.Idfilial = t1.Idfilial;
+
+-- Tabela forma de pagamento
+CREATE TABLE FormaPagamento (
+    IdForma INT AUTO_INCREMENT PRIMARY KEY,
+    Nome VARCHAR(30) NOT NULL
+);
+/*
+INSERT INTO FormaPagamento (Nome) VALUES 
+('Dinheiro'),
+('Cartão Crédito'),
+('Cartão Débito'),
+('Pix'),
+('Vale Alimentação (VA)'),
+('Vale Refeição (VR)');
+
+ALTER TABLE Comanda
+ADD COLUMN IdForma INT;
+
+ALTER TABLE Comanda
+ADD CONSTRAINT FK_Comanda_FormaPagamento
+FOREIGN KEY (IdForma) REFERENCES FormaPagamento(IdForma);
+*/
+
+select * from FormaPagamento;
 -- Tabela de Comanda (Nova)
 CREATE TABLE Comanda (
     IdComanda INT AUTO_INCREMENT PRIMARY KEY,
     IdColab int,
+    IdForma int,
     NomeCliente varchar(100) NOT NULL,    
     DataAbertura DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    DataFechamento DATETIME NULL,
-    ValorTotal DECIMAL(10,2),    
-    Situacao ENUM('A', 'F') NOT NULL DEFAULT 'A',
-    foreign key (IdColab) references Colaborador(IdColab)
+    DataFechamento TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    ValorTotal DECIMAL(10,2),
+    Desconto varchar(50),
+    Situacao char(1) default 'A' not null,  
+    foreign key (IdColab) references Colaborador(IdColab),
+    foreign key (IdForma) references FormaPagamento(IdForma)
 );
-select * from comanda;
+SELECT * FROM Comanda WHERE SITUACAO = 'A';
 -- Tabela de Itens da Comanda (Nova)
 CREATE TABLE ItemComanda (
     IdItem INT AUTO_INCREMENT PRIMARY KEY,
@@ -99,11 +124,3 @@ CREATE TABLE ItemComanda (
     FOREIGN KEY (IdComanda) REFERENCES Comanda(IdComanda) ON DELETE CASCADE,
     FOREIGN KEY (IdProd) REFERENCES ProdutoSimples(IdProd) ON DELETE CASCADE
 );
--- SELECT IdComanda FROM Comanda ORDER BY IdComanda DESC limit 1;
--- Exemplo de consulta para unir comandas e produtos
-SELECT * 
-FROM Comanda AS c
-INNER JOIN ItemComanda AS ic ON c.IdComanda = ic.IdComanda
-INNER JOIN ProdutoSimples AS p ON ic.IdProd = p.IdProd;
-SELECT * 
-FROM ItemComanda
