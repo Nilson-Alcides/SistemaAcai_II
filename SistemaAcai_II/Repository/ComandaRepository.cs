@@ -30,9 +30,9 @@ namespace SistemaAcai_II.Repository
                 conexao.Open();               
                 MySqlCommand cmd = new MySqlCommand("INSERT INTO Comanda (IdColab, NomeCliente) " +
                                                     " VALUES (@IdColab, @NomeCliente)", conexao);
-
                 cmd.Parameters.AddWithValue("@IdColab", comanda.RefColaborador.Id);
                 cmd.Parameters.AddWithValue("@NomeCliente", comanda.NomeCliente);
+
                 cmd.ExecuteNonQuery();
                 conexao.Close();
             }
@@ -135,8 +135,7 @@ namespace SistemaAcai_II.Repository
                             Id = (Int32)(dr["IdComanda"]),                          
                             NomeCliente = Convert.ToString(dr["NomeCliente"]),
                             DataAbertura = Convert.ToDateTime(dr["DataAbertura"]),
-                            ValorTotal = Convert.ToDecimal(dr["ValorTotal"]),
-                            
+                            ValorTotal = Convert.ToDecimal(dr["ValorTotal"])                            
                         });
                 }
                 return ListComanda.ToPagedList<Comanda>(NumeroPagina, RegistroPorPagina);
@@ -162,14 +161,37 @@ namespace SistemaAcai_II.Repository
             using (var conexao = new MySqlConnection(_conexaoMySQL))
             {
                 conexao.Open();
-                    MySqlCommand cmd = new MySqlCommand("UPDATE Comanda SET ValorTotal = @ValorTotal WHERE IdComanda = @IdComanda", conexao);
+                    MySqlCommand cmd = new MySqlCommand("UPDATE Comanda SET ValorTotal = @ValorTotal " +
+                        " WHERE IdComanda = @IdComanda", conexao);
+               
                 cmd.Parameters.Add("@ValorTotal", MySqlDbType.Decimal).Value = Convert.ToDecimal(string.Format(CultureInfo.InvariantCulture, "{0:0.000}", comanda.ValorTotal),
                                    CultureInfo.InvariantCulture);                                
-                cmd.Parameters.AddWithValue("@IdComanda", MySqlDbType.VarChar).Value = comanda.Id;
-                cmd.ExecuteNonQuery();
-                
+                cmd.Parameters.AddWithValue("@IdComanda", MySqlDbType.VarChar).Value = comanda.Id;                
+                cmd.ExecuteNonQuery();                
                 conexao.Close();
             }            
+        }
+        public void AtualizarValorComDesconto(Comanda comanda)
+         {
+            
+            string Situacao = SituacaoConstant.Fechada;
+            using (var conexao = new MySqlConnection(_conexaoMySQL))
+            {
+                conexao.Open();
+
+                MySqlCommand cmd = new MySqlCommand("UPDATE Comanda SET Desconto = @Desconto, " +
+                    " ValorTotal = @ValorTotal, Situacao = @Situacao, IdForma = @IdForma WHERE IdComanda = @IdComanda", conexao);
+                
+                cmd.Parameters.Add("@Desconto", MySqlDbType.VarChar).Value = comanda.Desconto;                
+                cmd.Parameters.Add("@ValorTotal", MySqlDbType.Decimal).Value = Convert.ToDecimal(string.Format(CultureInfo.InvariantCulture, "{0:0.000}", comanda.ValorTotal),
+                                   CultureInfo.InvariantCulture);
+                cmd.Parameters.AddWithValue("@IdForma", MySqlDbType.Int32).Value = comanda.RefFormasPagamento.Id;
+                cmd.Parameters.Add("@Situacao", MySqlDbType.VarChar).Value = Situacao;
+                cmd.Parameters.AddWithValue("@IdComanda", MySqlDbType.Int32).Value = comanda.Id;
+                cmd.ExecuteNonQuery();
+
+                conexao.Close();
+            }
         }
         public void Atualizar(Comanda comanda)
         {

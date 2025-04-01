@@ -226,7 +226,7 @@ namespace SistemaAcai_II.Repository
 
         public void Desativar(int Id)
         {
-            string Situacao = SituacaoConstant.Desativado;
+            string Situacao = SituacaoConstant.Desativado; 
             using (var conexao = new MySqlConnection(_conexaoMySQL))
             {
                 conexao.Open();

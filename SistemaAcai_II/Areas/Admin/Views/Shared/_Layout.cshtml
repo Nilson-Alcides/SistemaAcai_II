@@ -102,6 +102,12 @@
                                 </a>
                             </li>
                         }
+                        <li class="nav-item">
+                            <a class="nav-link text-white" asp-controller="Pagamento" asp-action="Index" data-index="7">
+                                <i class="fa-solid fa-users"></i>
+                                Forma de Pagamento (ALT + P)
+                            </a>
+                        </li>
 
                         <li class="nav-item">
                             <a class="nav-link text-white" asp-controller="Cliente" asp-action="Index" data-index="7">
@@ -147,8 +153,9 @@
     <script src="~/js/CarrinhoCompras.js" asp-append-version="true"></script>
 
     <script src="~/js/charts/charts.js"></script>
-    <script src="~/js/dashboard/dashboard.js"></script>
+   
     <script src="~/js/feather/feather.js"></script>
+    <script src="~/js/modal/modal.js"></script>
     <script src="~/js/mask/jquery.mask.min.js"></script>
     <script>
         document.addEventListener('keydown', function (e) {

@@ -55,7 +55,7 @@ namespace SistemaAcai_II.Repository
                     pagList.Add(
                         new FormasPagamento
                         {
-                            Id = Convert.ToInt32(dr["IdColab"]),
+                            Id = Convert.ToInt32(dr["IdForma"]),
                             Nome = (string)(dr["Nome"])
                         });
                 }

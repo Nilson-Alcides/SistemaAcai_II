@@ -19,20 +19,24 @@ namespace SistemaAcai_II.Controllers
         private readonly CookiePedidoCompra _cookiePedidoCompra;
         private readonly IProdutoSimplesRepository _produtoRepository;
         private readonly IItensComandaRepository _itensComandaRepository;
+        private readonly IFormasPagamentoRepository _formasPagamentoRepository;
         private LoginColaborador _loginColaborador;
        
 
         public ComandaController(IComandaRepository comandaRepository, CookiePedidoCompra cookiePedidoCompra,
-            IProdutoSimplesRepository produtoRepository, LoginColaborador loginColaborador, IItensComandaRepository itensComandaRepository)
+            IProdutoSimplesRepository produtoRepository, LoginColaborador loginColaborador, IItensComandaRepository itensComandaRepository, IFormasPagamentoRepository formasPagamentoRepository)
         {
             _comandaRepository = comandaRepository;
             _cookiePedidoCompra = cookiePedidoCompra;
             _produtoRepository = produtoRepository;
             _loginColaborador = loginColaborador;
             _itensComandaRepository = itensComandaRepository;
+            _formasPagamentoRepository = formasPagamentoRepository; 
         }
         public IActionResult Vendas(string termo)
         {
+            var listPagamentos = _formasPagamentoRepository.ObterTodasFormasPagamentos();
+            ViewBag.FormaPagamento = new SelectList(listPagamentos, "Id", "Nome");
             // Busca produtos caso tenha um termo de pesquisa
             var produtos = string.IsNullOrWhiteSpace(termo) ? new List<ProdutoSimples>() : _produtoRepository.BuscarPorNome(termo);
 
@@ -52,6 +56,10 @@ namespace SistemaAcai_II.Controllers
         [HttpPost]
         public IActionResult AdicionarItem(int id, string? pesoRcebido, int? quantidade)
         {
+
+            var listPagamentos = _formasPagamentoRepository.ObterTodasFormasPagamentos();
+            ViewBag.FormaPagamento = new SelectList(listPagamentos, "Id", "Nome");
+           
             // Converte o peso recebido para decimal, considerando separadores de decimal.
             decimal peso = 0;            
             if(pesoRcebido != null)
@@ -130,6 +138,13 @@ namespace SistemaAcai_II.Controllers
         [ColaboradorAutorizacao]
         public IActionResult SalvarComanda(Comanda comanda)
         {
+            if(comanda.RefFormasPagamento.Id != null)
+            {
+                var listPagamentos = _formasPagamentoRepository.ObterTodasFormasPagamentos();
+                ViewBag.FormaPagamento = new SelectList(listPagamentos, "Id", "Nome");
+            }
+            
+
             if (comanda == null)
             {
                 return BadRequest("Comanda não pode ser nula.");
@@ -141,7 +156,9 @@ namespace SistemaAcai_II.Controllers
             {
                 DataAbertura = DateTime.Now,
                 NomeCliente = comanda.NomeCliente,
-                RefColaborador = new Colaborador { Id = _loginColaborador.GetColaborador().Id }
+                RefColaborador = new Colaborador { Id = _loginColaborador.GetColaborador().Id },
+                RefFormasPagamento = new FormasPagamento { Id = comanda .RefFormasPagamento.Id},
+                Desconto = comanda.Desconto
             };
 
             // Salva a comanda e pega o último ID gerado
@@ -171,9 +188,25 @@ namespace SistemaAcai_II.Controllers
 
                 _itensComandaRepository.Cadastrar(novoItem);
             }
-
             novaComanda.ValorTotal = totalComanda;
-            _comandaRepository.AtualizarValor(novaComanda);
+            if(comanda.Desconto != null)
+            {
+                decimal desconto = Convert.ToDecimal(comanda.Desconto.Replace(".", ","));
+                if (desconto > 0)
+                {
+                    novaComanda.ValorTotal = (totalComanda - desconto);
+                }
+            } 
+            
+            if(comanda.RefFormasPagamento.Id == 0) 
+            {
+                _comandaRepository.AtualizarValor(novaComanda);
+            }
+            else
+            {
+                _comandaRepository.AtualizarValorComDesconto(novaComanda);
+            }
+            
 
             _cookiePedidoCompra.RemoverTodos();
 
@@ -189,6 +222,10 @@ namespace SistemaAcai_II.Controllers
         {
             return  new ContentResult() { Content = "Pagiina Localizada Comandas abertas." };
         }
-
+        public IActionResult limpaConada()
+        {
+            _cookiePedidoCompra.RemoverTodos();
+            return RedirectToAction(nameof(Vendas));
+        }
     }
 }
