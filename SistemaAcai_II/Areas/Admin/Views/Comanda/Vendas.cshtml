@@ -2,7 +2,7 @@
 @using SistemaAcai_II.Models.Constants
 @inject SistemaAcai_II.Libraries.Login.LoginColaborador _colaborador
 
-<h2>Vendas</h2>
+<h4>Vendas</h4>
 
 @if (TempData["Erro"] != null)
 {
@@ -24,11 +24,7 @@
         </div>
     </div>
 
-
-
-
     <!-- Campo de pesquisa -->
-
     <div class="form-group row">
         <label for="termo" class="col-sm-2 col-form-label">Pesquisar Produto</label>
         <div class="col-sm-6">
@@ -80,7 +76,7 @@
 }
 
 <!-- Exibir carrinho de compras -->
-<h3>Itens da Comanda</h3>
+<h4>Itens da Comanda</h4>
 
 @if (Model.ItensCarrinho != null && Model.ItensCarrinho.Any())
 {
@@ -144,27 +140,33 @@
                 }
             </tbody>
         </table>
-         <div id="formaPagamentoPrincipal" class="alert alert-secondary mt-3">
+        <div id="formaPagamentoPrincipal" class="alert alert-secondary mt-3">
             Forma de Pagamento: <span id="formaPagamentoSelecionadaPrincipal">Não selecionada</span>
         </div>
         <!-- Exibir total da comanda - Adicione um ID para poder atualizar via JS -->
         <div class="alert alert-info">
             <h4>Total da Comanda: <span id="totalComandaDisplay">@totalComanda.ToString("C")</span></h4>
         </div>
-       
+
         <div class="offset-md-4 col-md-6">
             <button type="button" class="btn btn-outline-primary me-2"
                     data-bs-toggle="modal" data-bs-target="#modalPagamento">
                 Pagamento
+            </button>           
+            <button 
+                type="submit" id="btnSalvarComanda" 
+                class="btn btn-outline-success me-2">Fechar Pedido
             </button>
-            <button type="submit" class="btn btn-outline-info me-2">Salvar Comanda</button>
-            <button type="submit" class="btn btn-outline-success me-2">Fechar Pedido</button>
-            <a asp-controller="Comanda" asp-action="limpaConada" class="btn btn-outline-danger" 
-            onclick="return confirm('Deseja realmente Remover?')"> Remover Itens</a>
+            <button 
+                type="submit" id="btnFecharPedido" 
+                class="btn btn-outline-info me-2">Salvar Comanda
+            </button>               
+             <a asp-controller="Comanda" asp-action="limpaConada" class="btn btn-outline-danger"
+                   onclick="return confirm('Deseja realmente Remover?')"> Remover Itens</a>
         </div>
 
-        <br />
-    </form>
+            <br />
+        </form>
 }
 else
 {
@@ -187,7 +189,7 @@ else
                     </div>
                 </form>
 
-                <div class="mt-4">                   
+                <div class="mt-4">
                     <div class="box">
                         <dl class="dlist-align" hidden>
                             <dt>Subtotal: </dt>
@@ -196,7 +198,7 @@ else
                             </dd>
                         </dl>
                         <dl class="dlist-align">
-                           
+
                             <dt>Valor Pago:</dt>
                             <dd>
                                 <input id="valorPago"
@@ -204,11 +206,10 @@ else
                                        type="text"
                                        style="width: 100px;"
                                        placeholder="0,00" />
-                            </dd>                         
-                            
+                            </dd>
+
                         </dl>
                         <dl class="dlist-align">
-
                             <dt>Troco:</dt>
                             <dd>
                                 <input id="troco" class="form-control form-control-sm dineiro"
@@ -217,8 +218,6 @@ else
                                        placeholder="0,00"
                                        readonly />
                             </dd>
-                            </dd>
-
                         </dl>
                         <dl class="dlist-align">
                             <dt>Desconto:</dt>
@@ -227,11 +226,9 @@ else
                                        class="form-control form-control-sm dineiro"
                                        type="text" style="width: 100px;"
                                        placeholder="0,00" />
-                                @*  <input asp-for="Comanda.Desconto" id="desconto"
-                                class="form-control dineiro" type="text" step="0.01" min="0" placeholder="Digite o desconto" /> *@
                             </dd>
                         </dl>
-                        
+
                         <dl class="dlist-align">
                             <dt>Forma de Pagamento:</dt>
                             <dd class="text-right" id="formaPagamentoSelecionada">Nenhuma selecionada</dd>
@@ -266,6 +263,22 @@ else
 @section Scripts {
     <script>
         $(document).ready(function () {
+            $('#formaPagamento').on('change', function () {
+                var selected = $(this).val();
+                if (selected) {
+                    $('#btnFecharPedido').hide();
+                    $('#btnSalvarComanda').show();
+                } else {
+                    $('#btnSalvarComanda').hide();
+                    $('#btnFecharPedido').show();                 
+                }
+            });
+
+            // Disparar evento de mudança caso o select já venha preenchido (ex: edição)
+            $('#formaPagamento').trigger('change');
+        });
+
+        $(document).ready(function () {
             var dadosPagamento = {
                 formaPagamentoId: '',
                 formaPagamentoTexto: '',
@@ -293,6 +306,7 @@ else
                     $('#troco').val('');
                 }
             }
+
 
             $('#desconto').on('blur', function () {
                 var valorFormatado = $(this).val();
