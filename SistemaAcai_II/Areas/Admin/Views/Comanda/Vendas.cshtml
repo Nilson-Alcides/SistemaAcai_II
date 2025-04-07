@@ -183,24 +183,49 @@ else
                 <form id="formPagamento">
                     <div class="form-group">
                         @Html.DropDownListFor(model => model.Comanda.RefFormasPagamento.Id, ViewBag.FormaPagamento as SelectList,
-                                 "Selecione a forma de pagamento", htmlAttributes: new { @class = "form-control", id = "formaPagamento" })
+                                 "Selecione a forma de pagamento", htmlAttributes: new { @class = "form-control", id = "formaPagamento", style = "width: 70%;" })
                     </div>
                 </form>
 
                 <div class="mt-4">                   
                     <div class="box">
-                        <dl class="dlist-align">
+                        <dl class="dlist-align" hidden>
                             <dt>Subtotal: </dt>
                             <dd class="text-right" id="subtotalValue">
                                 @(ViewBag.TotalComanda != null ? ((decimal)ViewBag.TotalComanda).ToString("C", new System.Globalization.CultureInfo("pt-BR")) : "R$ 0,00")
                             </dd>
                         </dl>
                         <dl class="dlist-align">
+                           
+                            <dt>Valor Pago:</dt>
+                            <dd>
+                                <input id="valorPago"
+                                       class="form-control form-control-sm dineiro"
+                                       type="text"
+                                       style="width: 100px;"
+                                       placeholder="0,00" />
+                            </dd>                         
+                            
+                        </dl>
+                        <dl class="dlist-align">
+
+                            <dt>Troco:</dt>
+                            <dd>
+                                <input id="troco" class="form-control form-control-sm dineiro"
+                                       type="text"
+                                       style="width: 100px;"
+                                       placeholder="0,00"
+                                       readonly />
+                            </dd>
+                            </dd>
+
+                        </dl>
+                        <dl class="dlist-align">
                             <dt>Desconto:</dt>
                             <dd>
                                 <input asp-for="Comanda.Desconto" id="desconto"
                                        class="form-control form-control-sm dineiro"
-                                       type="text style="width: 100px;"
+                                       type="text" style="width: 100px;"
                                        placeholder="0,00" />
                                 @*  <input asp-for="Comanda.Desconto" id="desconto"
                                 class="form-control dineiro" type="text" step="0.01" min="0" placeholder="Digite o desconto" /> *@
@@ -245,23 +270,35 @@ else
                 formaPagamentoId: '',
                 formaPagamentoTexto: '',
                 desconto: 0,
-                total: parseFloat('@(ViewBag.TotalComanda ?? 0)')
+                total: parseFloat('@(ViewBag.TotalComanda != null ? ViewBag.TotalComanda.ToString(System.Globalization.CultureInfo.InvariantCulture) : "0")'),
+                valorPago: 0,
+                troco: 0
             };
 
+            var campoValorPago = $('#valorPago').closest('.dlist-align');
+            var campoTroco = $('#valorPago').closest('.dlist-align').next('.dlist-align');
+
             $('#desconto').addClass('dinheiro');
+            $('#valorPago').addClass('dinheiro');
+
+            function atualizarVisibilidadeCamposDinheiro() {
+                var formaPagamentoSelecionadaTexto = $('#formaPagamento option:selected').text().toLowerCase();
+                if (formaPagamentoSelecionadaTexto.includes('dinheiro')) {
+                    campoValorPago.show();
+                    campoTroco.show();
+                } else {
+                    campoValorPago.hide();
+                    campoTroco.hide();
+                    $('#valorPago').val('');
+                    $('#troco').val('');
+                }
+            }
 
             $('#desconto').on('blur', function () {
                 var valorFormatado = $(this).val();
-
-                // Substitui vírgula por ponto e remove caracteres inválidos
                 var valorNumerico = parseFloat(valorFormatado.replace(/[^0-9,]/g, '').replace(',', '.'));
-
-                // Se o valor for NaN, assume 0
                 dadosPagamento.desconto = isNaN(valorNumerico) ? 0 : valorNumerico;
-
-                // Armazena o valor original formatado
                 $(this).data('valorOriginal', valorFormatado);
-
                 atualizarResumoPagamento();
             });
 
@@ -278,7 +315,20 @@ else
 
             $('#formaPagamento').change(function () {
                 atualizarResumoPagamento();
+                atualizarVisibilidadeCamposDinheiro();
             });
+
+            $('#valorPago').on('blur', function () {
+                var valorFormatado = $(this).val();
+                var valorNumerico = parseFloat(valorFormatado.replace(/[^0-9,]/g, '').replace(',', '.'));
+                dadosPagamento.valorPago = isNaN(valorNumerico) ? 0 : valorNumerico;
+                calcularTroco();
+            });
+
+            function calcularTroco() {
+                dadosPagamento.troco = dadosPagamento.valorPago - dadosPagamento.total;
+                $('#troco').val(formatarMoeda(dadosPagamento.troco));
+            }
 
             $('#confirmarPagamento').click(function () {
                 $('#desconto').trigger('blur');
@@ -287,23 +337,19 @@ else
             });
 
             function atualizarResumoPagamento() {
-                var subtotal = parseFloat('@(ViewBag.TotalComanda ?? 0)');
+                var subtotal = parseFloat('@(ViewBag.TotalComanda != null ? ViewBag.TotalComanda.ToString(System.Globalization.CultureInfo.InvariantCulture) : "0")');
                 dadosPagamento.total = subtotal - dadosPagamento.desconto;
-
                 dadosPagamento.formaPagamentoId = $('#formaPagamento').val();
                 dadosPagamento.formaPagamentoTexto = $('#formaPagamento option:selected').text() || "Nenhuma selecionada";
-
                 $('#totalAPagar').text(formatarMoeda(dadosPagamento.total));
                 $('#formaPagamentoSelecionada').text(dadosPagamento.formaPagamentoTexto);
+                calcularTroco();
             }
 
             function atualizarComandaPrincipal() {
                 $('#totalComandaDisplay').text(formatarMoeda(dadosPagamento.total));
                 $('#formaPagamentoSelecionadaPrincipal').text(dadosPagamento.formaPagamentoTexto);
                 $('#formaPagamentoPrincipal').text(dadosPagamento.formaPagamentoTexto);
-
-                // Converte desconto corretamente antes de enviar
-                //$('[name="Comanda.Desconto"]').val(dadosPagamento.desconto.toFixed(2).replace('.', ','));
                 $('[name="Comanda.Desconto"]').val(dadosPagamento.desconto.toFixed(2));
                 $('[name="Comanda.RefFormasPagamento.Id"]').val(dadosPagamento.formaPagamentoId);
             }
@@ -311,7 +357,8 @@ else
             function formatarMoeda(valor) {
                 return valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
             }
-        });
 
+            atualizarVisibilidadeCamposDinheiro();
+        });
     </script>
 }
