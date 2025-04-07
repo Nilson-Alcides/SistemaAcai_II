@@ -141,6 +141,43 @@ namespace SistemaAcai_II.Repository
                 return ListComanda.ToPagedList<Comanda>(NumeroPagina, RegistroPorPagina);
             }
         }
+        public IPagedList<Comanda> ObterTodasComandasFechadas(int? pagina, string pesquisa)
+        {
+            int RegistroPorPagina = _config.GetValue<int>("RegistroPorPagina");
+
+            int NumeroPagina = pagina ?? 1;
+            List<Comanda> ListComanda = new List<Comanda>();
+            using (var conexao = new MySqlConnection(_conexaoMySQL))
+            {
+                conexao.Open();
+                MySqlCommand cmd = new MySqlCommand("SELECT * FROM Comanda WHERE SITUACAO = 'F' ORDER BY IdComanda DESC;;", conexao);
+
+                if (!string.IsNullOrEmpty(pesquisa))
+                {
+                    cmd = new MySqlCommand("select * from Comanda where SITUACAO = 'F' AND IdComanda like '%" + pesquisa + "%' ORDER BY IdComanda DESC", conexao);
+                }
+
+                MySqlDataAdapter da = new MySqlDataAdapter(cmd);
+                DataTable dt = new DataTable();
+
+                da.Fill(dt);
+                conexao.Close();
+
+                foreach (DataRow dr in dt.Rows)
+                {
+                    ListComanda.Add(
+                        new Comanda
+                        {
+                            Id = (Int32)(dr["IdComanda"]),
+                            NomeCliente = Convert.ToString(dr["NomeCliente"]),
+                            DataAbertura = Convert.ToDateTime(dr["DataAbertura"]),
+                            DataFechamento = Convert.ToDateTime(dr["DataFechamento"]),
+                            ValorTotal = Convert.ToDecimal(dr["ValorTotal"])
+                        });
+                }
+                return ListComanda.ToPagedList<Comanda>(NumeroPagina, RegistroPorPagina);
+            }
+        }
 
         public void Ativar(int Id)
         {

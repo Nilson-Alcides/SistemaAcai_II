@@ -123,10 +123,19 @@
                             </a>
                         </li>
 
-                        <li class="nav-item">
+                        @* <li class="nav-item">
                             <a class="nav-link text-white" asp-controller="Relatorios" asp-action="Index" data-index="9">
                                 <i class="fa-solid fa-chart-bar"></i>
                                 Relatórios (ALT + 9)
+                            </a>
+                        </li> *@
+                    </ul>
+                    <ul class="nav nav-pills">
+                        <li class="nav-item"><span class="nav-link active text-white"><i class="fa-solid fa-chart-bar"></i> Relatórios (ALT + 9)</span></li>
+                        <li class="nav-item">
+                            <a class="nav-link text-white" asp-controller="Comanda" asp-action="ComandasFechada" data-index="9">
+                                <i class="fa-solid fa-chart-bar"></i>
+                                Comandas fechadas
                             </a>
                         </li>
                     </ul>
