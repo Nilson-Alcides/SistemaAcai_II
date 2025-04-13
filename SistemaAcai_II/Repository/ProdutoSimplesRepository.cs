@@ -55,7 +55,8 @@ namespace AppQuinta6.Repository
                         {
                             Id = Convert.ToInt32(dr["Id"]),
                             Descricao = (string)(dr["Descricao"]),
-                            PrecoUn = (decimal)(dr["PrecoUn"])
+                            PrecoUn = (decimal)(dr["PrecoUn"]),
+                            TipoMedida = (string)dr["TipoMedida"]
 
 
                         });
@@ -85,8 +86,8 @@ namespace AppQuinta6.Repository
                         {
                             Id = Convert.ToInt32(dr["Id"]),
                             Descricao = (string)(dr["Descricao"]),
-                            PrecoUn = (decimal)(dr["PrecoUn"])
-
+                            PrecoUn = (decimal)(dr["PrecoUn"]),
+                            TipoMedida = (string)dr["TipoMedida"]
                         });
                 }
                 return ListProd;
@@ -97,15 +98,18 @@ namespace AppQuinta6.Repository
             using (var conexao = new MySqlConnection(_conexaoMySQL))
             {
                 conexao.Open();
-                MySqlCommand cmd = new MySqlCommand("insert into ProdutoSimples(Descricao, PrecoUn)  " +
-                                                   " values(@Descricao, @PrecoUn)", conexao);
+                MySqlCommand cmd = new MySqlCommand("INSERT INTO ProdutoSimples (Descricao, PrecoUn, TipoMedida) " +
+                                                    "VALUES (@Descricao, @PrecoUn, @TipoMedida)", conexao);
 
-                cmd.Parameters.Add("@Descricao", MySqlDbType.VarChar).Value = produtoSimples.Descricao;             
-                cmd.Parameters.Add("@PrecoUn", MySqlDbType.Decimal).Value = Convert.ToDecimal(produtoSimples.PrecoUn, CultureInfo.InvariantCulture); 
+                cmd.Parameters.Add("@Descricao", MySqlDbType.VarChar).Value = produtoSimples.Descricao;
+                cmd.Parameters.Add("@PrecoUn", MySqlDbType.Decimal).Value = Convert.ToDecimal(produtoSimples.PrecoUn, CultureInfo.InvariantCulture);
+                cmd.Parameters.Add("@TipoMedida", MySqlDbType.VarChar).Value = produtoSimples.TipoMedida;
+
                 cmd.ExecuteNonQuery();
                 conexao.Close();
             }
         }
+
         public ProdutoSimples ObterProdutoSimples(int Id)
         {
             using (var conexao = new MySqlConnection(_conexaoMySQL))
@@ -124,27 +128,30 @@ namespace AppQuinta6.Repository
                     produtoSimples.Id = Convert.ToInt32(dr["Id"]);
                     produtoSimples.Descricao = (string)(dr["Descricao"]);
                     produtoSimples.PrecoUn = (decimal)(dr["PrecoUn"]);
-
+                    produtoSimples.TipoMedida = (string)dr["TipoMedida"];
                 }
                 return produtoSimples;
             }
         }
-        public void Atualizar(ProdutoSimples ProdutoSimples)
+
+        public void Atualizar(ProdutoSimples produto)
         {
             using (var conexao = new MySqlConnection(_conexaoMySQL))
             {
                 conexao.Open();
-                MySqlCommand cmd = new MySqlCommand("update ProdutoSimples set Descricao=@Descricao, PrecoUn=@PrecoUn " +
-                                                  "   WHERE IdProd=@Id ", conexao);
+                var cmd = new MySqlCommand("UPDATE ProdutoSimples SET Descricao = @Descricao, PrecoUn = @PrecoUn, TipoMedida = @TipoMedida WHERE IdProd = @Id", conexao);
 
-                cmd.Parameters.Add("@Descricao", MySqlDbType.VarChar).Value = ProdutoSimples.Descricao;
-                cmd.Parameters.Add("@PrecoUn", MySqlDbType.Decimal).Value = ProdutoSimples.PrecoUn;
-                cmd.Parameters.Add("@Id", MySqlDbType.Int32).Value = ProdutoSimples.Id; // <- ESTA LINHA FALTAVA
+                cmd.Parameters.Add("@Descricao", MySqlDbType.VarChar).Value = produto.Descricao;
+                cmd.Parameters.Add("@PrecoUn", MySqlDbType.Decimal).Value = produto.PrecoUn;
+                cmd.Parameters.Add("@TipoMedida", MySqlDbType.VarChar).Value = produto.TipoMedida;
+                cmd.Parameters.Add("@Id", MySqlDbType.Int32).Value = produto.Id;
 
                 cmd.ExecuteNonQuery();
                 conexao.Close();
             }
         }
+
+
         public void Excluir(int Id)
         {
             using (var conexao = new MySqlConnection(_conexaoMySQL))
@@ -176,7 +183,8 @@ namespace AppQuinta6.Repository
                         {                            
                             Id= Convert.ToInt32(reader["IdProd"]),
                             Descricao = reader["Descricao"].ToString(),
-                            PrecoUn = Convert.ToDecimal(reader["PrecoUn"])
+                            PrecoUn = Convert.ToDecimal(reader["PrecoUn"]),
+                            TipoMedida = reader["TipoMedida"].ToString(),
                         };
                     }
                 }
@@ -202,7 +210,8 @@ namespace AppQuinta6.Repository
                         {
                             Id = Convert.ToInt32(reader["IdProd"]),
                             Descricao = reader["Descricao"].ToString(),
-                            PrecoUn = Convert.ToDecimal(reader["PrecoUn"])
+                            PrecoUn = Convert.ToDecimal(reader["PrecoUn"]),
+                            TipoMedida = (reader["TipoMedida"].ToString())
                         });
                     }
                 }
@@ -248,7 +257,9 @@ namespace AppQuinta6.Repository
                             {
                                 Id = Convert.ToInt32(reader["IdProd"]),
                                 Descricao = reader["Descricao"].ToString(),
-                                PrecoUn = Convert.ToDecimal(reader["PrecoUn"])
+                                PrecoUn = Convert.ToDecimal(reader["PrecoUn"]),
+                                TipoMedida = (reader["TipoMedida"].ToString())
+
                             });
                         }
                     }
@@ -266,30 +277,6 @@ namespace AppQuinta6.Repository
         {
             throw new NotImplementedException();
         }
-        //public IEnumerable<ProdutoSimples> BuscarPorNome(string nome)
-        //{
-        //    var produtos = new List<ProdutoSimples>();
-        //    using (var conexao = new MySqlConnection(_conexaoMySQL))
-        //    {
-        //        conexao.Open();
-        //        string query = "SELECT * FROM Produto WHERE Descricao LIKE @Nome";
-        //        MySqlCommand cmd = new MySqlCommand(query, conexao);
-        //        cmd.Parameters.AddWithValue("@Nome", "%" + nome + "%");
 
-        //        using (var reader = cmd.ExecuteReader())
-        //        {
-        //            while (reader.Read())
-        //            {
-        //                produtos.Add(new ProdutoSimples
-        //                {
-        //                    Id = Convert.ToInt32(reader["Id"]),
-        //                    Descricao = reader["Descricao"].ToString(),
-        //                    PrecoUn = Convert.ToDecimal(reader["PrecoUn"])
-        //                });
-        //            }
-        //        }
-        //    }
-        //    return produtos;
-        //}
     }
 }

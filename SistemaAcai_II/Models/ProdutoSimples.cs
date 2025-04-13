@@ -13,8 +13,14 @@ namespace SistemaAcai_II.Models
 
         [Display(Name = "Valor", Description = "Valor.")]
         [Required(ErrorMessage = "A valor é obrigatória")]
+
         public decimal PrecoUn { get; set; }
 
+
+        [Display(Name = "TipoMedida", Description = "TipoMedida")]
+        [Required(ErrorMessage = "A Descrição é obrigatório.")]
+
+        public string TipoMedida { get; set; }
         public int? Quantidade { get; set; }
 
         public decimal peso { get; set; }

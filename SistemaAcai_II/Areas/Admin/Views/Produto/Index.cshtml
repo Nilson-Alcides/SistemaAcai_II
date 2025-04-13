@@ -29,7 +29,10 @@
             <th>ID</th>
             <th>Descrição</th>
             <th>Preço Unitário</th>
+            
+            <th>Tipo</th>        
             <th>Ações</th>
+
         </tr>
     </thead>
     <tbody>
@@ -39,9 +42,11 @@
                 <td>@produto.Id</td>
                 <td>@produto.Descricao</td>
                 <td>R$ @produto.PrecoUn.ToString("N2")</td>
+                <td>@produto.TipoMedida</td>
                 <td>
                     <a class="btn btn-sm btn-warning" href="/Admin/Produto/Atualizar/@produto.Id">Editar</a>
                 </td>
+               
             </tr>
         }
     </tbody>
