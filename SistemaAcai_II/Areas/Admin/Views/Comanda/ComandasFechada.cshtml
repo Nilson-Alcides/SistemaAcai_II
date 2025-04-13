@@ -1,0 +1,65 @@
+﻿@model IPagedList<SistemaAcai_II.Models.Comanda>
+
+@{
+    ViewData["Title"] = "Comandas Fechada";
+    var pesquisa = Context.Request.Query["pesquisa"];
+}
+<h2>Comandas Fechadas</h2>
+
+<form method="get">
+    <div class="form-group row">
+        <label for="pesquisa" class="col-sm-2 col-form-label">Faça a pesquisa</label>
+        <div class="col-sm-4">
+            <input type="text" name="pesquisa" id="pesquisa" value="@pesquisa" class="form-control" placeholder="Digite o código" autofocus>
+        </div>
+        <div class="col-sm-4">
+            <button type="submit" class="btn btn-primary">Pesquisar</button>
+        </div>
+    </div>
+</form>
+<br />
+@if (Model.Count > 0)
+{
+    <a class="btn btn-primary" asp-action="Vendas">Vendas</a>
+    <br />
+    @Html.PagedListPager((IPagedList)Model, pagina => Url.Action("Index", new { pagina }))
+    <div class="table-responsive">
+        <table class="table table-bordered">
+            <thead class="thead-dark">
+                <tr>
+                    <th scope="col">@Html.DisplayNameFor(model => model.First().Id)</th>
+                    <th scope="col">@Html.DisplayNameFor(model => model.First().NomeCliente)</th>
+                    <th scope="col">@Html.DisplayNameFor(model => model.First().DataAbertura)</th>
+                    <th scope="col">@Html.DisplayNameFor(model => model.First().DataFechamento)</th>
+                    <th scope="col">@Html.DisplayNameFor(model => model.First().ValorTotal)</th>
+
+                    <th scope="col">Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (Comanda comanda in Model)
+                {
+
+                    <tr>
+                        <th scope="row">@comanda.Id</th>
+                        <td>@comanda.NomeCliente</td>
+                        <td>@comanda.DataAbertura.ToString("dd/MM/yyyy")</td>
+                        <td>@comanda.DataFechamento?.ToString("dd/MM/yyyy")</td>
+                        <td>@comanda.ValorTotal.ToString("C")</td>
+
+                        <td>
+                            <a asp-action="Atualizar" asp-route-id="@comanda.Id" class="btn btn-success">Fechar Comanda</a>
+                            <a asp-action="Detalhes" asp-route-id="@comanda.Id" class="btn btn-warning">Itens da Comanda</a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}
+else
+{
+    <span>Nenhum registro cadastrado!</span>
+    <br />
+    <a class="btn btn-primary" asp-action="Cadastrar">Cadastrar</a>
+}

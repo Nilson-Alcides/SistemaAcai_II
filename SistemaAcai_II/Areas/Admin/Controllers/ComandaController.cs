@@ -206,8 +206,6 @@ namespace SistemaAcai_II.Controllers
             {
                 _comandaRepository.AtualizarValorComDesconto(novaComanda);
             }
-            
-
             _cookiePedidoCompra.RemoverTodos();
 
             return RedirectToAction("Index");
@@ -217,15 +215,19 @@ namespace SistemaAcai_II.Controllers
         {
             return View(_comandaRepository.ObterTodasComandas(pagina, pesquisa));
         }
-
-        public IActionResult ComandasAbertas()
-        {
-            return  new ContentResult() { Content = "Pagiina Localizada Comandas abertas." };
-        }
         public IActionResult limpaConada()
         {
             _cookiePedidoCompra.RemoverTodos();
             return RedirectToAction(nameof(Vendas));
         }
+        public IActionResult ComandasFechada(int? pagina, string pesquisa)
+        {
+            return View(_comandaRepository.ObterTodasComandasFechadas(pagina, pesquisa));
+        }
+
+
+
+
+
     }
 }

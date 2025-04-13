@@ -2,7 +2,67 @@
     ViewData["Title"] = "Home Page";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
-</div>
+<HTML
+
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bem-vindo ao Açai do Dudu</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            margin: 0;
+            padding: 0;
+            background-image: url('imagens/Logo_Acai.png'); /* Substitua pela URL da sua imagem */
+           
+            background-size: contain; /* Garante que a imagem caiba dentro do elemento */
+            background-repeat: no-repeat;
+            background-position: center;
+            color: #333; /* Cor do texto para melhor contraste com a imagem */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-color: rgba(255, 255, 255, 0.8); /* Adiciona uma camada semi-transparente opcional */
+           background-blend-mode: overlay; /* Combina a cor de fundo com a imagem */
+        }
+
+        .container {
+          /*  background-color: rgba(255, 255, 255, 0.9); /* Fundo branco semi-transparente para o texto */
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            max-width: 80%;
+        }
+
+        h1 {
+            color: #7b1fa2; /* Cor roxa característica do açaí */
+            margin-bottom: 20px;
+        }
+
+        p {
+            line-height: 1.6;
+            margin-bottom: 15px;
+        }
+
+        .assinatura {
+            font-style: italic;
+            color: #555;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Bem-vindo ao Açai do Dudu!</h1>
+        <p>Olá, tudo bem? Seja muito bem-vindo(a) ao Açai do Dudu, o seu novo portal para o mundo do açaí! Aqui você encontrará tudo o que precisa para se deliciar com essa fruta deliciosa e saudável.</p>
+        <p>Nosso site oferece uma variedade de receitas de açaí, desde as mais simples até as mais elaboradas. Você também encontrará informações sobre os benefícios do açaí para a saúde, dicas de como escolher o melhor açaí e muito mais.</p>
+        <p>Estamos sempre atualizando nosso conteúdo com novas receitas, dicas e informações. Então, não deixe de nos visitar com frequência para ficar por dentro de tudo o que acontece no mundo do açaí.</p>
+        <p>Esperamos que você aproveite o nosso site e se delicie com o nosso açaí!</p>
+        <p class="assinatura">Atenciosamente,</p>
+        <p class="assinatura">Equipe do Açai do Dudu</p>
+    </div>
+</body>
+</html>

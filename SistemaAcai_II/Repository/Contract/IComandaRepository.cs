@@ -10,6 +10,7 @@ namespace SistemaAcai_II.Repository.Contract
         Comanda ObterComandaPorId(int id);        
         IEnumerable<Comanda> ObterTodasComandas();
         IPagedList<Comanda> ObterTodasComandas(int? pagina, string pesquisa);
+        IPagedList<Comanda> ObterTodasComandasFechadas(int? pagina, string pesquisa);
         void AtualizarValor(Comanda comanda);
         void AtualizarValorComDesconto(Comanda comanda);
         void Atualizar(Comanda comanda);
