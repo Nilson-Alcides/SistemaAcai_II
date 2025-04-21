@@ -63,12 +63,12 @@
                             @if (produto.TipoMedida == "Kg")
                             {
                                 <input type="text" name="pesoRcebido" step="0.01" min="0.01" class="form-control-sm col-3 campo-peso" placeholder="Peso (Kg)" />
-                                <input type="hidden" name="quantidade" value="0" />
+                                <input type="hidden" name="quantidade" value="1" />
                             }
                             else
                             {
-                                <input type="number" name="quantidade" step="1" min="1" class="form-control-sm col-3 campo-quantidade" placeholder="Quantidade" />
-                                <input type="hidden" name="pesoRcebido" value="0" />
+                                <input type="number" name="quantidade" step="1" min="1" value="1" class="form-control-sm col-3 campo-quantidade" placeholder="Quantidade" />
+                                <input type="hidden" name="pesoRcebido" value="1" />
                             }
 
                             <button type="submit" class="btn btn-success btn-sm ms-2">Adicionar</button>

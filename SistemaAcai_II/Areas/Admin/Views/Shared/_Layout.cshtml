@@ -45,10 +45,9 @@
 
 </head>
 <body>
-    <nav class="navbar navbar-dark fixed-top bg-dark flex-md-nowrap bg-primary-purple p-0 shadow">
-        <a class="navbar-brand col-sm-3 col-md-2 mr-0" href="#">Painel</a>
-        <input class="form-control form-control-dark w-100" type="hidden" placeholder="" aria-label="Search">
-
+    <nav class="navbar navbar-dark navbar-inverse fixed-top bg-dark flex-md-nowrap bg-primary-purple p-0 shadow">
+        <a class="navbar-brand col-sm-3 col-md-2 mr-0" href="#">Painel</a>     
+                
         <ul class="navbar-nav px-3 bg-primary-purple">
             <li class="nav-item text-nowrap">
                 <a class="nav-link text-white" asp-area="Admin" asp-action="Logout" asp-controller="Home"><span>@_colaborador.GetColaborador().Nome </span> Sair</a>
@@ -56,9 +55,10 @@
         </ul>
     </nav>
 
+    
     <div class="container-fluid">
         <div class="row">
-            <nav class="col-md-2 d-none d-md-block bg-light sidebar">
+            <nav class="col-md-2 bg-light sidebar">
                 <div class="sidebar-sticky text-white">
                     <ul class="nav flex-column" id="menuPainel">
                         <li class="nav-item">
@@ -141,8 +141,7 @@
                     </ul>
 
                 </div>
-            </nav>
-
+            </nav>            
 
             <main role="main" class="offset-sm-2 col-md-9 ml-sm-auto col-lg-10 px-4">
 
@@ -159,6 +158,7 @@
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
+
     <script src="~/js/CarrinhoCompras.js" asp-append-version="true"></script>
 
     <script src="~/js/charts/charts.js"></script>
@@ -180,9 +180,8 @@
             }
         });
     </script>
+    
     @await RenderSectionAsync("Scripts", required: false)
-
-
 
 </body>
 </html>
