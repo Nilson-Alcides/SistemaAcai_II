@@ -1,151 +1,44 @@
-﻿@model SistemaAcai_II.Models.VendasViewModel
+﻿@model SistemaAcai_II.Models.Comanda
 @using SistemaAcai_II.Models.Constants
 @inject SistemaAcai_II.Libraries.Login.LoginColaborador _colaborador
 
-<h4>Vendas</h4>
-
-@if (TempData["Erro"] != null)
-{
-    <div class="alert alert-danger">@TempData["Erro"]</div>
+@{
+    ViewData["Title"] = "FechadaComanda";
+    decimal totalComanda = 0;
 }
 
-<form method="get">
-@*     <div class="form-group row align-items-center">
-        <label class="col-sm-2 col-form-label">Selecione o Tipo:</label>
-        <div class="col-sm-6 d-flex align-items-center">
-            <div class="form-check me-3">
-                <input type="radio" class="form-check-input" id="checkboxPeso" name="tipo" value="peso" checked />
-                <label class="form-check-label" for="checkboxPeso">Peso</label>
-            </div>
-            <div class="form-check">
-                <input type="radio" class="form-check-input" id="checkboxUnidade" name="tipo" value="unidade" />
-                <label class="form-check-label" for="checkboxUnidade">Unidade</label>
-            </div>
-        </div>
-    </div> *@
-
-    <!-- Campo de pesquisa -->
-    <div class="form-group row">
-        <label for="termo" class="col-sm-2 col-form-label">Pesquisar Produto</label>
-        <div class="col-sm-6">
-            <input type="text" name="termo" id="termo" class="form-control" placeholder="Digite o nome ou código do produto..." autofocus />
-        </div>
-        <div class="col-sm-4">
-            <button type="submit" class="btn btn-primary">Buscar</button>
-        </div>
-    </div>
-</form>
-
-<!-- Exibir resultados da pesquisa -->
-@if (Model.Produtos != null && Model.Produtos.Any())
-{
-    <h3>Produto</h3>
-    <table class="table">
-        <thead>
-            <tr>
-                <th>#Código</th>
-                <th>Nome</th>
-                <th>Preço Unitário</th>
-                <th>Peso (kg)</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var produto in Model.Produtos)
-            {
-                <tr>
-                    <td>@produto.Id</td>
-                    <td>@produto.Descricao</td>
-                    <td>@produto.PrecoUn.ToString("C")</td>
-                    <td>
-                        <form asp-action="AdicionarItem" method="post" class="d-flex">
-                            <input type="hidden" name="id" value="@produto.Id" />
-
-                            @if (produto.TipoMedida == "Kg")
-                            {
-                                <input type="text" name="pesoRcebido" step="0.01" min="0.01" class="form-control-sm col-3 campo-peso" placeholder="Peso (Kg)" />
-                                <input type="hidden" name="quantidade" value="1" />
-                            }
-                            else
-                            {
-                                <input type="number" name="quantidade" step="1" min="1" value="1" class="form-control-sm col-3 campo-quantidade" placeholder="Quantidade" />
-                                <input type="hidden" name="pesoRcebido" value="1" />
-                            }
-
-                            <button type="submit" class="btn btn-success btn-sm ms-2">Adicionar</button>
-                        </form>
-
-                    </td>
-                </tr>
-            }
-        </tbody>
-    </table>
-}
+<h1>FechadaComanda</h1>
 
 <!-- Exibir carrinho de compras -->
-<h4>Itens da Comanda</h4>
+<h4>N° da Comanda # @Model.Id </h4>
 
-@if (Model.ItensCarrinho != null && Model.ItensCarrinho.Any())
-{
-    <!-- Formulário para salvar a comanda -->
-    <form asp-action="SalvarComanda" asp-controller="Comanda" method="post">
-        <input type="hidden" asp-for="Comanda.Desconto" />
-        <input type="hidden" asp-for="Comanda.RefFormasPagamento.Id" />
-        <div class="form-group row">
-            <label for="NomeCliente" class="col-form-label col-sm-3">Nome do Cliente:</label>
-            <div class="col-sm-6">
-                <input type="text" id="NomeCliente" name="Comanda.NomeCliente" class="form-control form-control-sm" required />
-            </div>
+
+<!-- Formulário para salvar a comanda -->
+    <form asp-action="FechadaComanda" asp-controller="Comanda" method="post">
+        <input type="hidden" asp-for="Desconto" />
+        <input type="hidden" asp-for="RefFormasPagamento.Id" />
+        <input type="hidden" asp-for="Id" />
+
+        <div class="form-group col-6">
+            <label asp-for="NomeCliente"></label>
+            <input asp-for="NomeCliente" class="form-control" readonly />
         </div>
 
-        <table class="table">
-            <thead>
-                <tr>
-                    <th>Código</th>
-                    <th>Nome</th>
-                    <th>Peso (kg)</th>
-                    <th>Preço Unitário</th>
-                    <th>Subtotal</th>
-                    <th>Ação</th>
-                </tr>
-            </thead>
-            <tbody>
-                @{
-                    decimal totalComanda = 0;
-                }
-                @foreach (var item in Model.ItensCarrinho)
-                {
-                    var subtotal = item.peso * item.PrecoUn;
-                    @if (item.peso <= 0)
-                    {
-                        subtotal = Convert.ToDecimal(item.Quantidade * item.PrecoUn);
-                    }
+        <div class="form-group col-6">
+            <label asp-for="DataAbertura"></label>
+            <input asp-for="DataAbertura" type="date" class="form-control" readonly>
 
-                    ViewBag.TotalComanda = totalComanda += subtotal;
+        </div>
+        <div class="form-group col-6">
+            <label asp-for="ValorTotal"></label>
+            <input asp-for="ValorTotal" class="form-control" readonly>
 
-                    <tr>
-                        <td>@item.Id</td>
-                        <td>@item.Descricao</td>
-                        @if (@item.peso > 0)
-                        {
-                            <td>@item.peso.ToString("N3") Kg</td>
-                        }
-                        else
-                        {
-                            <td>@item.Quantidade Un</td>
-                        }
-
-                        <td>@item.PrecoUn.ToString("C")</td>
-                        <td>@subtotal.ToString("C")</td>
-                        @if (_colaborador.GetColaborador() != null && _colaborador.GetColaborador().Tipo == ColaboradorTipoConstant.Gerente)
-                        {
-                            <td class="text-right">
-                                <a asp-controller="Comanda" asp-action="RemoverItem" asp-route-id="@item.Id" class="btn btn-outline-danger">× Remover</a>
-                            </td>
-                        }
-                    </tr>
-                }
-            </tbody>
-        </table>
+        </div>
+        @{
+            totalComanda = Model.ValorTotal;
+            ViewBag.TotalComanda = totalComanda;
+        }
+   
         <div id="formaPagamentoPrincipal" class="alert alert-secondary mt-3">
             Forma de Pagamento: <span id="formaPagamentoSelecionadaPrincipal">Não selecionada</span>
         </div>
@@ -158,26 +51,16 @@
             <button type="button" class="btn btn-outline-primary me-2"
                     data-bs-toggle="modal" data-bs-target="#modalPagamento">
                 Pagamento
-            </button>           
-            <button 
-                type="submit" id="btnSalvarComanda" 
-                class="btn btn-outline-success me-2">Fechar Pedido
             </button>
-            <button 
-                type="submit" id="btnFecharPedido" 
-                class="btn btn-outline-info me-2">Salvar Comanda
-            </button>               
-             <a asp-controller="Comanda" asp-action="limpaConada" class="btn btn-outline-danger"
-                   onclick="return confirm('Deseja realmente Remover?')"> Remover Itens</a>
+            <button type="submit" id="btnSalvarComanda"
+                    class="btn btn-outline-success me-2">
+                Fechar Pedido
+            </button>            
         </div>
-
-            <br />
+        <br />
     </form>
-}
-else
-{
-    <p>Nenhum item no carrinho.</p>
-}
+
+
 
 <!-- Modal de Seleção de Forma de Pagamento -->
 <div class="modal fade" id="modalPagamento" tabindex="-1" aria-labelledby="modalPagamentoLabel" aria-hidden="true">
@@ -190,7 +73,7 @@ else
             <div class="modal-body">
                 <form id="formPagamento">
                     <div class="form-group">
-                        @Html.DropDownListFor(model => model.Comanda.RefFormasPagamento.Id, ViewBag.FormaPagamento as SelectList,
+                        @Html.DropDownListFor(model => model.RefFormasPagamento.Id, ViewBag.FormaPagamento as SelectList,
                                  "Selecione a forma de pagamento", htmlAttributes: new { @class = "form-control", id = "formaPagamento", style = "width: 70%;" })
                     </div>
                 </form>
@@ -228,7 +111,7 @@ else
                         <dl class="dlist-align">
                             <dt>Desconto:</dt>
                             <dd>
-                                <input asp-for="Comanda.Desconto" id="desconto"
+                                <input asp-for="Desconto" id="desconto"
                                        class="form-control form-control-sm dineiro"
                                        type="text" style="width: 100px;"
                                        placeholder="0,00" />
@@ -267,22 +150,7 @@ else
 </div>
 
 @section Scripts {
-    <script>
-        $(document).ready(function () {
-            $('#formaPagamento').on('change', function () {
-                var selected = $(this).val();
-                if (selected) {
-                    $('#btnFecharPedido').hide();
-                    $('#btnSalvarComanda').show();
-                } else {
-                    $('#btnSalvarComanda').hide();
-                    $('#btnFecharPedido').show();                 
-                }
-            });
-
-            // Disparar evento de mudança caso o select já venha preenchido (ex: edição)
-            $('#formaPagamento').trigger('change');
-        });
+    <script>        
 
         $(document).ready(function () {
             var dadosPagamento = {
@@ -312,7 +180,7 @@ else
                     $('#troco').val('');
                 }
             }
-           
+
 
             $('#desconto').on('blur', function () {
                 var valorFormatado = $(this).val();
@@ -370,8 +238,8 @@ else
                 $('#totalComandaDisplay').text(formatarMoeda(dadosPagamento.total));
                 $('#formaPagamentoSelecionadaPrincipal').text(dadosPagamento.formaPagamentoTexto);
                 $('#formaPagamentoPrincipal').text(dadosPagamento.formaPagamentoTexto);
-                $('[name="Comanda.Desconto"]').val(dadosPagamento.desconto.toFixed(2));
-                $('[name="Comanda.RefFormasPagamento.Id"]').val(dadosPagamento.formaPagamentoId);
+                $('[name="Desconto"]').val(dadosPagamento.desconto.toFixed(2));
+                $('[name="RefFormasPagamento.Id"]').val(dadosPagamento.formaPagamentoId);
             }
 
             function formatarMoeda(valor) {
@@ -382,3 +250,4 @@ else
         });
     </script>
 }
+

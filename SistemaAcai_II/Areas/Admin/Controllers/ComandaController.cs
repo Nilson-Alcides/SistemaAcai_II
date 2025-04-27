@@ -224,10 +224,35 @@ namespace SistemaAcai_II.Controllers
         {
             return View(_comandaRepository.ObterTodasComandasFechadas(pagina, pesquisa));
         }
+        [HttpGet]
+        public IActionResult FechadaComanda(int id)
+        {
+            var listPagamentos = _formasPagamentoRepository.ObterTodasFormasPagamentos();
+            ViewBag.FormaPagamento = new SelectList(listPagamentos, "Id", "Nome");
+            Comanda comanda = _comandaRepository.ObterComandaPorId(id);
+            return View(comanda);            
+        }
+        [HttpPost]
+        public IActionResult FechadaComanda(Comanda comanda)
+        {
 
+            if (comanda.RefFormasPagamento.Id != null)
+            {
+                var listPagamentos = _formasPagamentoRepository.ObterTodasFormasPagamentos();
+                ViewBag.FormaPagamento = new SelectList(listPagamentos, "Id", "Nome");
+            }
+            if (comanda.Desconto != null)
+            {
+                decimal desconto = Convert.ToDecimal(comanda.Desconto.Replace(".", ","));
+                if (desconto > 0)
+                {
+                    comanda.ValorTotal = (comanda.ValorTotal - desconto);
+                }
+            }
+            _comandaRepository.AtualizarValorComDesconto(comanda);
 
-
-
+            return RedirectToAction(nameof(Index));
+        }
 
     }
 }
