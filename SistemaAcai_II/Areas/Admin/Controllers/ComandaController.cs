@@ -225,7 +225,20 @@ namespace SistemaAcai_II.Controllers
             return View(_comandaRepository.ObterTodasComandasFechadas(pagina, pesquisa));
         }
 
+        //controler que acessa o peso através de um serviço no windows que salva o peso no arquivo peso.txt - necessario instalar serviço no windows
+        [HttpGet]
+        public JsonResult LerPeso()
+        {
+            string caminhoPeso = @"C:\balanca\peso.txt";
 
+            if (System.IO.File.Exists(caminhoPeso))
+            {
+                var peso = System.IO.File.ReadAllText(caminhoPeso).Trim();
+                return Json(new { peso });
+            }
+
+            return Json(new { peso = "0" });
+        }
 
 
 
