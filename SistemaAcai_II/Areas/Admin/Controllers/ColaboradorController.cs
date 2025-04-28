@@ -40,7 +40,7 @@ namespace SistemaAcai_II.Areas.Colaborador.Controllers
             }
             return View();
         }
-        [HttpGet]
+        [HttpGet] 
         //[ValidateHttpReferer]
         public IActionResult Atualizar(int id)
         {

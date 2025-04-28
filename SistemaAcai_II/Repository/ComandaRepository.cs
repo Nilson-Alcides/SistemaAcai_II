@@ -43,7 +43,8 @@ namespace SistemaAcai_II.Repository
             using (var conexao = new MySqlConnection(_conexaoMySQL))
             {
                 conexao.Open();
-                MySqlCommand cmd = new MySqlCommand("select * from Comanda WHERE IdComanda=@IdComanda ", conexao);
+                MySqlCommand cmd = new MySqlCommand("select * from Comanda as t1 " +
+                    " inner join colaborador as t2 on t1.IdColab = t2.IdColab WHERE IdComanda=@IdComanda ", conexao);
                 cmd.Parameters.AddWithValue("@IdComanda", Id);
 
                 MySqlDataAdapter da = new MySqlDataAdapter(cmd);
@@ -58,13 +59,14 @@ namespace SistemaAcai_II.Repository
                     comanda.RefColaborador = new Colaborador
                     {
                         Id = Convert.ToInt32(dr["IdColab"]),
-                        Nome = (string)(dr["Nome"]),
-                        Email = (string)(dr["Email"]),
-                        Tipo = (string)(dr["Tipo"])
+                        Nome = Convert.ToString(dr["Nome"]),
+                        Email = Convert.ToString(dr["Email"]),
+                        Tipo = Convert.ToString(dr["Tipo"])
                     };
                     comanda.NomeCliente = (string)(dr["NomeCliente"]);
                     comanda.DataAbertura = Convert.ToDateTime(dr["DataAbertura"]);
-                    comanda.DataFechamento = Convert.ToDateTime(dr["Senha"]);
+                    comanda.DataFechamento = Convert.ToDateTime(dr["DataFechamento"]);
+                    comanda.ValorTotal = Convert.ToDecimal(dr["ValorTotal"]);
                     comanda.Status = (string)(dr["Situacao"]);
                 }
                 return comanda;
