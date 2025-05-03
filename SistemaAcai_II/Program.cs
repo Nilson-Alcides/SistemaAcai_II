@@ -4,6 +4,7 @@ using SistemaAcai_II.Repositories.Contracts;
 using SistemaAcai_II.Repositories.Contract;
 using SistemaAcai_II.Repository.Contract;
 using AppQuinta6.Repository;
+using SistemaAcai_II.Libraries.ExportarArquivo;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -28,6 +29,7 @@ builder.Services.AddScoped<IFormasPagamentoRepository, FormasPagamentoRepository
 
 builder.Services.AddScoped<LoginColaborador>();
 builder.Services.AddScoped<LoginCliente>();
+builder.Services.AddScoped<ExportaArquivo>();
 
 builder.Services.AddScoped<SistemaAcai_II.Libraries.Cookie.Cookie>();
 builder.Services.AddScoped<SistemaAcai_II.Libraries.PedidoCompra.CookiePedidoCompra>();

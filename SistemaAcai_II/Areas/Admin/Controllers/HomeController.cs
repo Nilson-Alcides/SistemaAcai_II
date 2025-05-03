@@ -2,6 +2,7 @@
 using SistemaAcai_II.Libraries.Filtro;
 using SistemaAcai_II.Libraries.Login;
 using SistemaAcai_II.Repositories.Contracts;
+using SistemaAcai_II.Repository.Contract;
 
 namespace SistemaAcai_II.Areas.Colaborador.Controllers
 {
@@ -11,11 +12,14 @@ namespace SistemaAcai_II.Areas.Colaborador.Controllers
 
         private IColaboradorRepository _repositoryColaborador;
         private LoginColaborador _loginColaborador;
+        private readonly IComandaRepository _comandaRepository;
 
-        public HomeController(IColaboradorRepository repositoryColaborador, LoginColaborador loginColaborador)
+        public HomeController(IColaboradorRepository repositoryColaborador, LoginColaborador loginColaborador,
+            IComandaRepository comandaRepository)
         {
             _repositoryColaborador = repositoryColaborador;
             _loginColaborador = loginColaborador;
+            _comandaRepository = comandaRepository;
         }
         public IActionResult Index()
         {
@@ -63,7 +67,7 @@ namespace SistemaAcai_II.Areas.Colaborador.Controllers
         [ColaboradorAutorizacao]
         public IActionResult Painel()
         {
-            return View();
+           return View(_comandaRepository.ObterTodasComandasFechadas());
         }
         [ColaboradorAutorizacao]
         //  [ValidateHttpReferer]

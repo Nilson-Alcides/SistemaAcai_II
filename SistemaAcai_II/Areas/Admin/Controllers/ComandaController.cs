@@ -220,6 +220,7 @@ namespace SistemaAcai_II.Controllers
             _cookiePedidoCompra.RemoverTodos();
             return RedirectToAction(nameof(Vendas));
         }
+        [HttpGet]
         public IActionResult ComandasFechada(int? pagina, string pesquisa)
         {
             return View(_comandaRepository.ObterTodasComandasFechadas(pagina, pesquisa));
@@ -269,10 +270,5 @@ namespace SistemaAcai_II.Controllers
 
             return Json(new { peso = "0" });
         }
-
-        
-        
-
-
     }
 }
