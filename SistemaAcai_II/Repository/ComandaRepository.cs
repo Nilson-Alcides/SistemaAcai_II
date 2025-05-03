@@ -152,11 +152,14 @@ namespace SistemaAcai_II.Repository
             using (var conexao = new MySqlConnection(_conexaoMySQL))
             {
                 conexao.Open();
-                MySqlCommand cmd = new MySqlCommand("SELECT * FROM Comanda WHERE SITUACAO = 'F' ORDER BY IdComanda DESC;;", conexao);
-
+              //  MySqlCommand cmd = new MySqlCommand("SELECT * FROM Comanda WHERE SITUACAO = 'F' ORDER BY IdComanda DESC;;", conexao);
+                MySqlCommand cmd = new MySqlCommand("SELECT * FROM Comanda AS t1 INNER JOIN FormaPagamento AS t2 " +
+                                " ON t1.IdForma = t2.IdForma WHERE SITUACAO = 'F' ORDER BY IdComanda DESC;", conexao);
                 if (!string.IsNullOrEmpty(pesquisa))
                 {
-                    cmd = new MySqlCommand("select * from Comanda where SITUACAO = 'F' AND IdComanda like '%" + pesquisa + "%' ORDER BY IdComanda DESC", conexao);
+                   // cmd = new MySqlCommand("select * from Comanda where SITUACAO = 'F' AND IdComanda like '%" + pesquisa + "%' ORDER BY IdComanda DESC", conexao);
+                    cmd = new MySqlCommand("SELECT * FROM Comanda AS t1 INNER JOIN FormaPagamento AS t2 " +
+                        " ON t1.IdForma = t2.IdForma where SITUACAO = 'F' AND IdComanda like '%" + pesquisa + "%' ORDER BY IdComanda DESC", conexao);
                 }
 
                 MySqlDataAdapter da = new MySqlDataAdapter(cmd);
@@ -174,6 +177,11 @@ namespace SistemaAcai_II.Repository
                             NomeCliente = Convert.ToString(dr["NomeCliente"]),
                             DataAbertura = Convert.ToDateTime(dr["DataAbertura"]),
                             DataFechamento = Convert.ToDateTime(dr["DataFechamento"]),
+                            RefFormasPagamento = new FormasPagamento
+                            {
+                                Id = Convert.ToInt32(dr["IdForma"]),
+                                Nome = Convert.ToString(dr["Nome"]),
+                            },
                             ValorTotal = Convert.ToDecimal(dr["ValorTotal"])
                         });
                 }
@@ -188,7 +196,9 @@ namespace SistemaAcai_II.Repository
             using (var conexao = new MySqlConnection(_conexaoMySQL))
             {
                 conexao.Open();
-                MySqlCommand cmd = new MySqlCommand("SELECT * FROM Comanda WHERE SITUACAO = 'F' ORDER BY IdComanda DESC;", conexao);
+                //MySqlCommand cmd = new MySqlCommand("SELECT * FROM Comanda WHERE SITUACAO = 'F' ORDER BY IdComanda DESC;", conexao);
+                MySqlCommand cmd = new MySqlCommand("SELECT * FROM Comanda AS t1 INNER JOIN FormaPagamento AS t2 " +
+                                " ON t1.IdForma = t2.IdForma WHERE SITUACAO = 'F' ORDER BY IdComanda DESC;", conexao);
                                 
                 MySqlDataAdapter da = new MySqlDataAdapter(cmd);
                 DataTable dt = new DataTable();
@@ -205,6 +215,11 @@ namespace SistemaAcai_II.Repository
                             NomeCliente = Convert.ToString(dr["NomeCliente"]),
                             DataAbertura = Convert.ToDateTime(dr["DataAbertura"]),
                             DataFechamento = Convert.ToDateTime(dr["DataFechamento"]),
+                            RefFormasPagamento = new FormasPagamento
+                            {
+                                Id = Convert.ToInt32(dr["IdForma"]),
+                                Nome = Convert.ToString(dr["Nome"]),
+                            },
                             Desconto = Convert.ToString(dr["Desconto"]),
                             ValorTotal = Convert.ToDecimal(dr["ValorTotal"])
                         });

@@ -5,6 +5,10 @@ using SistemaAcai_II.Repositories.Contract;
 using SistemaAcai_II.Repository.Contract;
 using AppQuinta6.Repository;
 using SistemaAcai_II.Libraries.ExportarArquivo;
+using DocumentFormat.OpenXml.Office2016.Drawing.ChartDrawing;
+using System.Net.Mail;
+using System.Net;
+using SistemaAcai_II.Libraries.Email;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -33,6 +37,24 @@ builder.Services.AddScoped<ExportaArquivo>();
 
 builder.Services.AddScoped<SistemaAcai_II.Libraries.Cookie.Cookie>();
 builder.Services.AddScoped<SistemaAcai_II.Libraries.PedidoCompra.CookiePedidoCompra>();
+
+/*
+ * SMTP
+ */
+builder.Services.AddTransient<SmtpClient>(provider =>
+{
+    var config = provider.GetRequiredService<IConfiguration>();
+    return new SmtpClient
+    {
+        Host = config["Email:Host"],
+        Port = int.Parse(config["Email:Port"]),
+        Credentials = new NetworkCredential(
+            config["Email:Username"],
+            config["Email:Password"]),
+        EnableSsl = true
+    };
+});
+builder.Services.AddScoped<GerenciarEmail>();
 
 // corrigir problema com TEMPDATA
 builder.Services.AddDistributedMemoryCache();

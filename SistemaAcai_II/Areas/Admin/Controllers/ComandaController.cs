@@ -260,7 +260,8 @@ namespace SistemaAcai_II.Controllers
         [HttpGet]
         public JsonResult LerPeso()
         {
-            string caminhoPeso = @"C:\balanca\peso.txt";
+           string caminhoPeso = @"C:\balanca\peso.txt";  
+
 
             if (System.IO.File.Exists(caminhoPeso))
             {

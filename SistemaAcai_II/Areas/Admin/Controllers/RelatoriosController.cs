@@ -18,23 +18,8 @@ namespace SistemaAcai_II.Areas.Admin.Controllers
         {
             _comandaRepository = comandaRepository;
             _exportaArquivo = exportaArquivo;
-        }        
-        //public IActionResult Index(DateTime? dataInicial, DateTime? dataFinal)
-        //{
-        //    var comandas = _comandaRepository.ObterTodasComandasFechadas();
-
-        //    if (dataInicial.HasValue && dataFinal.HasValue)
-        //    {
-        //        comandas = comandas
-        //            .Where(c => c.DataAbertura.Date >= dataInicial.Value.Date && c.DataAbertura.Date <= dataFinal.Value.Date)
-        //            .ToList();
-        //    }
-
-        //    ViewBag.DataInicial = dataInicial;
-        //    ViewBag.DataFinal = dataFinal;
-
-        //    return View(comandas);
-        //}
+        }       
+       
         public IActionResult Index(DateTime? dataInicial, DateTime? dataFinal, string export)
         {
             var comandas = _comandaRepository.ObterTodasComandasFechadas();

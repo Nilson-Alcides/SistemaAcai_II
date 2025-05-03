@@ -7,7 +7,7 @@ namespace SistemaAcai_II.Models
         [Display(Name = "Código", Description = "Código.")]
         public int Id { get; set; }
 
-        [Display(Name = "Descrição", Description = "descrição")]
+        [Display(Name = "Pagamento", Description = "descrição")]
         [Required(ErrorMessage = "Uma forma de pagamento é obrigatória.")]
         public string Nome { get; set; }
     }

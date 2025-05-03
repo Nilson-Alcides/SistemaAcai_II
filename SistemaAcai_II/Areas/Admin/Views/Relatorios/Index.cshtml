@@ -34,7 +34,9 @@
             <tr>
                 <th scope="col">@Html.DisplayNameFor(model => model.First().Id)</th>
                 <th scope="col">@Html.DisplayNameFor(model => model.First().NomeCliente)</th>
-                <th scope="col">@Html.DisplayNameFor(model => model.First().DataAbertura)</th>                
+                <th scope="col">@Html.DisplayNameFor(model => model.First().DataAbertura)</th>
+                <th scope="col">@Html.DisplayNameFor(model => model.First().DataFechamento)</th>
+                <th scope="col">@Html.DisplayNameFor(model => model.First().RefFormasPagamento.Nome)</th>
                 <th scope="col">@Html.DisplayNameFor(model => model.First().Desconto)</th>
                 <th scope="col">@Html.DisplayNameFor(model => model.First().ValorTotal)</th>
             </tr>
@@ -47,6 +49,8 @@
                     <th scope="row">@comanda.Id</th>
                     <td>@comanda.NomeCliente</td>
                     <td>@comanda.DataAbertura.ToString("dd/MM/yyyy")</td>
+                    <td>@comanda.DataFechamento?.ToString("dd/MM/yyyy")</td>
+                    <td>@comanda.RefFormasPagamento.Nome</td>
                     <td>R$ @comanda.Desconto</td>
                     <td>@comanda.ValorTotal.ToString("C")</td>
                 </tr>
