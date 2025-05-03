@@ -1,0 +1,63 @@
+﻿@model IEnumerable<SistemaAcai_II.Models.Comanda>
+@{
+    ViewData["Title"] = "Painel";
+    var dataInicial = ViewBag.DataInicial as DateTime?;
+    var dataFinal = ViewBag.DataFinal as DateTime?;
+}
+<h2 class="text-center text-md-left">Informe as datas</h2>
+<form asp-action="Index" method="get" class="mb-4">
+    <div class="d-flex align-items-center gap-2 offset-3">
+        <label for="dataInicial" class="mb-0 me-2">Data Inicial:</label>
+        <input type="date" name="dataInicial"
+               class="form-control form-control-sm me-3"
+               style="width: 150px;"
+               value="@(dataInicial.HasValue ? dataInicial.Value.ToString("yyyy-MM-dd") : "")" />
+
+        <label for="dataFinal" class="mb-0 me-2">Data Final:</label>
+        <input type="date" name="dataFinal"
+               class="form-control form-control-sm me-3"
+               style="width: 150px;"
+               value="@(dataFinal.HasValue ? dataFinal.Value.ToString("yyyy-MM-dd") : "")" />
+
+        <button type="submit" class="btn btn-sm btn-primary">Pesquisar</button>
+
+        <button type="submit" class="btn btn-sm btn-success me-2" name="export" value="excel">Exportar Excel</button>
+        <button type="submit" class="btn btn-sm btn-danger" name="export" value="pdf">Exportar PDF</button>
+    </div>
+</form>
+
+<h2 class="text-center text-md-left">Últimas Vendas</h2>
+
+<div class="table-responsive">
+    <table class="table table-striped table-bordered table-hover table-sm">
+        <thead>
+            <tr>
+                <th scope="col">@Html.DisplayNameFor(model => model.First().Id)</th>
+                <th scope="col">@Html.DisplayNameFor(model => model.First().NomeCliente)</th>
+                <th scope="col">@Html.DisplayNameFor(model => model.First().DataAbertura)</th>                
+                <th scope="col">@Html.DisplayNameFor(model => model.First().Desconto)</th>
+                <th scope="col">@Html.DisplayNameFor(model => model.First().ValorTotal)</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            @foreach (Comanda comanda in Model)
+            {
+                <tr>
+                    <th scope="row">@comanda.Id</th>
+                    <td>@comanda.NomeCliente</td>
+                    <td>@comanda.DataAbertura.ToString("dd/MM/yyyy")</td>
+                    <td>R$ @comanda.Desconto</td>
+                    <td>@comanda.ValorTotal.ToString("C")</td>
+                </tr>
+            }
+
+
+        </tbody>
+    </table>
+
+
+    @*  <footer class="footer bg-dark-purple text-white text-center p-3">
+    <p>© 2024 Sistema de Açaí - Todos os direitos reservados</p>
+    </footer> *@
+</div>

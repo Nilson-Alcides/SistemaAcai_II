@@ -181,6 +181,69 @@ namespace SistemaAcai_II.Repository
             }
         }
 
+        public IEnumerable<Comanda> ObterTodasComandasFechadas()
+        {
+            
+            List<Comanda> ListComanda = new List<Comanda>();
+            using (var conexao = new MySqlConnection(_conexaoMySQL))
+            {
+                conexao.Open();
+                MySqlCommand cmd = new MySqlCommand("SELECT * FROM Comanda WHERE SITUACAO = 'F' ORDER BY IdComanda DESC;", conexao);
+                                
+                MySqlDataAdapter da = new MySqlDataAdapter(cmd);
+                DataTable dt = new DataTable();
+
+                da.Fill(dt);
+                conexao.Close();
+
+                foreach (DataRow dr in dt.Rows)
+                {
+                    ListComanda.Add(
+                        new Comanda
+                        {
+                            Id = Convert.ToInt32(dr["IdComanda"]),
+                            NomeCliente = Convert.ToString(dr["NomeCliente"]),
+                            DataAbertura = Convert.ToDateTime(dr["DataAbertura"]),
+                            DataFechamento = Convert.ToDateTime(dr["DataFechamento"]),
+                            Desconto = Convert.ToString(dr["Desconto"]),
+                            ValorTotal = Convert.ToDecimal(dr["ValorTotal"])
+                        });
+                }
+                return ListComanda;
+            }
+        }
+        public IEnumerable<Comanda> ObterTodasComandasFechadasProData(DateTime dateInicial, DateTime dateFinal)
+        {
+            List<Comanda> ListComanda = new List<Comanda>();
+            using (var conexao = new MySqlConnection(_conexaoMySQL))
+            {
+                conexao.Open();
+                MySqlCommand cmd = new MySqlCommand("SELECT * FROM Comanda WHERE SITUACAO = 'F' AND DataFechamento BETWEEN @dateInicial AND @dateFinal ORDER BY IdComanda DESC;", conexao);
+                cmd.Parameters.AddWithValue("@dateInicial", dateInicial);
+                cmd.Parameters.AddWithValue("@dateFinal", dateFinal);
+
+                MySqlDataAdapter da = new MySqlDataAdapter(cmd);
+                DataTable dt = new DataTable();
+
+                da.Fill(dt);
+                conexao.Close();
+
+                foreach (DataRow dr in dt.Rows)
+                {
+                    ListComanda.Add(
+                        new Comanda
+                        {
+                            Id = Convert.ToInt32(dr["IdComanda"]),
+                            NomeCliente = Convert.ToString(dr["NomeCliente"]),
+                            DataAbertura = Convert.ToDateTime(dr["DataAbertura"]),
+                            DataFechamento = Convert.ToDateTime(dr["DataFechamento"]),
+                            Desconto = Convert.ToString(dr["Desconto"]),
+                            ValorTotal = Convert.ToDecimal(dr["ValorTotal"])
+                        });
+                }
+                return ListComanda;
+            }
+        }
         public void Ativar(int Id)
         {
             string Status = "Ativa";

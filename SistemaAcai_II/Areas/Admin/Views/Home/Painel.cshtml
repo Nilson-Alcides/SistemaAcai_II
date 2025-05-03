@@ -1,4 +1,5 @@
 ﻿@inject SistemaAcai_II.Libraries.Login.LoginColaborador _colaborador
+@model IEnumerable<SistemaAcai_II.Models.Comanda>
 @{
     ViewData["Title"] = "Painel";
 }
@@ -14,63 +15,24 @@
     <table class="table table-striped table-bordered table-hover table-sm">
         <thead>
             <tr>
-                <th>#Codigo</th>
-                <th>Descrição</th>
-                <th>Valor Total</th>
-                <th>Data</th>
-                <th>Filial</th>
-                <th>Status</th>
+                <th scope="col">@Html.DisplayNameFor(model => model.First().Id)</th>
+                <th scope="col">@Html.DisplayNameFor(model => model.First().NomeCliente)</th>
+                <th scope="col">@Html.DisplayNameFor(model => model.First().DataAbertura)</th>
+                <th scope="col">@Html.DisplayNameFor(model => model.First().ValorTotal)</th>
             </tr>
         </thead>
+       
         <tbody>
-            <tr>
-                <td>#1001</td>
-                <td>Açai / Sorvete / opcionais</td>
-                <td>R$50,00</td>
-                <td>25/01/2025</td>
-                <td>Açai Tocantins</td>
-                <td>Em preparação</td>
-            </tr>
-            <tr>
-                <td>#2001</td>
-                <td>Açai / Sorvete / opcionais</td>
-                <td>R$50,00</td>
-                <td>25/01/2025</td>
-                <td>Açai Viçosa</td>
-                <td>Em preparação</td>
-            </tr>
-            <tr>
-                <td>#1002</td>
-                <td>Açai / Sorvete / opcionais</td>
-                <td>R$50,00</td>
-                <td>25/01/2025</td>
-                <td>Açai Tocantins</td>
-                <td>Em preparação</td>
-            </tr>
-            <tr>
-                <td>#2002</td>
-                <td>Açai / Sorvete / opcionais</td>
-                <td>R$50,00</td>
-                <td>25/01/2025</td>
-                <td>Açai Viçosa</td>
-                <td>Completo</td>
-            </tr>
-            <tr>
-                <td>#1003</td>
-                <td>Açai / Sorvete / opcionais</td>
-                <td>R$50,00</td>
-                <td>25/01/2025</td>
-                <td>Açai Tocantins</td>
-                <td>Completo</td>
-            </tr>
-            <tr>
-                <td>#2003</td>
-                <td>Açai / Sorvete / opcionais</td>
-                <td>R$50,00</td>
-                <td>25/01/2025</td>
-                <td>Açai Viçosa</td>
-                <td>Pendente</td>
-            </tr>
+            @foreach (Comanda comanda in Model)
+            {
+                <tr>
+                    <th scope="row">@comanda.Id</th>
+                    <td>@comanda.NomeCliente</td>
+                    <td>@comanda.DataAbertura.ToString("dd/MM/yyyy")</td>
+                    <td>@comanda.ValorTotal.ToString("C")</td>
+                </tr>
+            }
+          
            
         </tbody>
     </table>
