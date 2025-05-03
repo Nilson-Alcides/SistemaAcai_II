@@ -384,16 +384,33 @@ else
         });
     </script>
     <script>
-        setInterval(function () {
-            fetch('/Admin/Comanda/LerPeso')
+
+        let modoManual = false;
+
+        // Ativa modo manual se usuário digitar ou clicar
+        const campoPeso = document.getElementById('pesoProduto');
+        campoPeso.addEventListener('input', () => {
+            if (campoPeso.value.trim() !== "" && parseFloat(campoPeso.value.replace(',', '.')) !== 0) {
+                modoManual = true;
+            }
+        });
+        campoPeso.addEventListener('blur', () => {
+            if (campoPeso.value.trim() === "" || parseFloat(campoPeso.value.replace(',', '.')) === 0) {
+                modoManual = false;
+            }
+        });
+
+        setInterval(() => {
+            fetch('/Admin/api/balanca')
                 .then(response => response.json())
                 .then(data => {
-                    if (data.peso && data.peso !== "") {
-                        document.getElementById("pesoProduto").value = data.peso;
+                    if (!modoManual) {
+                        campoPeso.value = data.peso;
                     }
-                })
-                .catch(error => console.error('Erro ao capturar peso:', error));
-        }, 1000); // 1 segundo
+                });
+        }, 1000);
+
+
     </script>
 
 }
