@@ -53,5 +53,37 @@ namespace SistemaAcai_II.Libraries.Email
             // Envia
             _smtp.Send(mensagem);
         }
+        public void EnviarResumoComandasDia(List<Comanda> comandas, Caixa caixa)
+        {
+            var pdfBytes = _exportaArquivo.GerarPdf(comandas);
+
+            var corpoMsg = $@"
+        <h2>Resumo do Caixa - Loja Açaí</h2>
+        <p><strong>Data:</strong> {DateTime.Now:dd/MM/yyyy}</p>
+        <p><strong>Valor Inicial:</strong> {caixa.ValorInicial:C}</p>
+        <p><strong>Total Comandas:</strong> {comandas.Count}</p>
+        <p><strong>Data Fechamento:</strong> {caixa.DataFechamento:dd/MM/yyyy HH:mm}</p>
+        <hr />
+        <p><em>E-mail enviado automaticamente pelo sistema LojaAçaí.</em></p>
+    ";
+
+            var mensagem = new MailMessage
+            {
+                From = new MailAddress(_configuration.GetValue<string>("Email:Username")),
+                Subject = $"Resumo do Caixa - {DateTime.Now:dd/MM/yyyy}",
+                Body = corpoMsg,
+                IsBodyHtml = true
+            };
+
+            mensagem.To.Add("nilsonalcise@gmail.com");
+
+            mensagem.Attachments.Add(new Attachment(
+                new MemoryStream(pdfBytes),
+                $"resumo_caixa_{DateTime.Now:yyyyMMdd}.pdf",
+                "application/pdf"
+            ));
+
+            _smtp.Send(mensagem);
+        }
     }
 }

@@ -30,6 +30,7 @@ builder.Services.AddScoped<IProdutoSimplesRepository, ProdutoSimplesRepository>(
 builder.Services.AddScoped<IComandaRepository, ComandaRepository>();
 builder.Services.AddScoped<IItensComandaRepository, ItemComandaRepository>();
 builder.Services.AddScoped<IFormasPagamentoRepository, FormasPagamentoRepository>();
+builder.Services.AddScoped<ICaixaRepository, CaixaRepository>();
 
 builder.Services.AddScoped<LoginColaborador>();
 builder.Services.AddScoped<LoginCliente>();

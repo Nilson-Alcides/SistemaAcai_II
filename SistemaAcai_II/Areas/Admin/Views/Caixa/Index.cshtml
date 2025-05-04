@@ -1,16 +1,33 @@
-﻿
+﻿@model SistemaAcai_II.Models.Caixa
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Caixa";
+    bool caixaAberto = ViewBag.CaixaAberto ?? false;
 }
+
 
 <h1>Caixa</h1>
 
 <div class="d-flex gap-2 mt-2">
-    <button id="btnFecharCaixa" class="btn btn-danger w-50">
-        <i class="fa-solid fa-lock"></i> Fechar Caixa
-    </button>
-    <button id="btnAbrirCaixa" class="btn btn-success w-50">
-        <i class="fa-solid fa-lock-open"></i> Abrir Caixa
-    </button>
+    @if (!caixaAberto)
+    {
+        <form asp-action="Abrir" method="post" class="w-50">
+            <div class="form-group col-5">
+                <label>Valor Inicial do Caixa</label>
+                <input type="text" asp-for="ValorInicial" class="form-control dineiro" step="0.01" required />
+                <br />
+                <button type="submit" class="btn btn-success w-100">
+                    <i class="fa-solid fa-lock-open"></i>  Abrir Caixa
+                </button>
+            </div>
+        </form>
+    }
+    else
+    {
+        <form asp-action="Fechar" method="post" class="w-50">
+            <button type="submit" class="btn btn-danger w-100">
+                <i class="fa-solid fa-unlock"></i>  Fechar Caixa
+            </button>
+        </form>
+    }
 </div>
 

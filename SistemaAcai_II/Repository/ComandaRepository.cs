@@ -9,6 +9,8 @@ using System.Globalization;
 using static Org.BouncyCastle.Math.EC.ECCurve;
 using X.PagedList.Extensions;
 using X.PagedList;
+using DocumentFormat.OpenXml.Office2010.Excel;
+using SkiaSharp;
 
 namespace SistemaAcai_II.Repository
 {
@@ -349,7 +351,46 @@ namespace SistemaAcai_II.Repository
 
                 return ultimoId;
             }
-        } 
+        }
+        public List<Comanda> BuscarComandasFechadasDoDia(DateTime dateInicial)
+        {
+            var dataConsulta = dateInicial.Date;
+            var comandas = new List<Comanda>();
+
+            using var conexao = new MySqlConnection(_conexaoMySQL);
+            conexao.Open();
+
+            
+            var query = @"SELECT * FROM Comanda AS t1 INNER JOIN FormaPagamento AS t2 ON t1.IdForma = t2.IdForma
+                        WHERE SITUACAO = 'F' AND DATE(DataFechamento) = @dateInicial ORDER BY IdComanda DESC";
+
+           // var query = @"SELECT * FROM Comanda WHERE Situacao = 'F' 
+                //  AND DATE(DataFechamento) = @dateInicial";
+
+            using var cmd = new MySqlCommand(query, conexao);
+            cmd.Parameters.AddWithValue("@dateInicial", dataConsulta);
+
+            using var dr = cmd.ExecuteReader();
+            while (dr.Read())
+            {
+                comandas.Add(new Comanda
+                {
+                    Id = Convert.ToInt32(dr["IdComanda"]),
+                    NomeCliente = Convert.ToString(dr["NomeCliente"]),
+                    DataAbertura = Convert.ToDateTime(dr["DataAbertura"]),
+                    DataFechamento = Convert.ToDateTime(dr["DataFechamento"]),
+                    RefFormasPagamento = new FormasPagamento
+                    {
+                        Id = Convert.ToInt32(dr["IdForma"]),
+                        Nome = Convert.ToString(dr["Nome"]),
+                    },
+                    Desconto = Convert.ToString(dr["Desconto"]),
+                    ValorTotal = Convert.ToDecimal(dr["ValorTotal"])
+                });
+            }
+
+            return comandas;
+        }
 
     }
 }
