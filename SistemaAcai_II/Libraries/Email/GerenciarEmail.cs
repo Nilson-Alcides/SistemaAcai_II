@@ -29,7 +29,7 @@ namespace SistemaAcai_II.Libraries.Email
         <p><strong>Data Fechamento:</strong> {comanda.DataFechamento:dd/MM/yyyy HH:mm}</p>
         <p><strong>Valor Total:</strong> {comanda.ValorTotal:C}</p>
         <hr />
-        <p><em>E-mail enviado automaticamente pelo sistema LojaAçaí.</em></p>
+        <p><em>E-mail enviado automaticamente pelo sistema LojaAçaí .</em></p>
     ";
 
             // Monta a mensagem
@@ -56,15 +56,17 @@ namespace SistemaAcai_II.Libraries.Email
         public void EnviarResumoComandasDia(List<Comanda> comandas, Caixa caixa)
         {
             var pdfBytes = _exportaArquivo.GerarPdf(comandas);
-
+            decimal totalGeral = comandas.Sum(c => c.ValorTotal);
             var corpoMsg = $@"
-        <h2>Resumo do Caixa - Loja Açaí</h2>
+        <h2>Resumo do Caixa - Loja Açaí do Dudu - Tocantins-MG</h2>
         <p><strong>Data:</strong> {DateTime.Now:dd/MM/yyyy}</p>
         <p><strong>Valor Inicial:</strong> {caixa.ValorInicial:C}</p>
+        <p><strong>Valor Total:</strong> {totalGeral}</p>
         <p><strong>Total Comandas:</strong> {comandas.Count}</p>
         <p><strong>Data Fechamento:</strong> {caixa.DataFechamento:dd/MM/yyyy HH:mm}</p>
         <hr />
-        <p><em>E-mail enviado automaticamente pelo sistema LojaAçaí.</em></p>
+        <p><em>E-mail enviado automaticamente pelo sistema Loja Açaí do Dudu - Tocantins.</em></p>
+        <p><em>Endereço: Av Dr João Cataldo Pinto 1643 (Rodovia sentido Piraúba) - Centro, Tocantins/MG..</em></p>
     ";
 
             var mensagem = new MailMessage
@@ -73,9 +75,8 @@ namespace SistemaAcai_II.Libraries.Email
                 Subject = $"Resumo do Caixa - {DateTime.Now:dd/MM/yyyy}",
                 Body = corpoMsg,
                 IsBodyHtml = true
-            };
-
-            mensagem.To.Add("nilsonalcise@gmail.com");
+            };            
+            mensagem.To.Add("nilson_alcides@hotmail.com");           
 
             mensagem.Attachments.Add(new Attachment(
                 new MemoryStream(pdfBytes),

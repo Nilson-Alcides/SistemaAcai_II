@@ -13,6 +13,7 @@ namespace SistemaAcai_II.Controllers
 {
     [Area("Admin")]
     [ColaboradorAutorizacao]
+    [TypeFilter(typeof(CaixaAutorizacaoAttribute))]
     public class ComandaController : Controller
     {
         private readonly IComandaRepository _comandaRepository;
@@ -33,6 +34,7 @@ namespace SistemaAcai_II.Controllers
             _itensComandaRepository = itensComandaRepository;
             _formasPagamentoRepository = formasPagamentoRepository; 
         }
+        
         public IActionResult Vendas(string termo)
         {
             var listPagamentos = _formasPagamentoRepository.ObterTodasFormasPagamentos();
@@ -136,14 +138,14 @@ namespace SistemaAcai_II.Controllers
        
         DateTime data;
         [ColaboradorAutorizacao]
+        [TypeFilter(typeof(CaixaAutorizacaoAttribute))]
         public IActionResult SalvarComanda(Comanda comanda)
         {
             if(comanda.RefFormasPagamento.Id != null)
             {
                 var listPagamentos = _formasPagamentoRepository.ObterTodasFormasPagamentos();
                 ViewBag.FormaPagamento = new SelectList(listPagamentos, "Id", "Nome");
-            }
-            
+            }            
 
             if (comanda == null)
             {

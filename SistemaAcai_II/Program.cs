@@ -9,6 +9,7 @@ using DocumentFormat.OpenXml.Office2016.Drawing.ChartDrawing;
 using System.Net.Mail;
 using System.Net;
 using SistemaAcai_II.Libraries.Email;
+using SistemaAcai_II.Libraries.Filtro;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -38,6 +39,7 @@ builder.Services.AddScoped<ExportaArquivo>();
 
 builder.Services.AddScoped<SistemaAcai_II.Libraries.Cookie.Cookie>();
 builder.Services.AddScoped<SistemaAcai_II.Libraries.PedidoCompra.CookiePedidoCompra>();
+builder.Services.AddScoped<CaixaAutorizacaoAttribute>();
 
 /*
  * SMTP
