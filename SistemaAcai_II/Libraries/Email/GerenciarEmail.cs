@@ -77,6 +77,7 @@ namespace SistemaAcai_II.Libraries.Email
                 IsBodyHtml = true
             };            
             mensagem.To.Add("nilson_alcides@hotmail.com");           
+            mensagem.To.Add("Acaidodudu@outlook.com");      
 
             mensagem.Attachments.Add(new Attachment(
                 new MemoryStream(pdfBytes),

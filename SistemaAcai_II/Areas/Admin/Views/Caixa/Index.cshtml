@@ -1,14 +1,14 @@
 ﻿@model SistemaAcai_II.Models.Caixa
 @{
     ViewData["Title"] = "Caixa";
-    bool caixaAberto = ViewBag.CaixaAberto ?? false;
+    var caixaAberto = ViewBag.CaixaAberto as SistemaAcai_II.Models.Caixa;
 }
 
 
 <h1>Caixa</h1>
 
 <div class="d-flex gap-2 mt-2">
-    @if (!caixaAberto)
+    @if (caixaAberto == null)
     {
         <form asp-action="Abrir" method="post" class="w-50">
             <div class="form-group col-5">

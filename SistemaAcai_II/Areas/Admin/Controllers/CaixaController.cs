@@ -24,7 +24,9 @@ namespace SistemaAcai_II.Areas.Admin.Controllers
         public IActionResult Index()
         {
             var caixaAberto = _caixaRepository.BuscarCaixaAbertoHoje();
-            ViewBag.CaixaAberto = caixaAberto != null;
+            ViewBag.CaixaAberto = caixaAberto;
+
+           //ViewBag.CaixaAberto = caixaAberto != null;
             return View();
         }
 

@@ -33,7 +33,15 @@ Senha Varchar(255) not null,
 Situacao char(1) not null
 );
 -- select * from cliente;
-
+-- Tabela de Caixa
+CREATE TABLE Caixa (
+    IdCaixa INT AUTO_INCREMENT PRIMARY KEY,
+    Situacao char(1) default 'A' not null, 
+    StatusEmail char(1) not null,
+    DataAbertura DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    DataFechamento DATETIME,
+    ValorInicial DECIMAL(10,2)
+);
 -- Tabela de Filiais
 CREATE TABLE Filiais (
     Idfilial INT AUTO_INCREMENT PRIMARY KEY,

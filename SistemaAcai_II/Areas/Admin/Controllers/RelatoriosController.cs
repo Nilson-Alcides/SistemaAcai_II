@@ -51,6 +51,12 @@ namespace SistemaAcai_II.Areas.Admin.Controllers
             ViewBag.DataFinal = dataFinal;
             return View(comandas);
         }
+        public IActionResult ComandaHoje()
+        {
+            DateTime date = DateTime.Now;
+            return View(_comandaRepository.BuscarComandasFechadasDoDia(date));
+        }
+        
 
     }
 }
