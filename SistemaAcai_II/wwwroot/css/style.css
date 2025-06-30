@@ -39,14 +39,31 @@ li {
     display: flex;
     width: 100%;
 }
-
+/*Ajuste cor */
 #sidebar {
+    background-color: #7d42aa !important;
     max-width: 264px;
     min-width: 264px;
     transition: all 0.35s ease-in-out;
     box-shadow: 0 0 35px 0 rgba(49, 57, 66, 0.5);
     z-index: 1111;
 }
+#sidebar .sidebar-link,
+#sidebar .sidebar-header,
+#sidebar .sidebar-logo a {
+    color: white !important;
+}
+
+#sidebar .sidebar-link:hover {
+    background-color: #7e3ff2 !important;
+    color: white !important;
+}
+
+main.content {
+    background-color: #f4f4f4;
+    min-height: 100vh;
+}
+
 
 /* Sidebar collapse */
 
@@ -122,3 +139,4 @@ a.sidebar-link {
         width: auto;
     }
 }
+

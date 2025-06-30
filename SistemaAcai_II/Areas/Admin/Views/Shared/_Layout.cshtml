@@ -3,170 +3,213 @@
 
 
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="en">
+
 <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <meta name="description" content="">
-    <meta name="author" content="Nilson Jose Alcides">
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - Sistema Açai </title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/dashboard/dashboard.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/pagedlist/PagedList.css" rel="stylesheet" type="text/css" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 
-    <title>@ViewBag.Title</title>
-
-    <head>
-        <meta charset="utf-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>@ViewData["Title"] - Sistema Açai </title>
-        <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
-        <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
-        <link rel="stylesheet" href="~/css/dashboard/dashboard.css" asp-append-version="true" />
-        <link rel="stylesheet" href="~/css/" asp-append-version="true" />
-        <link rel="stylesheet" href="~/css/pagedlist/PagedList.css" rel="stylesheet" type="text/css" />
-        <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-
-    </head>
-
-    <style>
-        .bd-placeholder-img {
-            font-size: 1.125rem;
-            text-anchor: middle;
-            -webkit-user-select: none;
-            -moz-user-select: none;
-            -ms-user-select: none;
-            user-select: none;
-        }
-
-        @@media (min-width: 768px) {
-            .bd-placeholder-img-lg {
-                font-size: 3.5rem;
-            }
-        }
-    </style>
-    <!-- Custom styles for this template -->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+ 
+    <script src="https://kit.fontawesome.com/ae360af17e.js" crossorigin="anonymous"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-KK94CHFLLe+nY2dmCWGMq91rCGa5gtU4mk92HdvYe+M/SXH301p5ILy+dN9+nJOZ" crossorigin="anonymous">  
+  
+    <link rel="stylesheet" href="~/css/style.css" asp-append-version="true" />
 
 </head>
+
 <body>
-    <nav class="navbar navbar-dark navbar-inverse fixed-top bg-dark flex-md-nowrap bg-primary-purple p-0 shadow">
-        <a class="navbar-brand col-sm-3 col-md-2 mr-0" href="#">Painel</a>     
-                
-        <ul class="navbar-nav px-3 bg-primary-purple">
-            <li class="nav-item text-nowrap">
-                <a class="nav-link text-white" asp-area="Admin" asp-action="Logout" asp-controller="Home"><span>@_colaborador.GetColaborador().Nome </span> Sair</a>
-            </li>
-        </ul>
-    </nav>
-
-    
-    <div class="container-fluid">
-        <div class="row">
-            <nav class="col-md-2 bg-light sidebar">
-                <div class="sidebar-sticky text-white">
-                    <ul class="nav flex-column" id="menuPainel">
-                        <li class="nav-item">
-                            <a class="nav-link active text-white" asp-area="Admin" asp-controller="Home" asp-action="Painel" data-index="1">
-                                <i class="fa-solid fa-house"></i>
-                                Painel de Controle (ALT + 1)
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-white" asp-action="Index" asp-controller="Caixa" data-index="2">
-                                <i class="fa-solid fa-file"></i>
-                                Caixa (ALT + 2)
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-white" asp-action="Vendas" asp-controller="Comanda" data-index="3">
-                                <i class="fa-solid fa-cart-shopping"></i>
-                                Vendas (ALT + 3)
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-white" asp-controller="Produto" asp-action="Index" data-index="4">
-                                <i class="fa-solid fa-cart-shopping"></i>
-                                Produto (ALT + 4)
-                            </a>
-                        </li>
-
-                        @if (_colaborador.GetColaborador() != null && _colaborador.GetColaborador().Tipo == ColaboradorTipoConstant.Gerente)
-                        {
-                            <li class="nav-item">
-                                <a class="nav-link text-white" asp-controller="Colaborador" asp-action="Index" data-index="5">
-                                    <i class="fa-solid fa-users"></i>
-                                    Colaborador (ALT + 5)
-                                </a>
-                            </li>
-
-                            <li class="nav-item">
-                                <a class="nav-link text-white" asp-controller="Filiais" asp-action="Index" data-index="6">
-                                    <i class="fa-solid fa-users"></i>
-                                    Filiais (ALT + 6)
-                                </a>
-                            </li>
-                        }
-                        <li class="nav-item">
-                            <a class="nav-link text-white" asp-controller="Pagamento" asp-action="Index" data-index="7">
-                                <i class="fa-solid fa-users"></i>
-                                Forma de Pagamento (ALT + P)
-                            </a>
-                        </li>
-
-                        <li class="nav-item">
-                            <a class="nav-link text-white" asp-controller="Cliente" asp-action="Index" data-index="7">
-                                <i class="fa-solid fa-users"></i>
-                                Cliente (ALT + 7)
-                            </a>
-                        </li>
-
-                        <li class="nav-item">
-                            <a class="nav-link text-white" asp-controller="Comanda" asp-action="Index" data-index="8">
-                                <i class="fa-solid fa-file"></i>
-                                Comandas Abertas (ALT + 8)
-                            </a>
-                        </li>
-
-                        @* <li class="nav-item">
-                            <a class="nav-link text-white" asp-controller="Relatorios" asp-action="Index" data-index="9">
-                                <i class="fa-solid fa-chart-bar"></i>
-                                Relatórios (ALT + 9)
-                            </a>
-                        </li> *@
-                    </ul>
-                    <ul class="nav nav-pills">
-                        <li class="nav-item"><span class="nav-link active text-white"><i class="fa-solid fa-chart-bar"></i> Relatórios (ALT + 9)</span></li>
-                        <li class="nav-item">
-                            <a class="nav-link text-white" asp-controller="Comanda" asp-action="ComandasFechada" data-index="9">
-                                <i class="fa-solid fa-chart-bar"></i>
-                                Comandas fechadas
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-white" asp-controller="Relatorios" asp-action="Index" data-index="10">
-                                <i class="fa-solid fa-chart-bar"></i>
-                               Comadas por data
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-white" asp-controller="Relatorios" asp-action="ComandaHoje" data-index="10">
-                                <i class="fa-solid fa-chart-bar"></i>
-                                Comadas do dia
-                            </a>
-                        </li>
-                    </ul>
-
+    <div class="wrapper">
+        <!-- Sidebar -->
+        <aside id="sidebar">
+            <div class="h-100">
+                <div class="sidebar-logo">
+                    <a asp-area="Admin" asp-controller="Home" asp-action="Painel"><i class="fa-solid fa-house"></i>
+                        Açai do Dudu
+                    </a>
+                   
                 </div>
-            </nav>            
+                <!-- Sidebar Navigation -->
+                <ul class="sidebar-nav">
+                    <li class="sidebar-header" data-index="1">
+                        Painel de Controle (ALT + 1)
+                    </li>
+                    
+                    <li class="sidebar-item">
+                        <a href="#" class="sidebar-link collapsed" data-bs-toggle="collapse" data-bs-target="#pages"
+                           aria-expanded="false" aria-controls="pages">
+                            <i class="fa-regular fa-file-lines pe-2"></i>
+                            CAIXA (ALT + 2)
+                        </a>                        
+                        <ul id="pages" class="sidebar-dropdown list-unstyled collapse" data-bs-parent="#sidebar">
+                            <li class="sidebar-item">
+                                <a asp-action="Index" asp-controller="Caixa" class="sidebar-link">Fechar</a>
+                            </li>
+                            <li class="sidebar-item">
+                                <a asp-action="Index" asp-controller="Caixa" class="sidebar-link">Abrir</a>
+                            </li>                           
+                        </ul>
+                    </li>
+                    <li class="sidebar-item">
+                        <a href="#" class="sidebar-link collapsed" data-bs-toggle="collapse" data-bs-target="#vendas"
+                           aria-expanded="false" aria-controls="dashboard">
+                            <i class="fa-solid fa-cart-shopping pe-2"></i>
+                            VENDAS
+                        </a>
+                        <ul id="vendas" class="sidebar-dropdown list-unstyled collapse" data-bs-parent="#sidebar">
+                            <li class="sidebar-item">
+                                <a asp-action="Vendas" asp-controller="Comanda" class="sidebar-link">
+                                    <i class="fa-solid fa-cart-shopping"></i>  Vendas (ALT + 3)</a>
+                            </li>                            
+                        </ul>
+                    </li>
+                    <li class="sidebar-item">
+                        <a href="#" class="sidebar-link collapsed" data-bs-toggle="collapse" data-bs-target="#comandas"
+                           aria-expanded="false" aria-controls="dashboard">
+                            <i class="fa-solid fa-sliders pe-2"></i>
+                            COMANDAS
+                        </a>
+                        <ul id="comandas" class="sidebar-dropdown list-unstyled collapse" data-bs-parent="#sidebar">
+                            <li class="sidebar-item">
+                                <a asp-controller="Comanda" asp-action="Index" class="sidebar-link">
+                                    <i class="fa-solid fa-folder-open"></i> Abertas (ALT + 8)
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+                    
+                    <li class="sidebar-item">
+                        <a href="#" class="sidebar-link collapsed" data-bs-toggle="collapse" data-bs-target="#produtos"
+                           aria-expanded="false" aria-controls="dashboard">
+                            <i class="fa-brands fa-product-hunt pe-2"></i>
+                              PRODUTOS
+                        </a>
+                        <ul id="produtos" class="sidebar-dropdown list-unstyled collapse" data-bs-parent="#sidebar">
+                            <li class="sidebar-item">
+                                <a asp-controller="Produto" asp-action="Index" class="sidebar-link">
+                                    <i class="fa-brands fa-product-hunt"></i> Produto (ALT + 4)
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+                    <li class="sidebar-item">
+                        <a href="#" class="sidebar-link collapsed" data-bs-toggle="collapse" data-bs-target="#pagamentos"
+                           aria-expanded="false" aria-controls="dashboard">
+                            <i class="fa-solid fa-cash-register pe-2"></i>
+                            PAGAMENTOS
+                        </a>
+                        <ul id="pagamentos" class="sidebar-dropdown list-unstyled collapse" data-bs-parent="#sidebar">
+                            <li class="sidebar-item">
+                                <a asp-controller="Pagamento" asp-action="Index" class="sidebar-link">
+                                    <i class="fa-solid fa-cash-register"></i> Pagamento (ALT + P)
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+                    <li class="sidebar-item">
+                        <a href="#" class="sidebar-link collapsed" data-bs-toggle="collapse" data-bs-target="#cadastro"
+                           aria-expanded="false" aria-controls="dashboard">
+                            <i class="fa-solid fa-cash-register pe-2"></i>
+                            CADASTRO
+                        </a>
+                        <ul id="cadastro" class="sidebar-dropdown list-unstyled collapse" data-bs-parent="#sidebar">
+                            <li class="sidebar-item">
+                                <a asp-controller="Colaborador" asp-action="Index" class="sidebar-link">
+                                    <i class="fa-solid fa-users"></i> Colaborador (ALT + 5)
+                                </a>
+                            </li>
+                        </ul>
+                        <ul id="cadastro" class="sidebar-dropdown list-unstyled collapse" data-bs-parent="#sidebar">
+                            <li class="sidebar-item">
+                                <a asp-controller="Filiais" asp-action="Index" class="sidebar-link">
+                                    <i class="fa-solid fa-users"></i> Filiais (ALT + 6)
+                                </a>
+                            </li>
+                        </ul>
+                        <ul id="cadastro" class="sidebar-dropdown list-unstyled collapse" data-bs-parent="#sidebar">
+                            <li class="sidebar-item">
+                                <a asp-controller="Cliente" asp-action="Index" class="sidebar-link">
+                                    <i class="fa-solid fa-users"></i> Cliente (ALT + 7)
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
 
-            <main role="main" class="offset-sm-2 col-md-9 ml-sm-auto col-lg-10 px-4">
+                    <li class="sidebar-header">
+                        <i class="fa-regular fa-file-lines pe-2"></i> Relatórios
+                    </li>
+                    <li class="sidebar-item">
+                        <a href="#" class="sidebar-link collapsed" data-bs-toggle="collapse" data-bs-target="#multi"
+                           aria-expanded="false" aria-controls="multi">
+                            <i class="fa-solid fa-share-nodes pe-2"></i>
+                            Multi Relatórios
+                        </a>
+                        <ul id="multi" class="sidebar-dropdown list-unstyled collapse" data-bs-parent="#sidebar">
+                            <li class="sidebar-item">
+                                <a href="#" class="sidebar-link collapsed" data-bs-toggle="collapse"
+                                   data-bs-target="#multi-two" aria-expanded="false" aria-controls="multi-two">
+                                    <i class="fa-regular fa-file-lines pe-2"></i>
+                                     Fechadas | Data | Hoje
+                                </a>
+                                <ul id="multi-two" class="sidebar-dropdown list-unstyled collapse">
+                                    <li class="sidebar-item">
+                                        <a asp-controller="Comanda" asp-action="ComandasFechada" class="sidebar-link">
+                                            <i class="fa-solid fa-xmark"></i> Fechadas
+                                        </a>
+                                    </li>
+                                    <li class="sidebar-item">
+                                        <a asp-controller="Relatorios" asp-action="Index" class="sidebar-link">
+                                            <i class="fa-regular fa-calendar-days"></i> Por Data
+                                        </a>
+                                    </li>
+                                    <li class="sidebar-item">
+                                        <a asp-controller="Relatorios" asp-action="ComandaHoje" class="sidebar-link">
+                                            <i class="fa-regular fa-calendar-days"></i> Hoje
+                                        </a>
+                                    </li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </li>
 
-                @RenderBody()
+                </ul>
+            </div>
+        </aside>
+        <!-- Main Component -->
+        <div class="main">
+            <nav class="navbar navbar-expand px-3 border-bottom">
+                <!-- Button for sidebar toggle -->
+                <button class="btn" type="button" data-bs-theme="dark">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="container-fluid">
+                    <ul class="navbar-nav ms-auto">
+                        <li class="nav-item text-nowrap">
+                            <a class="nav-link text-white" asp-area="Admin" asp-action="Logout" asp-controller="Home">
+                                <i class="fa-solid fa-user"></i> Seja bem vindo! <span>@_colaborador.GetColaborador().Nome</span> Sair
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </nav>
+            
+            <main class="content px-3 py-2">
+                <div class="container-fluid">
+                    <div class="mb-3">                        
+                        @RenderBody()
+                    </div>
+                </div>
             </main>
         </div>
     </div>
-
-   @*  <footer class="footer bg-dark-purple text-white text-center p-3">
-        <p>© 2024 Sistema de Açaí - Todos os direitos reservados</p>
-    </footer> *@
-
-
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
@@ -174,27 +217,31 @@
     <script src="~/js/CarrinhoCompras.js" asp-append-version="true"></script>
 
     <script src="~/js/charts/charts.js"></script>
-   
+
     <script src="~/js/feather/feather.js"></script>
     <script src="~/js/modal/modal.js"></script>
     <script src="~/js/mask/jquery.mask.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-ENjdO4Dr2bkBIFxQpeoTz1HIcje39Wm4jDKdf19U8gI4ddQ3GYNS7NTKfAdVQSZe"
+            crossorigin="anonymous"></script>
+ 
+    <script src="~/js/script.js" asp-append-version="true"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
         document.addEventListener('keydown', function (e) {
             if (e.altKey) {
-                const key = parseInt(e.key);
-                if (!isNaN(key) && key >= 1 && key <= 9) {
-                    const menuItem = document.querySelector('#menuPainel a[data-index="' + key + '"]');
-                    if (menuItem) {
-                        window.location.href = menuItem.href;
-                        e.preventDefault();
-                    }
+                let key = e.key.toLowerCase(); // Suporta números e letras
+                const selector = `#atalhos a[data-index="${key}"]`;
+                const link = document.querySelector(selector);
+                if (link) {
+                    window.location.href = link.href;
+                    e.preventDefault();
                 }
             }
         });
     </script>
-    
+
     @await RenderSectionAsync("Scripts", required: false)
-
 </body>
-</html>
 
+</html>

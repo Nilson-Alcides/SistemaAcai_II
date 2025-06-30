@@ -3,6 +3,14 @@
 @{
     ViewData["Title"] = "Painel";
 }
+<div class="card">
+    <div class="card-header bg-primary text-white">
+        Vendas da Semana
+    </div>
+    <div class="card-body">
+        <canvas id="graficoVendas"></canvas>
+    </div>
+</div>
 
 <!-- Gráfico responsivo -->
 <div class="w-100" style="overflow-x: auto;">
@@ -42,5 +50,30 @@
         <p>© 2024 Sistema de Açaí - Todos os direitos reservados</p>
     </footer> *@
 </div>
-
+@section Scripts {
+<script>
+    const ctx = document.getElementById('graficoVendas').getContext('2d');
+    const graficoVendas = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: ['Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb', 'Dom'],
+            datasets: [{
+                label: 'Vendas (R$)',
+                data: [150, 200, 180, 300, 250, 400, 320],
+                backgroundColor: 'rgba(153, 102, 255, 0.7)',
+                borderColor: 'rgba(153, 102, 255, 1)',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+</script>
+}
 
