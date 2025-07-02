@@ -6,6 +6,8 @@
 
 
 <h1>Caixa</h1>
+Para abrir aperte (CRLT + SHIFT + A)<br />
+Para fechar aperte (CRLT + SHIFT + F)
 
 <div class="d-flex gap-2 mt-2">
     @if (caixaAberto == null)
@@ -31,3 +33,26 @@
     }
 </div>
 
+@section Scripts {
+    <script>
+        document.addEventListener('keydown', function (e) {
+            // Verifica Ctrl + Shift + A
+            if (e.ctrlKey && e.shiftKey && e.key.toLowerCase() === 'a') {
+                const abrirBtn = document.querySelector('form[action*="Abrir"] button[type="submit"]');
+                if (abrirBtn) {
+                    e.preventDefault();
+                    abrirBtn.click();
+                }
+            }
+
+            // Verifica Ctrl + Shift + F
+            if (e.ctrlKey && e.shiftKey && e.key.toLowerCase() === 'f') {
+                const fecharBtn = document.querySelector('form[action*="Fechar"] button[type="submit"]');
+                if (fecharBtn) {
+                    e.preventDefault();
+                    fecharBtn.click();
+                }
+            }
+        });
+    </script>
+}
