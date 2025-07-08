@@ -73,7 +73,7 @@
                                 <input type="hidden" name="pesoRcebido" value="1" />
                             }
 
-                            <button type="submit" class="btn btn-success btn-sm ms-2">Adicionar</button>
+                            <button type="submit" class="btn btn-success btn-sm ms-2">Adicionar (Crtl + Shift + a)</button>
                         </form>
 
                     </td>
@@ -159,7 +159,7 @@
         <div class="offset-md-4 col-md-6">
             <button type="button" class="btn btn-outline-primary me-2"
                     data-bs-toggle="modal" data-bs-target="#modalPagamento">
-                Pagamento
+                Pagamento (Crtl + Shift + P)
             </button>           
             <button 
                 type="submit" id="btnSalvarComanda" 
@@ -261,8 +261,8 @@ else
                 </div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                <button type="button" class="btn btn-primary" id="confirmarPagamento">Confirmar</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar (Crtl + Shift + X)</button>
+                <button type="button" class="btn btn-primary" id="confirmarPagamento">Confirmar (Crtl + Shift + C)</button>
             </div>
         </div>
     </div>
@@ -412,5 +412,46 @@ else
 
 
     </script>
+<script>
+    document.addEventListener('keydown', function (e) {
+        const modalAberto = document.getElementById('modalPagamento')?.classList.contains('show');
+
+        // Ctrl + Shift + A – Adicionar Item
+        if (e.ctrlKey && e.shiftKey && e.key.toLowerCase() === 'a') {
+            const abrirBtn = document.querySelector('form[action*="AdicionarItem"] button[type="submit"]');
+            if (abrirBtn && !abrirBtn.disabled) {
+                e.preventDefault();
+                abrirBtn.click();
+            }
+        }
+
+        // Ctrl + Shift + P – Abrir Modal de Pagamento
+        if (e.ctrlKey && e.shiftKey && e.key.toLowerCase() === 'p') {
+            const btnPagamento = document.querySelector('button[data-bs-target="#modalPagamento"]');
+            if (btnPagamento && !btnPagamento.disabled) {
+                e.preventDefault();
+                btnPagamento.click();
+            }
+        }
+
+        // Ctrl + Shift + C – Confirmar pagamento (apenas se modal estiver aberto)
+        if (modalAberto && e.ctrlKey && e.shiftKey && e.key.toLowerCase() === 'c') {
+            const btnConfirmar = document.getElementById('confirmarPagamento');
+            if (btnConfirmar) {
+                e.preventDefault();
+                btnConfirmar.click();
+            }
+        }
+
+        // Ctrl + Shift + X – Cancelar pagamento (apenas se modal estiver aberto)
+        if (modalAberto && e.ctrlKey && e.shiftKey && e.key.toLowerCase() === 'x') {
+            const btnFechar = document.querySelector('#modalPagamento .btn-close');
+            if (btnFechar) {
+                e.preventDefault();
+                btnFechar.click();
+            }
+        }
+    });
+</script>
 
 }
