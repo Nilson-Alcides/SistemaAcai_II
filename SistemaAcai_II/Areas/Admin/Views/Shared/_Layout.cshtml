@@ -16,7 +16,7 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  
+
     <link rel="stylesheet" href="~/css/style.css" asp-append-version="true" />
 
 </head>
@@ -27,74 +27,72 @@
         <aside id="sidebar">
             <div class="h-100">
                 <div class="sidebar-logo">
-                    <a asp-area="Admin" asp-controller="Home" asp-action="Painel"><i class="fa-solid fa-house"></i>
+                    <a asp-area="Admin" asp-controller="Home" asp-action="Painel" data-index="1">
+                        <i class="fa-solid fa-house"></i>
                         Açai do Dudu
                     </a>
-                   
+
                 </div>
                 <!-- Sidebar Navigation -->
                 <ul class="sidebar-nav">
                     <li class="sidebar-header" data-index="1">
                         Painel de Controle (ALT + 1)
                     </li>
-                    
+
                     <li class="sidebar-item">
                         <a href="#" class="sidebar-link collapsed" data-bs-toggle="collapse" data-bs-target="#pages"
                            aria-expanded="false" aria-controls="pages">
                             <i class="fa-regular fa-file-lines pe-2"></i>
                             CAIXA (ALT + 2)
-                        </a>                        
+                        </a>
                         <ul id="pages" class="sidebar-dropdown list-unstyled collapse" data-bs-parent="#sidebar">
                             <li class="sidebar-item">
-                                <a asp-action="Index" asp-controller="Caixa" class="sidebar-link">
-                                    <i class="fa-solid fa-lock"></i> Fechar
-                                </a>
+                                <a asp-action="Index" asp-controller="Caixa" class="sidebar-link" data-index="2">Fechar</a>
                             </li>
                             <li class="sidebar-item">
-                                <a asp-action="Index" asp-controller="Caixa" class="sidebar-link">
-                                    <i class="fa-solid fa-lock-open"></i> Abrir
-                                </a>
-                            </li>                           
+                                <a asp-action="Index" asp-controller="Caixa" class="sidebar-link" data-index="2">Abrir</a>
+                            </li>
                         </ul>
                     </li>
                     <li class="sidebar-item">
                         <a href="#" class="sidebar-link collapsed" data-bs-toggle="collapse" data-bs-target="#vendas"
                            aria-expanded="false" aria-controls="dashboard">
                             <i class="fa-solid fa-cart-shopping pe-2"></i>
-                            VENDAS
+                            VENDAS  (ALT + 3)
                         </a>
                         <ul id="vendas" class="sidebar-dropdown list-unstyled collapse" data-bs-parent="#sidebar">
                             <li class="sidebar-item">
-                                <a asp-action="Vendas" asp-controller="Comanda" class="sidebar-link">
-                                    <i class="fa-solid fa-cart-shopping"></i>  Vendas (ALT + 3)</a>
-                            </li>                            
+                                <a asp-action="Vendas" asp-controller="Comanda" class="sidebar-link" data-index="3">
+                                    <i class="fa-solid fa-cart-shopping"></i>  Vendas
+                                </a>
+                            </li>
                         </ul>
                     </li>
                     <li class="sidebar-item">
                         <a href="#" class="sidebar-link collapsed" data-bs-toggle="collapse" data-bs-target="#comandas"
                            aria-expanded="false" aria-controls="dashboard">
                             <i class="fa-solid fa-sliders pe-2"></i>
-                            COMANDAS
+                            COMANDAS  (ALT + 4)
                         </a>
                         <ul id="comandas" class="sidebar-dropdown list-unstyled collapse" data-bs-parent="#sidebar">
                             <li class="sidebar-item">
-                                <a asp-controller="Comanda" asp-action="Index" class="sidebar-link">
-                                    <i class="fa-solid fa-folder-open"></i> Abertas (ALT + 8)
+                                <a asp-controller="Comanda" asp-action="Index" class="sidebar-link" data-index="4">
+                                    <i class="fa-solid fa-folder-open"></i> Abertas
                                 </a>
                             </li>
                         </ul>
                     </li>
-                    
+
                     <li class="sidebar-item">
                         <a href="#" class="sidebar-link collapsed" data-bs-toggle="collapse" data-bs-target="#produtos"
                            aria-expanded="false" aria-controls="dashboard">
                             <i class="fa-brands fa-product-hunt pe-2"></i>
-                              PRODUTOS
+                            PRODUTOS (ALT + 5)
                         </a>
                         <ul id="produtos" class="sidebar-dropdown list-unstyled collapse" data-bs-parent="#sidebar">
                             <li class="sidebar-item">
-                                <a asp-controller="Produto" asp-action="Index" class="sidebar-link">
-                                    <i class="fa-brands fa-product-hunt"></i> Produto (ALT + 4)
+                                <a asp-controller="Produto" asp-action="Index" class="sidebar-link" data-index="5">
+                                    <i class="fa-brands fa-product-hunt"></i> Produto
                                 </a>
                             </li>
                         </ul>
@@ -103,81 +101,73 @@
                         <a href="#" class="sidebar-link collapsed" data-bs-toggle="collapse" data-bs-target="#pagamentos"
                            aria-expanded="false" aria-controls="dashboard">
                             <i class="fa-solid fa-cash-register pe-2"></i>
-                            PAGAMENTOS
+                            PAGAMENTOS (ALT + P)
                         </a>
                         <ul id="pagamentos" class="sidebar-dropdown list-unstyled collapse" data-bs-parent="#sidebar">
                             <li class="sidebar-item">
-                                <a asp-controller="Pagamento" asp-action="Index" class="sidebar-link">
-                                    <i class="fa-solid fa-cash-register"></i> Pagamento (ALT + P)
+                                <a asp-controller="Pagamento" asp-action="Index" class="sidebar-link" data-index="p">
+                                    <i class="fa-solid fa-cash-register"></i> Pagamento
                                 </a>
                             </li>
                         </ul>
                     </li>
                     <li class="sidebar-item">
                         <a href="#" class="sidebar-link collapsed" data-bs-toggle="collapse" data-bs-target="#cadastro"
-                           aria-expanded="false" aria-controls="dashboard">
+                           aria-expanded="false" aria-controls="cadastro" data-index="c">
                             <i class="fa-solid fa-cash-register pe-2"></i>
-                            CADASTRO
+                            CADASTRO (ALT + C)
                         </a>
                         <ul id="cadastro" class="sidebar-dropdown list-unstyled collapse" data-bs-parent="#sidebar">
                             <li class="sidebar-item">
-                                <a asp-controller="Colaborador" asp-action="Index" class="sidebar-link">
-                                    <i class="fa-solid fa-users"></i> Colaborador (ALT + 5)
+                                <a asp-controller="Colaborador" asp-action="Index" class="sidebar-link" data-index="6">
+                                    <i class="fa-solid fa-users"></i> Colaborador (ALT + 6)
                                 </a>
                             </li>
-                        </ul>
-                        <ul id="cadastro" class="sidebar-dropdown list-unstyled collapse" data-bs-parent="#sidebar">
                             <li class="sidebar-item">
-                                <a asp-controller="Filiais" asp-action="Index" class="sidebar-link">
-                                    <i class="fa-solid fa-users"></i> Filiais (ALT + 6)
+                                <a asp-controller="Filiais" asp-action="Index" class="sidebar-link" data-index="7">
+                                    <i class="fa-solid fa-users"></i> Filiais (ALT + 7)
                                 </a>
                             </li>
-                        </ul>
-                        <ul id="cadastro" class="sidebar-dropdown list-unstyled collapse" data-bs-parent="#sidebar">
                             <li class="sidebar-item">
-                                <a asp-controller="Cliente" asp-action="Index" class="sidebar-link">
-                                    <i class="fa-solid fa-users"></i> Cliente (ALT + 7)
+                                <a asp-controller="Cliente" asp-action="Index" class="sidebar-link" data-index="8">
+                                    <i class="fa-solid fa-users"></i> Cliente (ALT + 8)
                                 </a>
                             </li>
                         </ul>
                     </li>
+
 
                     <li class="sidebar-header">
                         <i class="fa-regular fa-file-lines pe-2"></i> Relatórios
                     </li>
                     <li class="sidebar-item">
                         <a href="#" class="sidebar-link collapsed" data-bs-toggle="collapse" data-bs-target="#multi"
-                           aria-expanded="false" aria-controls="multi">
+                           aria-expanded="false" aria-controls="multi" data-index="m">
                             <i class="fa-solid fa-share-nodes pe-2"></i>
-                            Multi Relatórios
+                            Multi Relatórios (ALT + M)
                         </a>
-                        <ul id="multi" class="sidebar-dropdown list-unstyled collapse" data-bs-parent="#sidebar">
+
+                        <ul id="multi" class="sidebar-dropdown list-unstyled collapse">
                             <li class="sidebar-item">
-                                <a href="#" class="sidebar-link collapsed" data-bs-toggle="collapse"
-                                   data-bs-target="#multi-two" aria-expanded="false" aria-controls="multi-two">
-                                    <i class="fa-regular fa-file-lines pe-2"></i>
-                                     Fechadas | Data | Hoje
+                                <a asp-controller="Comanda" asp-action="ComandasFechada" class="sidebar-link" data-index="f">
+                                    <i class="fa-solid fa-xmark"></i> Fechadas (ALT + F)
                                 </a>
-                                <ul id="multi-two" class="sidebar-dropdown list-unstyled collapse">
-                                    <li class="sidebar-item">
-                                        <a asp-controller="Comanda" asp-action="ComandasFechada" class="sidebar-link">
-                                            <i class="fa-solid fa-xmark"></i> Fechadas
-                                        </a>
-                                    </li>
-                                    <li class="sidebar-item">
-                                        <a asp-controller="Relatorios" asp-action="Index" class="sidebar-link">
-                                            <i class="fa-regular fa-calendar-days"></i> Por Data
-                                        </a>
-                                    </li>
-                                    <li class="sidebar-item">
-                                        <a asp-controller="Relatorios" asp-action="ComandaHoje" class="sidebar-link">
-                                            <i class="fa-regular fa-calendar-days"></i> Hoje
-                                        </a>
-                                    </li>
-                                </ul>
+                            </li>
+                            <li class="sidebar-item">
+                                <a asp-controller="Relatorios" asp-action="Index" class="sidebar-link" data-index="d">
+                                    <i class="fa-regular fa-calendar-days"></i> Por Data (ALT + D)
+                                </a>
+                            </li>
+                            <li class="sidebar-item">
+                                <a asp-controller="Relatorios" asp-action="ComandaHoje" class="sidebar-link" data-index="h">
+                                    <i class="fa-regular fa-calendar-days"></i> Hoje (ALT + H)
+                                </a>
                             </li>
                         </ul>
                     </li>
+
+
+
 
                 </ul>
             </div>
@@ -199,10 +189,10 @@
                     </ul>
                 </div>
             </nav>
-            
+
             <main class="content px-3 py-2">
                 <div class="container-fluid">
-                    <div class="mb-3">                        
+                    <div class="mb-3">
                         @RenderBody()
                     </div>
                 </div>
@@ -218,24 +208,51 @@
     <script src="~/js/charts/charts.js"></script>
 
     <script src="~/js/feather/feather.js"></script>
-   @*  <script src="~/js/modal/modal.js"></script> *@
-    <script src="~/js/mask/jquery.mask.min.js"></script>  
- 
+    <script src="~/js/mask/jquery.mask.min.js"></script>     
+    <script src="~/js/mask/jquery.mask.min.js"></script>    
     <script src="~/js/script.js" asp-append-version="true"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script>
+    @*     <script>
         document.addEventListener('keydown', function (e) {
             if (e.altKey) {
                 let key = e.key.toLowerCase(); // Suporta números e letras
-                const selector = `#atalhos a[data-index="${key}"]`;
-                const link = document.querySelector(selector);
+                const link = document.querySelector(`a[data-index="${key}"]`);
                 if (link) {
                     window.location.href = link.href;
                     e.preventDefault();
                 }
             }
         });
+    </script> *@
+
+    <script>
+        document.addEventListener('keydown', function (e) {
+            if (e.altKey) {
+                let key = e.key.toLowerCase();
+                const link = document.querySelector(`a[data-index="${key}"]`);
+                if (link) {
+                    const target = link.getAttribute("data-bs-target");
+
+                    if (target) {
+                        // Toggle collapse se for submenu
+                        const submenu = document.querySelector(target);
+                        if (submenu) {
+                            const isExpanded = link.classList.contains("collapsed") === false;
+                            const bsCollapse = bootstrap.Collapse.getOrCreateInstance(submenu);
+                            isExpanded ? bsCollapse.hide() : bsCollapse.show();
+                        }
+                    } else if (link.href) {
+                        // Link normal
+                        window.location.href = link.href;
+                    }
+
+                    e.preventDefault();
+                }
+            }
+        });
     </script>
+
+
 
     @await RenderSectionAsync("Scripts", required: false)
 </body>
