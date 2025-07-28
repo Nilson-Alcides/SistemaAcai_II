@@ -258,6 +258,13 @@ namespace SistemaAcai_II.Controllers
             return RedirectToAction(nameof(Index));
         }
 
+        public IActionResult ItensComanda(int id)
+        {
+            ViewBag.NunComanda = id;
+            var itens = _itensComandaRepository.ObterItensPorComanda(id);
+            return View(itens);
+        }
+       
         //controler que acessa o peso através de um serviço no windows que salva o peso no arquivo peso.txt - necessario instalar serviço no windows
         [HttpGet]
         public JsonResult LerPeso()

@@ -6,12 +6,14 @@ namespace SistemaAcai_II.Repository.Contract
     {
         //CRUD
         IEnumerable<ItemComanda> ObterTodosItens();
+        IEnumerable<ItemComanda> ObterItensPorComanda(int Id);
 
         void Cadastrar(ItemComanda itemComanda);
 
         void Atualizar(ItemComanda itemComanda);
 
         ItemComanda ObterItensPorId(int Id);
+        
 
         void Excluir(int Id);
     }

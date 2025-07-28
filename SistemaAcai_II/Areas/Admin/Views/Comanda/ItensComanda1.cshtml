@@ -1,5 +1,6 @@
 ﻿@model IPagedList<SistemaAcai_II.Models.Comanda>
 
+
 @{
     ViewData["Title"] = "Clentes";
     var pesquisa = Context.Request.Query["pesquisa"];
@@ -31,14 +32,14 @@
                     <th scope="col">@Html.DisplayNameFor(model => model.First().NomeCliente)</th>
                     <th scope="col">@Html.DisplayNameFor(model => model.First().DataAbertura)</th>
                     <th scope="col">@Html.DisplayNameFor(model => model.First().ValorTotal)</th>
-                   
+
                     <th scope="col">Ações</th>
                 </tr>
             </thead>
             <tbody>
                 @foreach (Comanda comanda in Model)
                 {
-                    
+
                     <tr>
                         <th scope="row">@comanda.Id</th>
                         <td>@comanda.NomeCliente</td>
@@ -53,7 +54,7 @@
                 }
             </tbody>
         </table>
-    </div>  
+    </div>
 }
 else
 {
@@ -61,3 +62,4 @@ else
     <br />
     <a class="btn btn-primary" asp-action="Cadastrar">Cadastrar</a>
 }
+

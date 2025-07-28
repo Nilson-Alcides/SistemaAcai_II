@@ -8,5 +8,7 @@ namespace SistemaAcai_II.Repository.Contract
         void AbrirCadastrar(Caixa caixa);
         Caixa BuscarCaixaAbertoHoje();
         void FecharCaixa(Caixa caixa);
+        void FecharCaixaAntigos(Caixa caixa);
+        
     }
 }

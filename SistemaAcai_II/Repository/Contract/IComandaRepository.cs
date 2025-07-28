@@ -9,7 +9,7 @@ namespace SistemaAcai_II.Repository.Contract
         void Cadastrar(Comanda comanda);
         Comanda ObterComandaPorId(int id);        
         IEnumerable<Comanda> ObterTodasComandas();
-        IEnumerable<Comanda> ObterTodasComandasFechadas();
+        IEnumerable<Comanda> ObterTodasComandasFechadas();        
         IEnumerable<Comanda> ObterTodasComandasFechadasProData(DateTime dateInicial, DateTime dateFinal);
         IPagedList<Comanda> ObterTodasComandas(int? pagina, string pesquisa);
         IPagedList<Comanda> ObterTodasComandasFechadas(int? pagina, string pesquisa);

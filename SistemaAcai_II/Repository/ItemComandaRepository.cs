@@ -61,8 +61,9 @@ namespace SistemaAcai_II.Repository
             {
                 conexao.Open();
                 MySqlCommand cmd = new MySqlCommand("select * FROM ItemComanda as t1 " +
-                    " INNER JOIN ProdutoSimples AS t2 ON t1.IdProd = t1.IdProd WHERE IdComanda=@IdComanda ", conexao);
-                cmd.Parameters.AddWithValue("@IdComanda", Id);
+                    " INNER JOIN ProdutoSimples AS t2 ON t1.IdProd = t1.IdProd " +
+                    " INNER JOIN comanda as t3 on t1.IdComanda = t3.IdComanda WHERE t1.IdComanda = @t1.IdComanda ", conexao);
+                cmd.Parameters.AddWithValue("@t1.IdComanda", Id);
 
                 MySqlDataAdapter da = new MySqlDataAdapter(cmd);
                 MySqlDataReader dr;
@@ -118,8 +119,54 @@ namespace SistemaAcai_II.Repository
         {
             throw new NotImplementedException();
         }
+        public IEnumerable<ItemComanda> ObterItensPorComanda(int idComanda)
+        {
+            using (var conexao = new MySqlConnection(_conexaoMySQL))
+            {
+                conexao.Open();
 
-       
+                var query = @"
+                            SELECT * 
+                            FROM ItemComanda AS t1
+                            INNER JOIN ProdutoSimples AS t2 ON t1.IdProd = t2.IdProd
+                            INNER JOIN Comanda AS t3 ON t1.IdComanda = t3.IdComanda
+                            WHERE t1.IdComanda = @IdComanda";
+
+                MySqlCommand cmd = new MySqlCommand(query, conexao);
+                cmd.Parameters.AddWithValue("@IdComanda", idComanda);
+
+                MySqlDataReader dr = cmd.ExecuteReader();
+                var listaItens = new List<ItemComanda>();
+
+                while (dr.Read())
+                {
+                    var itemComanda = new ItemComanda
+                    {
+                        Id = Convert.ToInt32(dr["IdItem"]),
+
+                        Quantidade = dr["Quantidade"] != DBNull.Value ? Convert.ToInt32(dr["Quantidade"]) : 0,
+                        Peso = dr["Peso"] != DBNull.Value ? Convert.ToDecimal(dr["Peso"]) : 0m,
+
+                        RefProduto = new ProdutoSimples
+                        {
+                            Id = Convert.ToInt32(dr["IdProd"]),
+                            Descricao = Convert.ToString(dr["Descricao"]),
+                            PrecoUn = Convert.ToDecimal(dr["PrecoUn"])
+                        },
+                        RefComanda = new Comanda
+                        {
+                            Id = Convert.ToInt32(dr["IdComanda"]),
+                            DataAbertura = Convert.ToDateTime(dr["DataAbertura"]),
+                            DataFechamento = dr["DataFechamento"] != DBNull.Value ? Convert.ToDateTime(dr["DataFechamento"]) : (DateTime?)null
+                        }
+                    };
+
+                    listaItens.Add(itemComanda);
+                }
+
+                return listaItens;
+            }
+        }
         
     }
 }

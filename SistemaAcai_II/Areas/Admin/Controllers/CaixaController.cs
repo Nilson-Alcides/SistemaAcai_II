@@ -62,6 +62,7 @@ namespace SistemaAcai_II.Areas.Admin.Controllers
             caixa.Situacao = "F";
             caixa.StatusEmail = "S";
 
+            _caixaRepository.FecharCaixaAntigos(caixa);
             // Salvar alteração
             _caixaRepository.FecharCaixa(caixa);
 
@@ -74,5 +75,6 @@ namespace SistemaAcai_II.Areas.Admin.Controllers
             TempData["Mensagem"] = "Caixa fechado e e-mail enviado com sucesso.";
             return RedirectToAction("Index");
         }
+        
     }
 }

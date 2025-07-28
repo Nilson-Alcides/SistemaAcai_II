@@ -70,5 +70,29 @@ namespace SistemaAcai_II.Repository
 
             cmd.ExecuteNonQuery();
         }
+        public void FecharCaixaAntigos(Caixa caixa)
+        {
+            using var conexao = new MySqlConnection(_conexaoMySQL);
+            conexao.Open();
+
+            // Desativa o modo seguro
+            using (var cmdSafeOff = new MySqlCommand("SET SQL_SAFE_UPDATES = 0;", conexao))
+            {
+                cmdSafeOff.ExecuteNonQuery();
+            }
+
+            var query = @" UPDATE Caixa SET situacao = 'F' WHERE situacao = 'A' AND DATE(DataAbertura) != CURDATE(); ";
+
+            using var cmd = new MySqlCommand(query, conexao);
+           // cmd.Parameters.AddWithValue("@Situacao", caixa.Situacao);          
+
+            cmd.ExecuteNonQuery();
+
+            // (Opcional) Reativa o modo seguro
+            using (var cmdSafeOn = new MySqlCommand("SET SQL_SAFE_UPDATES = 1;", conexao))
+            {
+                cmdSafeOn.ExecuteNonQuery();
+            }
+        }
     }
 }
