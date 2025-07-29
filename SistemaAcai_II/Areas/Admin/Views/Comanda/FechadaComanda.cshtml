@@ -52,11 +52,11 @@
                     data-bs-toggle="modal" data-bs-target="#modalPagamento">
                 Pagamento
             </button>
-            <button type="submit" id="btnSalvarComanda"
-                    class="btn btn-outline-success me-2">
-                Fechar Pedido
-            </button>            
-        </div>
+        <button type="submit" id="btnSalvarComanda"
+                class="btn btn-outline-success me-2" disabled>
+            Fechar Pedido
+        </button>
+    </div>
         <br />
     </form>
 
@@ -232,6 +232,14 @@
                 $('#totalAPagar').text(formatarMoeda(dadosPagamento.total));
                 $('#formaPagamentoSelecionada').text(dadosPagamento.formaPagamentoTexto);
                 calcularTroco();
+
+                // 👉 Habilita ou desabilita o botão "Fechar Pedido"
+                if (dadosPagamento.formaPagamentoId && dadosPagamento.formaPagamentoId !== "0") {
+                    $('#btnSalvarComanda').prop('disabled', false);
+                } else {
+                    $('#btnSalvarComanda').prop('disabled', true);
+                }
+
             }
 
             function atualizarComandaPrincipal() {
