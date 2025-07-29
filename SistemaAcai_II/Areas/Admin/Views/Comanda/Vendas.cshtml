@@ -49,7 +49,7 @@
                 <th>Peso (kg)</th>
             </tr>
         </thead>
-        <tbody>
+        <tbody>            
             @foreach (var produto in Model.Produtos)
             {
                 <tr>
@@ -73,8 +73,35 @@
                         </form>
 
                     </td>
-                </tr>
-            }
+        </tr>
+        <!--Parte que colocaer o produto * quantidade-->
+          @*    
+                @{
+                int qtdDigitada = ViewBag.QuantidadeDigitada != null ? (int)ViewBag.QuantidadeDigitada : 1;
+                }
+                <tr>
+                    <td>@produto.Id</td>
+                    <td>@produto.Descricao</td>
+                    <td>@produto.PrecoUn.ToString("C")</td>
+                    <td>
+                        <form asp-action="AdicionarItem" method="post" class="d-flex">
+                            <input type="hidden" name="id" value="@produto.Id" />
+
+                            @if (produto.TipoMedida == "Kg")
+                            {
+                                <input type="text" name="pesoRcebido" step="0.01" min="0.01" class="form-control-sm col-3 campo-peso" placeholder="Peso (Kg)" />
+                            }
+                            else
+                            {
+                                <input type="number" name="quantidade" step="1" min="1"
+                                       value="@qtdDigitada" class="form-control-sm col-3 campo-quantidade" placeholder="Qtd" />
+                            }
+
+                            <button type="submit" class="btn btn-success btn-sm ms-2">Adicionar</button>
+                        </form>
+                    </td>
+                </tr>*@
+            } 
         </tbody>
     </table>
 }

@@ -65,7 +65,7 @@ namespace SistemaAcai_II.Areas.Colaborador.Controllers
             }
         }
         [ColaboradorAutorizacao]
-        public IActionResult Painel()
+        public IActionResult Painel() 
         {
            return View(_comandaRepository.ObterTodasComandasFechadas());
         }
@@ -76,6 +76,65 @@ namespace SistemaAcai_II.Areas.Colaborador.Controllers
             _loginColaborador.Logout();
             return RedirectToAction("Login", "Home");
         }
+        [HttpGet]
+        public JsonResult ObterDadosGrafico()
+        {
+            var comandas = _comandaRepository.ObterTodasComandasFechadas();
+
+            var hoje = DateTime.Today;
+            var amanha = hoje.AddDays(1);
+            var inicioSemana = hoje.AddDays(-(int)(hoje.DayOfWeek == DayOfWeek.Sunday ? 6 : ((int)hoje.DayOfWeek - 1)));
+
+            var dadosPorDia = comandas
+                .Where(c => c.DataFechamento != null &&
+                            c.DataFechamento.Value >= inicioSemana &&
+                            c.DataFechamento.Value < amanha) // inclui o dia atual inteiro
+                .GroupBy(c => (int)c.DataFechamento.Value.DayOfWeek)
+                .Select(g => new
+                {
+                    Dia = g.Key,
+                    Total = g.Sum(c => c.ValorTotal)
+                })
+                .ToList();
+
+            decimal[] totais = new decimal[7]; // índice: 0=Dom, ..., 6=Sáb
+            foreach (var item in dadosPorDia)
+            {
+                totais[item.Dia] = item.Total;
+            }
+
+            var labels = new[] { "Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb" };
+
+            return Json(new { labels = labels, valores = totais });
+        }
+
+
+
+        //    [HttpGet]
+        //    public JsonResult ObterDadosGrafico()
+        //    {
+        //        var comandas = _comandaRepository.ObterTodasComandasFechadas();
+
+        //        // Somente comandas com DataFechamento válida
+        //        var dadosPorDia = comandas
+        //            .Where(c => c.DataFechamento != null)
+        //            .GroupBy(c => (int)c.DataFechamento.Value.DayOfWeek)
+        //            .Select(g => new
+        //            {
+        //                Dia = g.Key,
+        //                Total = g.Sum(c => c.ValorTotal)
+        //            })
+        //            .ToList();
+
+        //        // Cria um array com os 7 dias da semana: [Dom, Seg, Ter, Qua, Qui, Sex, Sáb]
+        //        decimal[] totais = new decimal[7];
+        //        foreach (var item in dadosPorDia)
+        //        {
+        //            totais[item.Dia] = item.Total;
+        //        }
+
+        //        return Json(totais);
+        //    }
     }
 
 }
