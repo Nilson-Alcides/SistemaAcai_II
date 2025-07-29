@@ -50,11 +50,11 @@
         <div class="offset-md-4 col-md-6">
             <button type="button" class="btn btn-outline-primary me-2"
                     data-bs-toggle="modal" data-bs-target="#modalPagamento">
-                Pagamento
+                Pagamento (Alt + p)
             </button>
         <button type="submit" id="btnSalvarComanda"
                 class="btn btn-outline-success me-2" disabled>
-            Fechar Pedido
+            Fechar Pedido (Alt + 5)
         </button>
     </div>
         <br />
@@ -142,8 +142,8 @@
                 </div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                <button type="button" class="btn btn-primary" id="confirmarPagamento">Confirmar</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar (Alt + x)</button>
+                <button type="button" class="btn btn-primary" id="confirmarPagamento">Confirmar (Alt + c)</button>
             </div>
         </div>
     </div>
@@ -257,5 +257,50 @@
             atualizarVisibilidadeCamposDinheiro();
         });
     </script>
+
+    <script>
+        document.addEventListener('keydown', function (e) {
+            const modalAberto = document.getElementById('modalPagamento')?.classList.contains('show');
+
+            // Alt + P → Abrir modal de pagamento
+            if (e.altKey && e.key.toLowerCase() === 'p' && !modalAberto) {
+                const botaoPagamento = document.querySelector('button[data-bs-target="#modalPagamento"]');
+                if (botaoPagamento) {
+                    e.preventDefault();
+                    botaoPagamento.click();
+                }
+            }
+
+            // Alt + 5 → Fechar pedido
+            if (e.altKey && e.key === '5' && !modalAberto) {
+                const botaoFechar = document.getElementById('btnSalvarComanda');
+                if (botaoFechar && !botaoFechar.disabled) {
+                    e.preventDefault();
+                    botaoFechar.click();
+                }
+            }
+
+            // Alt + C → Confirmar pagamento no modal
+            if (e.altKey && e.key.toLowerCase() === 'c' && modalAberto) {
+                const btnConfirmar = document.getElementById('confirmarPagamento');
+                if (btnConfirmar) {
+                    e.preventDefault();
+                    btnConfirmar.click();
+                }
+            }
+
+            // Alt + X → Cancelar/fechar modal
+            if (e.altKey && e.key.toLowerCase() === 'x' && modalAberto) {
+                const btnFecharModal = document.querySelector('#modalPagamento .btn-close');
+                if (btnFecharModal) {
+                    e.preventDefault();
+                    btnFecharModal.click();
+                }
+            }
+        });
+    </script>
+
+
+
 }
 
