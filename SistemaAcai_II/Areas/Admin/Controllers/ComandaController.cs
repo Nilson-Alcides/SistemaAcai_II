@@ -365,7 +365,15 @@ namespace SistemaAcai_II.Controllers
 
             return RedirectToAction(nameof(Index));
         }
-
+        [HttpGet]
+        public IActionResult CancelarComanda(int id)
+        {
+            Comanda comanda = _comandaRepository.ObterComandaPorId(id);
+            _comandaRepository.Cancelar(comanda);
+            
+            return RedirectToAction(nameof(Index));
+        }
+        
         public IActionResult ItensComanda(int id)
         {
             ViewBag.NunComanda = id;

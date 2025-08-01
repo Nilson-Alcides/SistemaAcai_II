@@ -14,5 +14,6 @@ namespace SistemaAcai_II.Models.Contants
         //Situação da Comanda/Caixa
         public const string Fechada = "F";
         public const string Aberto = "A";
+        public const string Cancelado = "C";
     }
 }

@@ -16,6 +16,7 @@ namespace SistemaAcai_II.Repository.Contract
         void AtualizarValor(Comanda comanda);
         void AtualizarValorComDesconto(Comanda comanda);
         void Atualizar(Comanda comanda);
+        void Cancelar(Comanda comanda);
         int BuscarUltimoIdComanda();
         void Excluir(int id);
         List<Comanda> BuscarComandasFechadasDoDia(DateTime dateInicial);

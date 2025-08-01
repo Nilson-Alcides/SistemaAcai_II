@@ -326,6 +326,20 @@ namespace SistemaAcai_II.Repository
                 conexao.Close();
             }
         }
+        public void Cancelar(Comanda comanda)
+        {
+            string Situacao = SituacaoConstant.Cancelado;
+            using (var conexao = new MySqlConnection(_conexaoMySQL))
+            {
+                conexao.Open();
+                MySqlCommand cmd = new MySqlCommand("UPDATE Comanda SET DataFechamento = @DataFechamento, Situacao = @Situacao WHERE IdComanda = @IdComanda", conexao);
+                cmd.Parameters.AddWithValue("@DataFechamento", comanda.DataFechamento);
+                cmd.Parameters.AddWithValue("@Situacao", Situacao);
+                cmd.Parameters.AddWithValue("@IdComanda", comanda.Id);
+                cmd.ExecuteNonQuery();
+                conexao.Close();
+            }
+        }
 
         public void Excluir(int id)
         {
