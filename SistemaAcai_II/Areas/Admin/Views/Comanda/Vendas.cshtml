@@ -1,7 +1,9 @@
 ﻿@model SistemaAcai_II.Models.VendasViewModel
 @using SistemaAcai_II.Models.Constants
 @inject SistemaAcai_II.Libraries.Login.LoginColaborador _colaborador
-
+@{
+    int qtdDigitada = ViewBag.QuantidadeDigitada != null ? (int)ViewBag.QuantidadeDigitada : 1;
+}
 <h4>Vendas</h4>
 
 @if (TempData["Erro"] != null)
@@ -10,19 +12,6 @@
 }
 
 <form method="get">
-    @*     <div class="form-group row align-items-center">
-        <label class="col-sm-2 col-form-label">Selecione o Tipo:</label>
-        <div class="col-sm-6 d-flex align-items-center">
-            <div class="form-check me-3">
-                <input type="radio" class="form-check-input" id="checkboxPeso" name="tipo" value="peso" checked />
-                <label class="form-check-label" for="checkboxPeso">Peso</label>
-            </div>
-            <div class="form-check">
-                <input type="radio" class="form-check-input" id="checkboxUnidade" name="tipo" value="unidade" />
-                <label class="form-check-label" for="checkboxUnidade">Unidade</label>
-            </div>
-        </div>
-    </div> *@
 
     <!-- Campo de pesquisa -->
     <div class="form-group row">
@@ -49,7 +38,8 @@
                 <th>Peso (kg)</th>
             </tr>
         </thead>
-        <tbody>
+        <tbody>            
+
             @foreach (var produto in Model.Produtos)
             {
                 <tr>
@@ -66,41 +56,17 @@
                             }
                             else
                             {
-                                <input type="number" name="quantidade" step="1" min="1" class="form-control-sm col-3 campo-quantidade" placeholder="Quantidade" />
+                                @* <input type="number" name="quantidade" step="1" min="1" class="form-control-sm col-3 campo-quantidade" placeholder="Quantidade" /> *@
+                                <input type="number" name="quantidade" step="1" min="1"
+                                       value="@produto.Quantidade"
+                                       class="form-control-sm col-3 campo-quantidade" placeholder="Quantidade" />
                             }
 
                             <button type="submit" class="btn btn-success btn-sm ms-2">Adicionar </button>
                         </form>
 
                     </td>
-                </tr>
-                <!--Parte que colocaer o produto * quantidade-->
-                @*    
-                @{
-                int qtdDigitada = ViewBag.QuantidadeDigitada != null ? (int)ViewBag.QuantidadeDigitada : 1;
-                }
-                <tr>
-                    <td>@produto.Id</td>
-                    <td>@produto.Descricao</td>
-                    <td>@produto.PrecoUn.ToString("C")</td>
-                    <td>
-                        <form asp-action="AdicionarItem" method="post" class="d-flex">
-                            <input type="hidden" name="id" value="@produto.Id" />
-
-                            @if (produto.TipoMedida == "Kg")
-                            {
-                                <input type="text" name="pesoRcebido" step="0.01" min="0.01" class="form-control-sm col-3 campo-peso" placeholder="Peso (Kg)" />
-                            }
-                            else
-                            {
-                                <input type="number" name="quantidade" step="1" min="1"
-                                       value="@qtdDigitada" class="form-control-sm col-3 campo-quantidade" placeholder="Qtd" />
-                            }
-
-                            <button type="submit" class="btn btn-success btn-sm ms-2">Adicionar</button>
-                        </form>
-                    </td>
-                </tr>*@
+                </tr>               
             }
         </tbody>
     </table>
@@ -179,7 +145,7 @@
             <h4>Total da Comanda: <span id="totalComandaDisplay">@totalComanda.ToString("C")</span></h4>
         </div>
 
-        <div class="offset-md-4 col-md-6">
+        <div class="offset-md-2 col-md-8">
             <button type="button" class="btn btn-outline-primary me-2"
                     data-bs-toggle="modal" data-bs-target="#modalPagamento">
                 Pagamento (Alt + P)

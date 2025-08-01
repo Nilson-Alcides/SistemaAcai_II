@@ -39,13 +39,49 @@ namespace SistemaAcai_II.Controllers
         {
             var listPagamentos = _formasPagamentoRepository.ObterTodasFormasPagamentos();
             ViewBag.FormaPagamento = new SelectList(listPagamentos, "Id", "Nome");
-            // Busca produtos caso tenha um termo de pesquisa
-            var produtos = string.IsNullOrWhiteSpace(termo) ? new List<ProdutoSimples>() : _produtoRepository.BuscarPorNome(termo);
 
-            // Obtém os itens do carrinho
+            int quantidadeDigitada = 1;
+            string termoBusca = termo;
+
+            // Verifica se o termo está no formato "codigo*quantidade"
+            if (!string.IsNullOrWhiteSpace(termo) && termo.Contains("*"))
+            {
+                var partes = termo.Split('*');
+                if (partes.Length == 2)
+                {
+                    termoBusca = partes[0];
+
+                    if (int.TryParse(partes[1], out int qtd))
+                    {
+                        quantidadeDigitada = qtd;
+                    }
+                }
+            }
+
+            // Realiza a busca por nome ou código
+            var produtos = string.IsNullOrWhiteSpace(termoBusca)
+                ? new List<ProdutoSimples>()
+                : _produtoRepository.BuscarPorNome(termoBusca);
+
+            // Aplica a quantidade apenas se o produto for por unidade
+            foreach (var produto in produtos)
+            {
+                if (produto.TipoMedida?.ToLower() == "unidade")
+                {
+                    produto.Quantidade = quantidadeDigitada;
+                }
+                else
+                {
+                    // Deixa como está para produtos por quilo
+                    produto.Quantidade = 0; // ou null, conforme sua lógica de balança
+                }
+            }
+
             var itensCarrinho = _cookiePedidoCompra.Consultar();
 
-            // Passa os dados para a View
+            // ViewBag com quantidade pré-preenchida
+            ViewBag.QuantidadeDigitada = quantidadeDigitada;
+
             var model = new VendasViewModel
             {
                 Produtos = produtos,
@@ -54,6 +90,35 @@ namespace SistemaAcai_II.Controllers
 
             return View(model);
         }
+
+
+
+        //public IActionResult Vendas(string termo)
+        //{
+        //    var listPagamentos = _formasPagamentoRepository.ObterTodasFormasPagamentos();
+        //    ViewBag.FormaPagamento = new SelectList(listPagamentos, "Id", "Nome");
+        //    // Busca produtos caso tenha um termo de pesquisa
+        //    var produtos = string.IsNullOrWhiteSpace(termo) ? new List<ProdutoSimples>() : _produtoRepository.BuscarPorNome(termo);
+
+        //    // Obtém os itens do carrinho
+        //    var itensCarrinho = _cookiePedidoCompra.Consultar();
+
+        //    // Passa os dados para a View
+        //    var model = new VendasViewModel
+        //    {
+        //        Produtos = produtos,
+        //        ItensCarrinho = itensCarrinho
+        //    };
+
+        //    return View(model);
+        //}
+
+
+
+
+
+
+
 // Venda codigo * quantidade -- descomente o codigo abaixo
 
         //public IActionResult Vendas(string termo)
