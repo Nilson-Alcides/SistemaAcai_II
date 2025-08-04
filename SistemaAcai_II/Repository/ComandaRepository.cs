@@ -136,10 +136,14 @@ namespace SistemaAcai_II.Repository
                     ListComanda.Add(
                         new Comanda
                         {
-                            Id = (Int32)(dr["IdComanda"]),                          
-                            NomeCliente = Convert.ToString(dr["NomeCliente"]),
-                            DataAbertura = Convert.ToDateTime(dr["DataAbertura"]),
-                            ValorTotal = Convert.ToDecimal(dr["ValorTotal"])                            
+                            //Id = (Int32)(dr["IdComanda"]),                          
+                            //NomeCliente = Convert.ToString(dr["NomeCliente"]),
+                            //DataAbertura = Convert.ToDateTime(dr["DataAbertura"]),
+                            //ValorTotal = Convert.ToDecimal(dr["ValorTotal"])
+                            Id = dr["IdComanda"] != DBNull.Value ? Convert.ToInt32(dr["IdComanda"]) : 0,
+                            NomeCliente = dr["NomeCliente"] != DBNull.Value ? Convert.ToString(dr["NomeCliente"]) : "",
+                            DataAbertura = dr["DataAbertura"] != DBNull.Value ? Convert.ToDateTime(dr["DataAbertura"]) : DateTime.MinValue,
+                            ValorTotal = dr["ValorTotal"] != DBNull.Value ? Convert.ToDecimal(dr["ValorTotal"]) : 0
                         });
                 }
                 return ListComanda.ToPagedList<Comanda>(NumeroPagina, RegistroPorPagina);

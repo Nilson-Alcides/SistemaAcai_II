@@ -1,8 +1,10 @@
 ﻿@model SistemaAcai_II.Models.VendasViewModel
 @using SistemaAcai_II.Models.Constants
 @inject SistemaAcai_II.Libraries.Login.LoginColaborador _colaborador
-
-<h2>Vendas</h2>
+@{
+    int qtdDigitada = ViewBag.QuantidadeDigitada != null ? (int)ViewBag.QuantidadeDigitada : 1;
+}
+<h4>Vendas</h4>
 
 @if (TempData["Erro"] != null)
 {
@@ -10,25 +12,8 @@
 }
 
 <form method="get">
-    <div class="form-group row align-items-center">
-        <label class="col-sm-2 col-form-label">Selecione o Tipo:</label>
-        <div class="col-sm-6 d-flex align-items-center">
-            <div class="form-check me-3">
-                <input type="radio" class="form-check-input" id="checkboxPeso" name="tipo" value="peso" checked />
-                <label class="form-check-label" for="checkboxPeso">Peso</label>
-            </div>
-            <div class="form-check">
-                <input type="radio" class="form-check-input" id="checkboxUnidade" name="tipo" value="unidade" />
-                <label class="form-check-label" for="checkboxUnidade">Unidade</label>
-            </div>
-        </div>
-    </div>
 
-
-
-
-<!-- Campo de pesquisa -->
-
+    <!-- Campo de pesquisa -->
     <div class="form-group row">
         <label for="termo" class="col-sm-2 col-form-label">Pesquisar Produto</label>
         <div class="col-sm-6">
@@ -54,6 +39,7 @@
             </tr>
         </thead>
         <tbody>
+
             @foreach (var produto in Model.Produtos)
             {
                 <tr>
@@ -63,15 +49,22 @@
                     <td>
                         <form asp-action="AdicionarItem" method="post" class="d-flex">
                             <input type="hidden" name="id" value="@produto.Id" />
-                            <!-- Campo de peso reduzido e alinhado com o botão -->
 
-                            <input type="text" name="pesoRcebido" step="0.01" min="0.01" class="form-control-sm col-3  peso campo-peso"/>
-                            @* <input type="number" id="peso" class="form-control" step="0.01" placeholder="Digite ou capture" /> *@
+                            @if (produto.TipoMedida == "Kg")
+                            {
+                                <input type="text" id="pesoProduto" name="pesoRcebido" step="0.01" min="0.01" class="form-control-sm col-3 campo-peso" placeholder="Peso (Kg)" />
+                            }
+                            else
+                            {
+                                @* <input type="number" name="quantidade" step="1" min="1" class="form-control-sm col-3 campo-quantidade" placeholder="Quantidade" /> *@
+                                <input type="number" name="quantidade" step="1" min="1"
+                                       value="@produto.Quantidade"
+                                       class="form-control-sm col-3 campo-quantidade" placeholder="Quantidade" />
+                            }
 
-                            <input type="number" name="quantidade" step="1" min="1"
-                                   class="form-control-sm col-3 campo-quantidade" placeholder="Quantidade" style="display: none;" />
-                            <button type="submit" class="btn btn-success btn-sm ms-2">Adicionar</button>
+                            <button type="submit" class="btn btn-success btn-sm ms-2">Adicionar </button>
                         </form>
+
                     </td>
                 </tr>
             }
@@ -80,88 +73,487 @@
 }
 
 <!-- Exibir carrinho de compras -->
-<h3>Itens da Comanda</h3>
+<h4>Itens da Comanda</h4>
+
 
 @if (Model.ItensCarrinho != null && Model.ItensCarrinho.Any())
 {
     <!-- Formulário para salvar a comanda -->
+
     <form asp-action="SalvarComanda" asp-controller="Comanda" method="post">
+        <input type="hidden" asp-for="Comanda.Desconto" />
+        <input type="hidden" id="formaPagamentoId" asp-for="Comanda.RefFormasPagamento.Id" />
+        <input type="hidden" id="formaPagamentoHidden" name="Comanda.RefFormasPagamento.Id" value="0" />
+
         <div class="form-group row">
             <label for="NomeCliente" class="col-form-label col-sm-3">Nome do Cliente:</label>
             <div class="col-sm-6">
                 <input type="text" id="NomeCliente" name="Comanda.NomeCliente" class="form-control form-control-sm" required />
             </div>
         </div>
-
-        <table class="table">
-            <thead>
-                <tr>
-                    <th>Código</th>
-                    <th>Nome</th>
-                    <th>Peso (kg)</th>
-                    <th>Preço Unitário</th>
-                    <th>Subtotal</th>
-                    <th>Ação</th>
-                </tr>
-            </thead>
-            <tbody>
-                @{
-                    decimal totalComanda = 0;
-                }
-                @foreach (var item in Model.ItensCarrinho)
-                {
-                    var subtotal = item.peso * item.PrecoUn;
-                    @if (item.peso <= 0)
-                    {
-                        subtotal = Convert.ToDecimal( item.Quantidade * item.PrecoUn);
-                    }
-                        
-                    ViewBag.TotalComanda = totalComanda += subtotal;
-
-                    <tr>
-                        <td>@item.Id</td>
-                        <td>@item.Descricao</td>
-                        @if (@item.peso > 0)
-                        {
-                            <td>@item.peso.ToString("N3") Kg</td>
+        <div class="row">
+            <!-- Coluna com tabela de itens -->
+            <div class="col-md-9">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Código</th>
+                            <th>Nome</th>
+                            <th>Peso (kg)</th>
+                            <th>Preço Unitário</th>
+                            <th>Subtotal</th>
+                            <th>Ação</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @{
+                            decimal totalComanda = 0;
                         }
-                        else
+                        @foreach (var item in Model.ItensCarrinho)
                         {
-                            <td>@item.Quantidade Un</td>
-                        }
+                            var subtotal = item.peso * item.PrecoUn;
+                            @if (item.peso <= 0)
+                            {
+                                subtotal = Convert.ToDecimal(item.Quantidade * item.PrecoUn);
+                            }
 
-                        <td>@item.PrecoUn.ToString("C")</td>
-                        <td>@subtotal.ToString("C")</td>
-                        @if (_colaborador.GetColaborador() != null && _colaborador.GetColaborador().Tipo == ColaboradorTipoConstant.Gerente)
-                        {
-                            <td class="text-right">
-                                <a asp-controller="Comanda" asp-action="RemoverItem" asp-route-id="@item.Id" class="btn btn-outline-danger">× Remover</a>
-                            </td>
-                        }
-                    </tr>
-                }
-            </tbody>
-        </table>
+                            ViewBag.TotalComanda = totalComanda += subtotal;
 
-        <!-- Exibir total da comanda -->
-        <div class="alert alert-info">
-            <h4>Total da Comanda: @totalComanda.ToString("C")</h4>
+                            <tr>
+                                <td>@item.Id</td>
+                                <td>@item.Descricao</td>
+                                @if (@item.peso > 0)
+                                {
+                                    <td>@item.peso.ToString("N3") Kg</td>
+                                }
+                                else
+                                {
+                                    <td>@item.Quantidade Un</td>
+                                }
+
+                                <td>@item.PrecoUn.ToString("C")</td>
+                                <td>@subtotal.ToString("C")</td>
+                                @if (_colaborador.GetColaborador() != null && _colaborador.GetColaborador().Tipo == ColaboradorTipoConstant.Gerente)
+                                {
+                                    <td class="text-right">
+                                        <a asp-controller="Comanda" asp-action="RemoverItem" asp-route-id="@item.Id" class="btn btn-outline-danger">× Remover</a>
+                                    </td>
+                                }
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+
+
+                <div id="formaPagamentoPrincipal" class="alert alert-secondary mt-3">
+                    Forma de Pagamento: <span id="formaPagamentoSelecionadaPrincipal">Não selecionada</span>
+                </div>
+                <!-- Exibir total da comanda - Adicione um ID para poder atualizar via JS -->
+                <div class="alert alert-info">
+                    <h4>Total da Comanda: <span id="totalComandaDisplay">@totalComanda.ToString("C")</span></h4>
+                </div>
+
+
+
+                <div class="offset-sm-1 col-md-10 d-flex flex-wrap align-items-center gap-1">
+                    <button type="button" class="btn btn-outline-primary"
+                            data-bs-toggle="modal" data-bs-target="#modalPagamento">
+                        Pagamento (Alt + P)
+                    </button>
+                    <button type="submit" id="btnSalvarComanda"
+                            class="btn btn-outline-success">
+                        Fechar Pedido (Alt + 5)
+                    </button>
+                    <button type="submit" id="btnFecharPedido"
+                            class="btn btn-outline-info" onclick="limparFormaPagamento()">
+                        Salvar Comanda (Alt + S)
+                    </button>
+                    @*  <a asp-controller="Comanda" asp-action="limpaConada"
+                class="btn btn-outline-danger"
+                onclick="return confirm('Deseja realmente Remover?')">
+                Remover Itens (Alt + I)
+                </a> *@
+                </div>
+            </div>
+            <!-- Coluna com o card de forma de pagamento -->
+            <div class="col-md-3">
+                <div class="card border-primary shadow">
+                    <div class="card-header bg-primary text-white">
+                        <strong>Forma de Pagamento</strong>
+                    </div>
+                    <div class="card-body">
+                        <form asp-action="FinalizarVenda" method="post">
+                            @foreach (var forma in ViewBag.FormaPagamento as SelectList)
+                            {
+                                <div class="form-check mb-2">
+                                    <input class="form-check-input" type="radio" name="formaPagamentoId" value="@forma.Value" id="forma@forma.Value" required />
+                                    <label class="form-check-label" for="forma@forma.Value">@forma.Text</label>
+                                </div>
+                            }
+                            @*  <button type="button" class="btn btn-success" id="confirmarPagamento">Confirmar (Alt + c)</button> *@
+
+
+                        </form>
+                    </div>
+                </div>
+            </div>
+
         </div>
-
-        <div class="offset-md-4 col-md-4">
-            <button type="submit" class="btn btn-outline-primary">Salvar Comanda</button>
-            <button type="submit" class="btn btn-outline-success">Fechar Pedido</button>
-        </div>
-        
         <br />
     </form>
-    
 }
+
 else
 {
     <p>Nenhum item no carrinho.</p>
 }
-@* <div class="offset-md-4 col-md-4">
-    <a asp-action="Index" class="btn btn-outline-primary">Comandas abertas</a>
-</div> *@
 
+<!-- Modal de Seleção de Forma de Pagamento -->
+<div class="modal fade" id="modalPagamento" tabindex="-1" aria-labelledby="modalPagamentoLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalPagamentoLabel">Selecione a Forma de Pagamento</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="formPagamento">
+                    <div class="form-group">
+                        @Html.DropDownListFor(model => model.Comanda.RefFormasPagamento.Id, ViewBag.FormaPagamento as SelectList,
+                                 "Selecione a forma de pagamento", htmlAttributes: new { @class = "form-control", id = "formaPagamento", style = "width: 70%;" })
+                    </div>
+                </form>
+
+                <div class="mt-4">
+                    <div class="box">
+                        <dl class="dlist-align" hidden>
+                            <dt>Subtotal: </dt>
+                            <dd class="text-right" id="subtotalValue">
+                                @(ViewBag.TotalComanda != null ? ((decimal)ViewBag.TotalComanda).ToString("C", new System.Globalization.CultureInfo("pt-BR")) : "R$ 0,00")
+                            </dd>
+                        </dl>
+                        <dl class="dlist-align">
+
+                            <dt>Valor Pago:</dt>
+                            <dd>
+                                <input id="valorPago"
+                                       class="form-control form-control-sm dineiro"
+                                       type="text"
+                                       style="width: 100px;"
+                                       placeholder="0,00" />
+                            </dd>
+
+                        </dl>
+                        <dl class="dlist-align">
+                            <dt>Troco:</dt>
+                            <dd>
+                                <input id="troco" class="form-control form-control-sm dineiro"
+                                       type="text"
+                                       style="width: 100px;"
+                                       placeholder="0,00"
+                                       readonly />
+                            </dd>
+                        </dl>
+                        <dl class="dlist-align">
+                            <dt>Desconto:</dt>
+                            <dd>
+                                <input asp-for="Comanda.Desconto" id="desconto"
+                                       class="form-control form-control-sm dineiro"
+                                       type="text" style="width: 100px;"
+                                       placeholder="0,00" />
+                            </dd>
+                        </dl>
+
+                        <dl class="dlist-align">
+                            <dt>Forma de Pagamento:</dt>
+                            <dd class="text-right" id="formaPagamentoSelecionada">Nenhuma selecionada</dd>
+                        </dl>
+
+                        <dl class="dlist-align" id="detalhesDesconto" style="display: none;">
+                            <dt>Desconto Aplicado:</dt>
+                            <dd class="text-right" id="descontoAplicado">R$ 0,00</dd>
+                        </dl>
+
+
+                        <dl class="dlist-align">
+                            <dt>Total a pagar:</dt>
+                            <dd class="text-right text-success fw-bold" id="totalAPagar">
+                                @{
+                                    decimal total = ViewBag.TotalComanda != null ? (decimal)ViewBag.TotalComanda : 0;
+                                    @total.ToString("N2", System.Globalization.CultureInfo.GetCultureInfo("pt-BR"))
+                                }
+                            </dd>
+                        </dl>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar (Alt + x)</button>
+                <button type="button" class="btn btn-primary" id="confirmarPagamento">Confirmar (Alt + c)</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+
+    <script>
+        $(document).ready(function () {
+            $('#formaPagamento').on('change', function () {
+                var selected = $(this).val();
+                if (selected) {
+                    $('#btnFecharPedido').hide();
+                    $('#btnSalvarComanda').show();
+                } else {
+                    $('#btnSalvarComanda').hide();
+                    $('#btnFecharPedido').show();
+                }
+            });
+
+            // Disparar evento de mudança caso o select já venha preenchido (ex: edição)
+            $('#formaPagamento').trigger('change');
+        });
+
+        $(document).ready(function () {
+            var dadosPagamento = {
+                formaPagamentoId: '',
+                formaPagamentoTexto: '',
+                desconto: 0,
+                total: parseFloat('@(ViewBag.TotalComanda != null ? ViewBag.TotalComanda.ToString(System.Globalization.CultureInfo.InvariantCulture) : "0")'),
+                valorPago: 0,
+                troco: 0
+            };
+
+            var campoValorPago = $('#valorPago').closest('.dlist-align');
+            var campoTroco = $('#valorPago').closest('.dlist-align').next('.dlist-align');
+
+            $('#desconto').addClass('dinheiro');
+            $('#valorPago').addClass('dinheiro');
+
+            function atualizarVisibilidadeCamposDinheiro() {
+                var formaPagamentoSelecionadaTexto = $('#formaPagamento option:selected').text().toLowerCase();
+                if (formaPagamentoSelecionadaTexto.includes('dinheiro')) {
+                    campoValorPago.show();
+                    campoTroco.show();
+                } else {
+                    campoValorPago.hide();
+                    campoTroco.hide();
+                    $('#valorPago').val('');
+                    $('#troco').val('');
+                }
+            }
+
+
+            $('#desconto').on('blur', function () {
+                var valorFormatado = $(this).val();
+                var valorNumerico = parseFloat(valorFormatado.replace(/[^0-9,]/g, '').replace(',', '.'));
+                dadosPagamento.desconto = isNaN(valorNumerico) ? 0 : valorNumerico;
+                $(this).data('valorOriginal', valorFormatado);
+                atualizarResumoPagamento();
+            });
+
+            $('#desconto').on('focus', function () {
+                var valorOriginal = $(this).data('valorOriginal');
+                if (valorOriginal) {
+                    $(this).val(valorOriginal);
+                }
+            });
+
+            $('#desconto').on('input', function () {
+                atualizarResumoPagamento();
+            });
+
+            $('#formaPagamento').change(function () {
+                atualizarResumoPagamento();
+                atualizarVisibilidadeCamposDinheiro();
+            });
+
+            $('#valorPago').on('blur', function () {
+                var valorFormatado = $(this).val();
+                var valorNumerico = parseFloat(valorFormatado.replace(/[^0-9,]/g, '').replace(',', '.'));
+                dadosPagamento.valorPago = isNaN(valorNumerico) ? 0 : valorNumerico;
+                calcularTroco();
+            });
+
+            function calcularTroco() {
+                dadosPagamento.troco = dadosPagamento.valorPago - dadosPagamento.total;
+                $('#troco').val(formatarMoeda(dadosPagamento.troco));
+            }
+
+            $('#confirmarPagamento').click(function () {
+                $('#desconto').trigger('blur');
+                atualizarComandaPrincipal();
+                $('#modalPagamento').modal('hide');
+            });
+
+            function atualizarResumoPagamento() {
+                var subtotal = parseFloat('@(ViewBag.TotalComanda != null ? ViewBag.TotalComanda.ToString(System.Globalization.CultureInfo.InvariantCulture) : "0")');
+                dadosPagamento.total = subtotal - dadosPagamento.desconto;
+                dadosPagamento.formaPagamentoId = $('#formaPagamento').val();
+                dadosPagamento.formaPagamentoTexto = $('#formaPagamento option:selected').text() || "Nenhuma selecionada";
+                $('#totalAPagar').text(formatarMoeda(dadosPagamento.total));
+                $('#formaPagamentoSelecionada').text(dadosPagamento.formaPagamentoTexto);
+                calcularTroco();
+            }
+
+            function atualizarComandaPrincipal() {
+                $('#totalComandaDisplay').text(formatarMoeda(dadosPagamento.total));
+                $('#formaPagamentoSelecionadaPrincipal').text(dadosPagamento.formaPagamentoTexto);
+                $('#formaPagamentoPrincipal').text(dadosPagamento.formaPagamentoTexto);
+                $('[name="Comanda.Desconto"]').val(dadosPagamento.desconto.toFixed(2));
+                $('[name="Comanda.RefFormasPagamento.Id"]').val(dadosPagamento.formaPagamentoId);
+            }
+
+            function formatarMoeda(valor) {
+                return valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+            }
+
+            atualizarVisibilidadeCamposDinheiro();
+        });
+    </script>
+    <script>
+
+        let modoManual = false;
+
+        // Ativa modo manual se usuário digitar ou clicar
+        const campoPeso = document.getElementById('pesoProduto');
+        campoPeso.addEventListener('input', () => {
+            if (campoPeso.value.trim() !== "" && parseFloat(campoPeso.value.replace(',', '.')) !== 0) {
+                modoManual = true;
+            }
+        });
+        campoPeso.addEventListener('blur', () => {
+            if (campoPeso.value.trim() === "" || parseFloat(campoPeso.value.replace(',', '.')) === 0) {
+                modoManual = false;
+            }
+        });
+
+        setInterval(() => {
+            fetch('/Admin/api/balanca')
+                .then(response => response.json())
+                .then(data => {
+                    if (!modoManual) {
+                        campoPeso.value = data.peso;
+                    }
+                });
+        }, 1000);
+
+
+    </script>
+    <script>
+        document.addEventListener('keydown', function (e) {
+            const modalAberto = document.getElementById('modalPagamento')?.classList.contains('show');
+
+            // Alt + P – Abrir Modal de Pagamento
+            if (e.altKey && e.key.toLowerCase() === 'p') {
+                const btnPagamento = document.querySelector('button[data-bs-target="#modalPagamento"]');
+                if (btnPagamento && !btnPagamento.disabled) {
+                    e.preventDefault();
+                    btnPagamento.click();
+                }
+            }
+
+            // Alt + C – Confirmar pagamento
+            if (modalAberto && e.altKey && e.key.toLowerCase() === 'c') {
+                const btnConfirmar = document.getElementById('confirmarPagamento');
+                if (btnConfirmar) {
+                    e.preventDefault();
+                    btnConfirmar.click();
+                }
+            }
+
+            // Alt + X – Cancelar pagamento
+            if (modalAberto && e.altKey && e.key.toLowerCase() === 'x') {
+                const btnFechar = document.querySelector('#modalPagamento .btn-close');
+                if (btnFechar) {
+                    e.preventDefault();
+                    btnFechar.click();
+                }
+            }
+
+            // Alt + S – Salvar Comanda
+            if (e.altKey && e.key.toLowerCase() === 's') {
+                const btnSalvar = document.getElementById('btnFecharPedido');
+                if (btnSalvar) {
+                    e.preventDefault();
+                    btnSalvar.click();
+                }
+            }
+
+            // Alt + 5 – Fechar Pedido
+            if (e.altKey && e.key === '5') {
+                const btnFecharPedido = document.getElementById('btnSalvarComanda');
+                if (btnFecharPedido) {
+                    e.preventDefault();
+                    btnFecharPedido.click();
+                }
+            }
+
+            // Alt + I – Remover Itens
+            if (e.altKey && e.key.toLowerCase() === 'i') {
+                const btnRemover = document.querySelector('a[href*="limpaConada"]');
+                if (btnRemover) {
+                    e.preventDefault();
+                    const confirmar = confirm("Deseja realmente Remover?");
+                    if (confirmar) {
+                        window.location.href = btnRemover.href;
+                    }
+                }
+            }
+        });
+    </script>
+    <script>
+        $(document).ready(function () {
+
+            // Sempre mostra os dois botões inicialmente
+            $('#btnSalvarComanda').show();
+            $('#btnFecharPedido').show();
+
+            function atualizarFormaPagamento(formaPagamentoId, formaPagamentoTexto) {
+                $('#formaPagamentoHidden').val(formaPagamentoId);
+                $('#formaPagamentoPrincipal').text(formaPagamentoTexto);
+                $('#formaPagamentoSelecionadaPrincipal').text(formaPagamentoTexto);
+                $('[name="Comanda.RefFormasPagamento.Id"]').val(formaPagamentoId);
+            }
+
+            // Quando seleciona forma de pagamento no SELECT
+            $('#formaPagamento').on('change', function () {
+                const id = $(this).val();
+                const texto = $(this).find('option:selected').text();
+                atualizarFormaPagamento(id, texto);
+            });
+
+            // Quando seleciona forma de pagamento nos radio buttons
+            $('input[name="formaPagamentoId"]').on('change', function () {
+                const id = $(this).val();
+                const texto = $(this).next('label').text();
+                atualizarFormaPagamento(id, texto);
+            });
+
+            // Clicar em Salvar: zera forma de pagamento
+            $('#btnSalvarComanda').on('click', function () {
+                $('#formaPagamentoHidden').val(0); // <- IMPORTANTE: garante que salvar é sem pagamento
+            });
+
+            // Clicar em Fechar: exige forma de pagamento
+            $('#btnFecharPedido').on('click', function (e) {
+                const idPagamento = $('#formaPagamentoHidden').val();
+
+                // Garante que o valor foi atualizado antes da validação
+                setTimeout(function () {
+                    const idPagamentoAtualizado = $('#formaPagamentoHidden').val();
+                    if (!idPagamentoAtualizado || idPagamentoAtualizado == "0") {
+                        e.preventDefault();
+                        alert('Selecione uma forma de pagamento para fechar o pedido.');
+                    }
+                }, 50); // pequeno delay para garantir sincronização
+            });
+        });
+    </script>
+    <script>
+        function limparFormaPagamento() {
+            document.getElementById("formaPagamentoId").value = "";
+        }
+    </script>
+
+}
