@@ -70,14 +70,14 @@
 
 @if (Model.ItensCarrinho != null && Model.ItensCarrinho.Any())
 {
-    <form asp-action="SalvarComanda" asp-controller="Comanda" method="post">
+    <form asp-action="SalvarComanda" asp-controller="Comanda" method="post" id="formComanda">
         <input type="hidden" id="formaPagamentoHidden" name="Comanda.RefFormasPagamento.Id" value="0" />
         <input type="hidden" name="Comanda.Desconto" id="inputDesconto" />
 
         <div class="form-group row">
             <label for="NomeCliente" class="col-form-label col-sm-3">Nome do Cliente:</label>
             <div class="col-sm-6">
-                <input type="text" id="NomeCliente" name="Comanda.NomeCliente" class="form-control form-control-sm" required />
+                <input type="text" id="NomeCliente" name="Comanda.NomeCliente" class="form-control form-control-sm" />
             </div>
         </div>
 
@@ -138,8 +138,7 @@
                 </div>
 
                 <div class="offset-sm-1 col-md-10 d-flex flex-wrap align-items-center gap-1">
-                    
-                    <button type="submit" id="btnFecharPedido" class="btn btn-outline-success">
+                    <button type="button" id="btnExibirPagamento" class="btn btn-outline-success">
                         Fechar Pedido (Alt + 5)
                     </button>
                     <button type="submit" id="btnSalvarComanda"
@@ -155,7 +154,7 @@
             </div>
 
             <div class="col-md-3">
-                <div class="card border-primary shadow">
+                <div id="cardPagamento" class="card border-primary shadow" style="display: none;">
                     <div class="card-header bg-primary text-white">
                         <strong>Forma de Pagamento</strong>
                     </div>
@@ -163,7 +162,7 @@
                         @foreach (var forma in ViewBag.FormaPagamento as SelectList)
                         {
                             <div class="form-check mb-2">
-                                <input class="form-check-input" type="radio" name="formaPagamentoId" value="@forma.Value" id="forma@forma.Value" required />
+                                <input class="form-check-input" type="radio" name="formaPagamentoId" value="@forma.Value" id="forma@forma.Value" />
                                 <label class="form-check-label" for="forma@forma.Value">@forma.Text</label>
                             </div>
                         }
@@ -235,6 +234,46 @@ else
     </script>
 
     <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Lógica para mostrar/ocultar o card de pagamento
+            const btnExibirPagamento = document.getElementById('btnExibirPagamento');
+            const cardPagamento = document.getElementById('cardPagamento');
+            const formaPagamentoRadios = document.querySelectorAll('input[name="formaPagamentoId"]');
+            const formComanda = document.getElementById('formComanda');
+
+            if (btnExibirPagamento && cardPagamento) {
+                btnExibirPagamento.addEventListener('click', function () {
+                    // Exibe o card de pagamento
+                    cardPagamento.style.display = 'block';
+
+                    // Muda o tipo do botão para submit
+                    this.type = 'submit';
+
+                    // Remove o event listener para evitar submissões múltiplas
+                    this.removeEventListener('click', arguments.callee);
+
+                    // Adiciona a validação antes da submissão
+                    formComanda.addEventListener('submit', function (event) {
+                        const formaSelecionada = document.querySelector('input[name="formaPagamentoId"]:checked');
+                        if (!formaSelecionada) {
+                            alert('Por favor, selecione uma forma de pagamento.');
+                            event.preventDefault(); // Impede a submissão do formulário
+                        }
+                    });
+                });
+            }
+
+            // Lógica para o campo Nome do Cliente
+            const nomeClienteInput = document.getElementById('NomeCliente');
+            formComanda.addEventListener('submit', function () {
+                if (nomeClienteInput.value.trim() === '') {
+                    nomeClienteInput.value = 'Não Informado';
+                }
+            });
+        });
+    </script>
+
+    <script>
         document.addEventListener('keydown', function (e) {
             const modalAberto = document.getElementById('modalPagamento')?.classList.contains('show');
 
@@ -267,7 +306,7 @@ else
 
             // Alt + S – Salvar Comanda
             if (e.altKey && e.key.toLowerCase() === 's') {
-                const btnSalvar = document.getElementById('btnFecharPedido');
+                const btnSalvar = document.getElementById('btnSalvarComanda');
                 if (btnSalvar) {
                     e.preventDefault();
                     btnSalvar.click();
@@ -276,7 +315,7 @@ else
 
             // Alt + 5 – Fechar Pedido
             if (e.altKey && e.key === '5') {
-                const btnFecharPedido = document.getElementById('btnSalvarComanda');
+                const btnFecharPedido = document.getElementById('btnExibirPagamento');
                 if (btnFecharPedido) {
                     e.preventDefault();
                     btnFecharPedido.click();
@@ -311,12 +350,13 @@ else
             let totalComDesconto = totalOriginal;
 
             function formatarMoeda(valor) {
+                if (isNaN(valor)) return "R$ 0,00";
                 return valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
             }
 
             function atualizarTotal() {
                 const desconto = parseFloat(descontoInput.val().replace(/[^0-9,]/g, '').replace(',', '.')) || 0;
-                inputDescontoHidden.val(desconto); // Atualiza o campo oculto
+                inputDescontoHidden.val(desconto);
                 totalComDesconto = totalOriginal - desconto;
                 if (totalComDesconto < 0) totalComDesconto = 0;
                 totalComandaElemento.text(formatarMoeda(totalComDesconto));
@@ -359,8 +399,13 @@ else
                 formaPagamentoHidden.val(0); // Garante que o ID da forma de pagamento seja 0 para "Salvar Comanda"
             });
 
-            atualizarTotal(); // Atualiza o total ao carregar a página
-            atualizarVisibilidadeDinheiro(); // Define a visibilidade dos campos de dinheiro
+            // Adicionado novo botão para Fechar Pedido
+            $('#btnExibirPagamento').on('click', function () {
+                $('#cardPagamento').show();
+            });
+
+            atualizarTotal();
+            atualizarVisibilidadeDinheiro();
         });
     </script>
 }
