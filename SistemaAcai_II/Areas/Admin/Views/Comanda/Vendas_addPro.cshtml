@@ -1,4 +1,4 @@
-﻿@model SistemaAcai_II.Models.VendasViewModel
+﻿@* @model SistemaAcai_II.Models.VendasViewModel
 @using SistemaAcai_II.Models.Constants
 @inject SistemaAcai_II.Libraries.Login.LoginColaborador _colaborador
 @{
@@ -405,12 +405,17 @@ else
             });
 
             atualizarTotal();
-            atualizarVisibilidadeDinheiro();
+            atualizarVisibilidadeDinheiro(); 
         });
     </script>
-}
+} *@
 
-@* @model SistemaAcai_II.Models.VendasViewModel
+
+
+
+
+ 
+@model SistemaAcai_II.Models.VendasViewModel
 @using SistemaAcai_II.Models.Constants
 @inject SistemaAcai_II.Libraries.Login.LoginColaborador _colaborador
 @{
@@ -635,6 +640,45 @@ else
 @section Scripts {
     <script>
         document.addEventListener('DOMContentLoaded', function () {
+            // Lógica para mostrar/ocultar o card de pagamento
+            const btnExibirPagamento = document.getElementById('btnExibirPagamento');
+            const cardPagamento = document.getElementById('cardPagamento');
+            const formaPagamentoRadios = document.querySelectorAll('input[name="formaPagamentoId"]');
+            const formComanda = document.getElementById('formComanda');
+
+            if (btnExibirPagamento && cardPagamento) {
+                btnExibirPagamento.addEventListener('click', function () {
+                    // Exibe o card de pagamento
+                    cardPagamento.style.display = 'block';
+
+                    // Muda o tipo do botão para submit
+                    this.type = 'submit';
+
+                    // Remove o event listener para evitar submissões múltiplas
+                    this.removeEventListener('click', arguments.callee);
+
+                    // Adiciona a validação antes da submissão
+                    formComanda.addEventListener('submit', function (event) {
+                        const formaSelecionada = document.querySelector('input[name="formaPagamentoId"]:checked');
+                        if (!formaSelecionada) {
+                            alert('Por favor, selecione uma forma de pagamento.');
+                            event.preventDefault(); // Impede a submissão do formulário
+                        }
+                    });
+                });
+            }
+
+            // Lógica para o campo Nome do Cliente
+            const nomeClienteInput = document.getElementById('NomeCliente');
+            formComanda.addEventListener('submit', function () {
+                if (nomeClienteInput.value.trim() === '') {
+                    nomeClienteInput.value = 'Não Informado';
+                }
+            });
+        });
+    </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
             // Referências para os elementos do DOM
             const formComanda = document.getElementById('formComanda');
             const btnSalvarComanda = document.getElementById('btnSalvarComanda');
@@ -645,7 +689,7 @@ else
             const btnConfirmarPagamento = document.getElementById('btnConfirmarPagamento');
 
             // --- Lógica para o botão "Salvar Comanda" ---
-            if (btnSalvarComanda || btnFecharPedido ) {
+            if (btnSalvarComanda) {
                 btnSalvarComanda.addEventListener('click', function () {
                     // Se o campo do nome do cliente estiver vazio, define "Não Informado"
                     if (nomeClienteInput.value.trim() === '') {
@@ -859,4 +903,4 @@ else
             atualizarVisibilidadeDinheiro();
         });
     </script>
-} *@
+}

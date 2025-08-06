@@ -35,63 +35,6 @@ namespace SistemaAcai_II.Controllers
             _formasPagamentoRepository = formasPagamentoRepository; 
         }
 
-        //public IActionResult Vendas(string termo)
-        //{
-        //    var listPagamentos = _formasPagamentoRepository.ObterTodasFormasPagamentos();
-        //    ViewBag.FormaPagamento = new SelectList(listPagamentos, "Id", "Nome");
-
-        //    int quantidadeDigitada = 1;
-        //    string termoBusca = termo;
-
-        //    // Verifica se o termo está no formato "codigo*quantidade"
-        //    if (!string.IsNullOrWhiteSpace(termo) && termo.Contains("*"))
-        //    {
-        //        var partes = termo.Split('*');
-        //        if (partes.Length == 2)
-        //        {
-        //            termoBusca = partes[0];
-
-        //            if (int.TryParse(partes[1], out int qtd))
-        //            {
-        //                quantidadeDigitada = qtd;
-        //            }
-        //        }
-        //    }
-
-        //    // Realiza a busca por nome ou código
-        //    var produtos = string.IsNullOrWhiteSpace(termoBusca)
-        //        ? new List<ProdutoSimples>()
-        //        : _produtoRepository.BuscarPorNome(termoBusca);
-
-        //    // Aplica a quantidade apenas se o produto for por unidade
-        //    foreach (var produto in produtos)
-        //    {
-        //        if (produto.TipoMedida?.ToLower() == "unidade")
-        //        {
-        //            produto.Quantidade = quantidadeDigitada;
-        //        }
-        //        else
-        //        {
-        //            // Deixa como está para produtos por quilo
-        //            produto.Quantidade = 0; // ou null, conforme sua lógica de balança
-        //        }
-        //    }
-
-        //    var itensCarrinho = _cookiePedidoCompra.Consultar();
-
-        //    // ViewBag com quantidade pré-preenchida
-        //    ViewBag.QuantidadeDigitada = quantidadeDigitada;
-
-        //    var model = new VendasViewModel
-        //    {
-        //        Produtos = produtos,
-        //        ItensCarrinho = itensCarrinho
-        //    };
-
-        //    return View(model);
-        //}
-
-
 
         public IActionResult Vendas(string termo)
         {
@@ -224,6 +167,21 @@ namespace SistemaAcai_II.Controllers
             // Redireciona para a página de vendas
             return RedirectToAction(nameof(Vendas));
         }
+        [HttpGet]
+        public IActionResult ObterProdutoPorId(int id)
+        {
+            var produto = _produtoRepository.ObterProduto(id);
+            if (produto == null)
+            {
+                return NotFound("Produto não encontrado.");
+            }
+
+            // Retorna apenas os dados necessários em formato JSON
+            return Json(new { id = produto.Id, tipoMedida = produto.TipoMedida });
+        }
+
+
+
         public IActionResult RemoverItem(int id)
         {
             _cookiePedidoCompra.Remover(new ProdutoSimples() { Id = id });
