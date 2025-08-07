@@ -67,8 +67,8 @@ namespace SistemaAcai_II.Repository
                     };
                     comanda.NomeCliente = (string)(dr["NomeCliente"]);
                     comanda.DataAbertura = Convert.ToDateTime(dr["DataAbertura"]);
-                    comanda.DataFechamento = Convert.ToDateTime(dr["DataFechamento"]);
-                    comanda.ValorTotal = Convert.ToDecimal(dr["ValorTotal"]);
+                    comanda.DataFechamento = Convert.ToDateTime(dr["DataFechamento"]);                    
+                    comanda.ValorTotal = dr["ValorTotal"] != DBNull.Value ? Convert.ToDecimal(dr["ValorTotal"]): 0m;
                     comanda.Status = (string)(dr["Situacao"]);
                 }
                 return comanda;

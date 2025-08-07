@@ -1,4 +1,4 @@
-﻿@model IEnumerable<SistemaAcai_II.Models.Comanda>
+﻿@* @model IEnumerable<SistemaAcai_II.Models.Comanda>
 @{
     ViewData["Title"] = "ComandaHoje";
 }
@@ -35,6 +35,96 @@
 
 
         </tbody>
+        <tfoot>
+            <tr>
+                <td colspan="6" class="text-right font-weight-bold">Total das Vendas:</td>
+                <td class="font-weight-bold">
+                    @Model.Sum(c => c.ValorTotal).ToString("C")
+                </td>
+            </tr>
+        </tfoot>
+    </table>
+</div> *@
+@model IEnumerable<SistemaAcai_II.Models.Comanda>
+@{
+    ViewData["Title"] = "ComandaHoje";
+
+    var totalPorFormaPagamento = Model
+        .GroupBy(c => c.RefFormasPagamento?.Nome)
+        .Select(g => new { Forma = g.Key, Total = g.Sum(c => c.ValorTotal) })
+        .ToList();
+
+    var totalGeral = Model.Sum(c => c.ValorTotal);
+}
+
+<h2 class="text-center text-md-left">Vendas do dia: @DateTime.Now.ToString("dd/MM/yyyy")</h2>
+
+<div class="table-responsive">
+    <table class="table table-striped table-bordered table-hover table-sm">
+        <thead>
+            <tr>
+                <th scope="col">@Html.DisplayNameFor(model => model.First().Id)</th>
+                <th scope="col">@Html.DisplayNameFor(model => model.First().NomeCliente)</th>
+                <th scope="col">@Html.DisplayNameFor(model => model.First().DataAbertura)</th>
+                <th scope="col">@Html.DisplayNameFor(model => model.First().DataFechamento)</th>
+                <th scope="col">@Html.DisplayNameFor(model => model.First().RefFormasPagamento.Nome)</th>
+                <th scope="col">@Html.DisplayNameFor(model => model.First().Desconto)</th>
+                <th scope="col">@Html.DisplayNameFor(model => model.First().ValorTotal)</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            @foreach (Comanda comanda in Model)
+            {
+                <tr>
+                    <th scope="row">@comanda.Id</th>
+                    <td>@comanda.NomeCliente</td>
+                    <td>@comanda.DataAbertura.ToString("dd/MM/yyyy")</td>
+                    <td>@comanda.DataFechamento?.ToString("dd/MM/yyyy")</td>
+                    <td>@comanda.RefFormasPagamento?.Nome</td>
+                    <td>R$ @comanda.Desconto</td>
+                    <td>@comanda.ValorTotal.ToString("C")</td>
+                </tr>
+            }
+        </tbody>
+
+        <tfoot>
+            <tr>
+                <td colspan="6" class="text-right font-weight-bold">Total das Vendas:</td>
+                <td class="font-weight-bold">
+                    @totalGeral.ToString("C")
+                </td>
+            </tr>
+        </tfoot>
     </table>
 </div>
+
+<!-- Resumo por Forma de Pagamento -->
+<div class="mt-4">
+    <h4>Resumo: @DateTime.Now.ToString("dd/MM/yyyy")</h4>
+    <table class="table table-bordered table-sm w-50">
+        <thead>
+            <tr>
+                <th>Forma de Pagamento</th>
+                <th>Total</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in totalPorFormaPagamento)
+            {
+                <tr>
+                    <td>@item.Forma</td>
+                    <td>@item.Total.ToString("C")</td>
+                </tr>
+            }
+        </tbody>
+        <tfoot>
+            <tr>
+                <td class="text-right font-weight-bold">Total Geral:</td>
+                <td class="font-weight-bold">@totalGeral.ToString("C")</td>
+            </tr>
+        </tfoot>
+    </table>
+</div>
+
 

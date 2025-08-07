@@ -73,7 +73,8 @@ namespace SistemaAcai_II.Areas.Admin.Controllers
             _gerenciarEmail.EnviarResumoComandasDia(comandas, caixa);
 
             TempData["Mensagem"] = "Caixa fechado e e-mail enviado com sucesso.";
-            return RedirectToAction("Index");
+
+            return RedirectToAction("ComandaHoje", "Relatorios");
         }
         
     }

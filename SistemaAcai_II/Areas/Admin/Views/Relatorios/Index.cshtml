@@ -3,6 +3,13 @@
     ViewData["Title"] = "Painel";
     var dataInicial = ViewBag.DataInicial as DateTime?;
     var dataFinal = ViewBag.DataFinal as DateTime?;
+
+    var totalPorFormaPagamento = Model
+        .GroupBy(c => c.RefFormasPagamento?.Nome)
+        .Select(g => new { Forma = g.Key, Total = g.Sum(c => c.ValorTotal) })
+        .ToList();
+
+    var totalGeral = Model.Sum(c => c.ValorTotal);
 }
 <h2 class="text-center text-md-left">Informe as datas</h2>
 <form asp-action="Index" method="get" class="mb-4">
@@ -58,5 +65,59 @@
 
 
         </tbody>
+        <tfoot>
+            <tr>
+                <td colspan="6" class="text-right font-weight-bold">Total das Vendas:</td>
+                <td class="font-weight-bold">
+                    @Model.Sum(c => c.ValorTotal).ToString("C")
+                </td>
+            </tr>
+        </tfoot>
+    </table>
+</div>
+
+<!-- Resumo por Forma de Pagamento -->
+<div class="mt-4">
+    <h4>Resumo Geral de Vendas</h4>
+
+    @if (dataInicial.HasValue && dataFinal.HasValue)
+    {
+        <p><strong>Período:</strong> @dataInicial.Value.ToString("dd/MM/yyyy") até @dataFinal.Value.ToString("dd/MM/yyyy")</p>
+    }
+    else if (dataInicial.HasValue)
+    {
+        <p><strong>Data Inicial:</strong> @dataInicial.Value.ToString("dd/MM/yyyy")</p>
+    }
+    else if (dataFinal.HasValue)
+    {
+        <p><strong>Data Final:</strong> @dataFinal.Value.ToString("dd/MM/yyyy")</p>
+    }
+    else
+    {
+        <p><strong>Período:</strong> Todas as datas</p>
+    }
+
+    <table class="table table-bordered table-sm w-50">
+        <thead>
+            <tr>
+                <th>Forma de Pagamento</th>
+                <th>Total</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in totalPorFormaPagamento)
+            {
+                <tr>
+                    <td>@item.Forma</td>
+                    <td>@item.Total.ToString("C")</td>
+                </tr>
+            }
+        </tbody>
+        <tfoot>
+            <tr>
+                <td class="text-right font-weight-bold">Total Geral:</td>
+                <td class="font-weight-bold">@totalGeral.ToString("C")</td>
+            </tr>
+        </tfoot>
     </table>
 </div>
