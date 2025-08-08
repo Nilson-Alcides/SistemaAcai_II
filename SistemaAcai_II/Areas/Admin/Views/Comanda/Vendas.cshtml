@@ -57,7 +57,7 @@
                                        class="form-control-sm col-3 campo-quantidade" placeholder="Quantidade" />
                             }
 
-                            <button type="submit" class="btn btn-success btn-sm ms-2">Adicionar </button>
+                            @* <button type="submit" class="btn btn-success btn-sm ms-2">Adicionar </button> *@
                         </form>
                     </td>
                 </tr>
@@ -408,6 +408,33 @@ else
             atualizarVisibilidadeDinheiro();
         });
     </script>
+
+    <script>
+    $(document).ready(function () {
+        // Se existirem produtos, foca no primeiro campo de quantidade ou peso visível
+        const primeiroCampo = $('.campo-quantidade:visible, .campo-peso:visible').first();
+        if (primeiroCampo.length > 0) {
+            primeiroCampo.focus();
+            primeiroCampo.select(); // opcional: seleciona o conteúdo do campo
+        }
+    });
+</script>
+
+<script>
+    document.addEventListener('keydown', function (e) {
+        if (e.key === "Escape") {
+            const campoBusca = document.getElementById('termo');
+            const formBusca = campoBusca?.closest('form');
+
+            if (campoBusca && formBusca) {
+                campoBusca.value = "";      // Limpa o campo
+                campoBusca.focus();         // Foca novamente
+                formBusca.submit();         // Submete o formulário com termo vazio
+            }
+        }
+    });
+</script>
+
 }
 
 @* @model SistemaAcai_II.Models.VendasViewModel
