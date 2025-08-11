@@ -435,6 +435,123 @@ else
     });
 </script>
 
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  const formBusca = document.querySelector('form[method="get"]');
+  const inputTermo = document.getElementById('termo');
+
+  if (!formBusca || !inputTermo) return;
+
+  formBusca.addEventListener('submit', function () {
+    if (!formBusca.querySelector('input[name="auto"]')) {
+      const h = document.createElement('input');
+      h.type = 'hidden';
+      h.name = 'auto';
+      h.value = '1';
+      formBusca.appendChild(h);
+    }
+  });
+});
+</script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  const params = new URLSearchParams(window.location.search);
+  if (params.get('auto') !== '1') return;
+
+  const termoBruto = (params.get('termo') || '').trim();
+  if (!termoBruto) return;
+
+  function parseTermo(t) {
+    const [codRaw, qtdRaw] = t.split('*');
+    const codigo = (codRaw || '').trim();
+    let qtd = 1;
+    if ((qtdRaw || '').trim() !== '') {
+      const n = parseFloat(qtdRaw.replace(',', '.'));
+      if (!isNaN(n) && n > 0) qtd = n;
+    }
+    return { codigo, qtd };
+  }
+
+  async function obterPesoDaBalanca(tentativas = 3, intervaloMs = 300) {
+    for (let i = 0; i < tentativas; i++) {
+      try {
+        const resp = await fetch('/Admin/api/balanca', { cache: 'no-store' });
+        if (!resp.ok) continue;
+        const data = await resp.json();
+        // Aceita número (com , ou .) e garante três casas
+        let valor = 0;
+        if (typeof data?.peso === 'string') {
+          valor = parseFloat(String(data.peso).replace(',', '.'));
+        } else if (typeof data?.peso === 'number') {
+          valor = data.peso;
+        }
+        if (!isNaN(valor) && valor > 0) {
+          // arredonda para 3 casas (ex.: 0.250)
+          return Math.round(valor * 1000) / 1000;
+        }
+      } catch (e) { /* ignora e tenta de novo */ }
+      if (i < tentativas - 1) await new Promise(r => setTimeout(r, intervaloMs));
+    }
+    return null; // não conseguiu peso válido
+  }
+
+  const { codigo, qtd } = parseTermo(termoBruto);
+
+  // linhas logo após o <h3> Produto
+  const linhas = document.querySelectorAll('h3 + table.table tbody tr');
+  if (!linhas.length) return;
+
+  let alvo = null;
+  if (codigo) {
+    linhas.forEach(tr => {
+      const codCell = tr.querySelector('td:first-child');
+      if (codCell && codCell.textContent.trim() === codigo) {
+        alvo = tr;
+      }
+    });
+  }
+  if (!alvo) alvo = linhas[0];
+
+  const formAdd = alvo.querySelector('form[method="post"]');
+  if (!formAdd) return;
+
+  const qtdInput  = formAdd.querySelector('input[name="quantidade"]');
+  const pesoInput = formAdd.querySelector('input[name="pesoRcebido"]');
+
+  (async () => {
+    if (qtdInput) {
+      // Produto por unidade → usa qtd (inteiro >=1)
+      const inteiro = Number.isInteger(qtd) ? qtd : Math.max(1, Math.round(qtd));
+      qtdInput.value = inteiro;
+      formAdd.submit();
+      return;
+    }
+
+    if (pesoInput) {
+      // Produto por Kg → tenta pegar peso da balança
+      let peso = await obterPesoDaBalanca(4, 250); // até ~1s total
+      if (peso === null) {
+        // fallback: se o usuário digitou algo como codigo*0,250, usa isso
+        peso = (typeof qtd === 'number' && qtd > 0) ? qtd : 0;
+      }
+      if (peso <= 0) {
+        alert('Não foi possível obter o peso da balança. Verifique a balança ou informe o peso manualmente.');
+        // foca o campo para edição manual
+        pesoInput.focus();
+        return;
+      }
+      // form aceita vírgula — converte e garante 3 casas
+      const textoPeso = String(peso.toFixed(3)).replace('.', ',');
+      pesoInput.value = textoPeso;
+      formAdd.submit();
+      return;
+    }
+  })();
+});
+</script>
+
+
 }
 
 @* @model SistemaAcai_II.Models.VendasViewModel
