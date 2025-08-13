@@ -52,7 +52,7 @@
                                     {
                                         <div class="input-group">
                                             <input type="text" name="pesoRcebido" id="pesoProduto-@produto.Id"
-                                                   class="form-control-sm campo-peso" value="0" />
+                                                   class="form-control-sm col-3 campo-peso" value="0" />
                                             <span class="input-group-text">Kg</span>
                                         </div>
                                         <input type="hidden" name="quantidade" value="0" />
@@ -61,7 +61,7 @@
                                     {
                                         <div class="input-group">
                                             <input type="text" name="quantidade" id="quantidadeProduto-@produto.Id"
-                                                   class="form-control-sm campo-quantidade" value="1" />
+                                                   class="form-control-sm col-3 campo-quantidade" value="1" />
                                             <span class="input-group-text">Un</span>
                                         </div>
                                         <input type="hidden" name="pesoRcebido" value="0" />
@@ -152,10 +152,10 @@
 
                 <div class="offset-sm-1 col-md-10 d-flex flex-wrap align-items-center gap-1">
                     <button type="button" id="btnFecharPedido" class="btn btn-outline-success">
-                        Fechar Pedido (Alt + 5)
+                        Fechar (Alt + 5)
                     </button>
                     <button type="button" id="btnSalvarComanda" class="btn btn-outline-info">
-                        Salvar Comanda (Alt + S)
+                        Salvar (Alt + S)
                     </button>
                     <a asp-controller="Comanda" asp-action="limpaConada"
                        class="btn btn-outline-danger"
@@ -207,8 +207,10 @@
                             </dd>
                         </dl>
                     </div>
-                    <div class="card-footer text-end">
-                        <button type="button" class="btn btn-success" id="btnConfirmarPagamento">Finalizar</button>
+                    <div class="card-footer">
+                        <button type="button" class="btn btn-success w-100" id="btnConfirmarPagamento">
+                            Finalizar (Alt + 6)
+                        </button>
                     </div>
                 </div>
             </div>
@@ -220,8 +222,194 @@ else
 {
     <p>Nenhum item no carrinho.</p>
 }
-
 @section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Referências principais
+            const formComanda = document.getElementById('formComanda');
+            const btnSalvarComanda = document.getElementById('btnSalvarComanda');
+            const nomeClienteInput = document.getElementById('NomeCliente');
+            const formaPagamentoHidden = document.getElementById('formaPagamentoHidden');
+            const btnFecharPedido = document.getElementById('btnFecharPedido');
+            const cardPagamento = document.getElementById('cardPagamento');
+            const btnConfirmarPagamento = document.getElementById('btnConfirmarPagamento');
+            const campoPesquisa = document.getElementById('termo');
+            const formBusca = document.getElementById('formBusca');
+
+            // --- Salvar Comanda ---
+            if (btnSalvarComanda) {
+                btnSalvarComanda.addEventListener('click', function () {
+                    if (nomeClienteInput.value.trim() === '') {
+                        nomeClienteInput.value = 'Não Informado';
+                    }
+                    formaPagamentoHidden.value = 0;
+                    formComanda.submit();
+                });
+            }
+
+            // --- Fechar Pedido ---
+            if (btnFecharPedido && btnConfirmarPagamento) {
+                btnFecharPedido.addEventListener('click', function () {
+                    cardPagamento.style.display = 'block';
+                    btnFecharPedido.style.display = 'none';
+                    const primeiroRadio = document.querySelector('input[name="formaPagamentoId"]');
+                    if (primeiroRadio) primeiroRadio.focus();
+                });
+
+                btnConfirmarPagamento.addEventListener('click', function () {
+                    const formaSelecionada = document.querySelector('input[name="formaPagamentoId"]:checked');
+                    if (!formaSelecionada) {
+                        alert('Por favor, selecione uma forma de pagamento.');
+                        return;
+                    }
+                    formComanda.submit();
+                });
+            }
+
+            // --- Balança ---
+            let pesoDaBalanca = 0;
+            let balancaDisponivel = false;
+            setInterval(() => {
+                fetch('/Admin/api/balanca')
+                    .then(response => response.json())
+                    .then(data => {
+                        pesoDaBalanca = parseFloat(data.peso.replace(',', '.')) || 0;
+                        balancaDisponivel = pesoDaBalanca > 0;
+                    });
+            }, 500);
+
+            // --- Adicionar Produto ---
+            function adicionarProduto(id, peso, quantidade) {
+                const url = '@Url.Action("AdicionarItem", "Comanda")';
+                const formData = new URLSearchParams();
+                formData.append('id', id);
+                formData.append('pesoRcebido', peso ?? 0);
+                formData.append('quantidade', quantidade ?? 0);
+
+                fetch(url, { method: 'POST', body: formData })
+                    .then(response => {
+                        if (response.ok) {
+                            window.location.reload();
+                        } else {
+                            response.text().then(text => {
+                                alert('Erro ao adicionar item: ' + text);
+                            });
+                        }
+                    });
+            }
+
+            // --- Busca com campo ---
+            if (formBusca) {
+                formBusca.addEventListener('submit', async (e) => {
+                    const termo = campoPesquisa.value.trim();
+                    const partes = termo.split('*');
+
+                    if (partes.length === 2) {
+                        e.preventDefault();
+                        const valorDigitado = parseFloat(partes[0].trim().replace(',', '.'));
+                        const codigo = partes[1].trim();
+
+                        try {
+                            const produto = await fetch(`@Url.Action("ObterProdutoPorId", "Comanda")?id=${codigo}`).then(res => res.json());
+                            if (produto) {
+                                if (produto.tipoMedida.toLowerCase() === 'kg') {
+                                    adicionarProduto(codigo, valorDigitado, 0);
+                                } else if (produto.tipoMedida.toLowerCase() === 'unidade') {
+                                    adicionarProduto(codigo, 0, valorDigitado);
+                                }
+                            }
+                        } catch {
+                            alert('Produto não encontrado ou erro de comunicação.');
+                        }
+                    } else if (balancaDisponivel && !isNaN(parseInt(termo))) {
+                        e.preventDefault();
+                        adicionarProduto(termo, pesoDaBalanca, 0);
+                    }
+                });
+            }
+
+            // --- Atalhos ---
+            document.addEventListener('keydown', function (e) {
+                if (e.altKey && e.key === '5') {
+                    e.preventDefault();
+                    btnFecharPedido?.click();
+                }
+                if (e.altKey && e.key === '6') {
+                    e.preventDefault();
+                    btnConfirmarPagamento?.click();
+                }
+                if (e.altKey && e.key.toLowerCase() === 's') {
+                    e.preventDefault();
+                    btnSalvarComanda?.click();
+                }
+            });
+        });
+
+        // --- Cálculos e máscaras ---
+        $(document).ready(function () {
+            $('.cep').mask('00000-000');
+            $('.Telefone').mask('(00) 0000-0000');
+            $('.dineiro').mask("#.##0,00", { reverse: true });
+            $('.cpf').mask('000.000.000-00', { reverse: true });
+            $('.cnpj').mask('00.000.000/0000-00', { reverse: true });
+            $('.ie').mask('000.000.000/0000', { reverse: true });
+
+            const totalComandaElemento = $('#totalComandaDisplay');
+            const descontoInput = $('#desconto');
+            const valorPagoInput = $('#valorPago');
+            const trocoInput = $('#troco');
+            const formaPagamentoRadios = $('input[name="formaPagamentoId"]');
+            const formaPagamentoHidden = $('#formaPagamentoHidden');
+            const inputDescontoHidden = $('#inputDesconto');
+
+            let totalOriginal = parseFloat('@(ViewBag.TotalComanda?.ToString(System.Globalization.CultureInfo.InvariantCulture) ?? "0")');
+            let totalComDesconto = totalOriginal;
+
+            function formatarMoeda(valor) {
+                return isNaN(valor) ? "R$ 0,00" : valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+            }
+
+            function atualizarTotal() {
+                const desconto = parseFloat(descontoInput.val().replace(/[^0-9,]/g, '').replace(',', '.')) || 0;
+                inputDescontoHidden.val(desconto);
+                totalComDesconto = Math.max(totalOriginal - desconto, 0);
+                totalComandaElemento.text(formatarMoeda(totalComDesconto));
+                calcularTroco();
+            }
+
+            function calcularTroco() {
+                const valorPago = parseFloat(valorPagoInput.val().replace(/[^0-9,]/g, '').replace(',', '.')) || 0;
+                const troco = valorPago - totalComDesconto;
+                trocoInput.val(formatarMoeda(troco));
+            }
+
+            function atualizarVisibilidadeDinheiro() {
+                const formaSelecionada = $('input[name="formaPagamentoId"]:checked').next('label').text().trim().toLowerCase();
+                if (formaSelecionada === 'dinheiro') {
+                    $('#pagamentoDinheiro, #campoValorPago, #campoTroco').show();
+                } else {
+                    $('#pagamentoDinheiro, #campoValorPago, #campoTroco').hide();
+                    valorPagoInput.val('');
+                    trocoInput.val('');
+                }
+            }
+
+            descontoInput.on('input', atualizarTotal);
+            valorPagoInput.on('input', calcularTroco);
+            formaPagamentoRadios.on('change', function () {
+                formaPagamentoHidden.val($(this).val());
+                $('#formaPagamentoSelecionadaPrincipal').text($(this).next('label').text());
+                atualizarVisibilidadeDinheiro();
+            });
+
+            atualizarTotal();
+            atualizarVisibilidadeDinheiro();
+        });
+    </script>
+}
+
+
+@* @section Scripts {
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             // Lógica para mostrar/ocultar o card de pagamento
@@ -291,6 +479,7 @@ else
                 // Ao clicar em "Fechar Pedido", exibe o card de pagamento
                 btnFecharPedido.addEventListener('click', function () {
                     cardPagamento.style.display = 'block';
+                    btnFecharPedido.style.display = 'none'; // Oculta o botão "Fechar Pedido"
                     // Foca no primeiro radio button para melhor usabilidade
                     const primeiroRadio = document.querySelector('input[name="formaPagamentoId"]');
                     if (primeiroRadio) {
@@ -387,6 +576,13 @@ else
                     e.preventDefault();
                     if (btnFecharPedido) {
                         btnFecharPedido.click();
+                    }
+                }
+                // Alt + 5 – Finalizar
+                if (e.altKey && e.key === '6') {
+                    e.preventDefault();
+                    if (btnConfirmarPagamento) {
+                        btnConfirmarPagamento.click();
                     }
                 }
                 // Alt + S – Salvar Comanda
@@ -487,4 +683,4 @@ else
             atualizarVisibilidadeDinheiro();
         });
     </script>
-}
+} *@
