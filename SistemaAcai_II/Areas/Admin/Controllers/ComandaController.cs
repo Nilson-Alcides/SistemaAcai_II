@@ -134,32 +134,42 @@ namespace SistemaAcai_II.Controllers
 
             // Verifica se o item já existe na lista
             var itemExistente = itensCarrinho.FirstOrDefault(p => p.Id == id);
-
-            if (itemExistente != null)
+            //Atualiza itens da comanda
+            //if (itemExistente != null)
+            //{
+            //    if (itemExistente.peso > 0) 
+            //    {
+            //        // Atualiza o peso do item existente
+            //        itemExistente.peso += peso;
+            //    }
+            //    else if(itemExistente.Quantidade > 0)
+            //    {
+            //        itemExistente.Quantidade += quantidade;
+            //    }
+            //}
+            //else
+            //{
+            //    // Adiciona um novo item à lista
+            //    var novoItem = new ProdutoSimples
+            //    {
+            //        Id = id,
+            //        Descricao = produto.Descricao,
+            //        peso = peso,
+            //        Quantidade = quantidade,
+            //        PrecoUn = produto.PrecoUn
+            //    };
+            //    itensCarrinho.Add(novoItem);
+            //}
+            // Adiciona um novo item à lista
+            var novoItem = new ProdutoSimples
             {
-                if (itemExistente.peso > 0) 
-                {
-                    // Atualiza o peso do item existente
-                    itemExistente.peso += peso;
-                }
-                else if(itemExistente.Quantidade > 0)
-                {
-                    itemExistente.Quantidade += quantidade;
-                }
-            }
-            else
-            {
-                // Adiciona um novo item à lista
-                var novoItem = new ProdutoSimples
-                {
-                    Id = id,
-                    Descricao = produto.Descricao,
-                    peso = peso,
-                    Quantidade = quantidade,
-                    PrecoUn = produto.PrecoUn
-                };
-                itensCarrinho.Add(novoItem);
-            }
+                Id = id,
+                Descricao = produto.Descricao,
+                peso = peso,
+                Quantidade = quantidade,
+                PrecoUn = produto.PrecoUn
+            };
+            itensCarrinho.Add(novoItem);
 
             // Salva a lista atualizada no cookie
             _cookiePedidoCompra.Salvar(itensCarrinho);

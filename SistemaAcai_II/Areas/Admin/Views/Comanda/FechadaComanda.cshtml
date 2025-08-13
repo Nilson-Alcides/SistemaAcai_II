@@ -3,11 +3,11 @@
 @inject SistemaAcai_II.Libraries.Login.LoginColaborador _colaborador
 
 @{
-    ViewData["Title"] = "FechadaComanda";
+    ViewData["Title"] = "Fechar Pedido";
     decimal totalComanda = 0;
 }
 
-<h1>FechadaComanda</h1>
+<h1>Fechar Pedido</h1>
 
 <!-- Exibir carrinho de compras -->
 <h4>N° da Comanda # @Model.Id </h4>
@@ -52,11 +52,12 @@
                     data-bs-toggle="modal" data-bs-target="#modalPagamento">
                 Pagamento (Alt + p)
             </button>
-        <button type="submit" id="btnSalvarComanda"
-                class="btn btn-outline-success me-2" disabled>
-            Fechar Pedido (Alt + 5)
-        </button>
-    </div>
+            <button type="submit" id="btnSalvarComanda"
+                    class="btn btn-outline-success me-2" disabled>
+                Fechar Pedido (Alt + 5)
+            </button>
+        </div>
+
         <br />
     </form>
 
@@ -299,8 +300,5 @@
             }
         });
     </script>
-
-
-
 }
 

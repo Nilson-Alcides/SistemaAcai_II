@@ -1,560 +1,5 @@
-﻿@model SistemaAcai_II.Models.VendasViewModel
-@using SistemaAcai_II.Models.Constants
-@inject SistemaAcai_II.Libraries.Login.LoginColaborador _colaborador
-@{
-    int qtdDigitada = ViewBag.QuantidadeDigitada != null ? (int)ViewBag.QuantidadeDigitada : 1;
-}
-<h4>Vendas</h4>
-
-@if (TempData["Erro"] != null)
-{
-    <div class="alert alert-danger">@TempData["Erro"]</div>
-}
-
-<form method="get">
-    <div class="form-group row">
-        <label for="termo" class="col-sm-2 col-form-label">Pesquisar Produto</label>
-        <div class="col-sm-6">
-            <input type="text" name="termo" id="termo" class="form-control" placeholder="Digite o nome ou código do produto..." autofocus />
-        </div>
-        <div class="col-sm-4">
-            <button type="submit" class="btn btn-primary">Buscar</button>
-        </div>
-    </div>
-</form>
-
-@if (Model.Produtos != null && Model.Produtos.Any())
-{
-    <h3>Produto</h3>
-    <table class="table">
-        <thead>
-            <tr>
-                <th>#Código</th>
-                <th>Nome</th>
-                <th>Preço Unitário</th>
-                <th>Peso (kg)</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var produto in Model.Produtos)
-            {
-                <tr>
-                    <td>@produto.Id</td>
-                    <td>@produto.Descricao</td>
-                    <td>@produto.PrecoUn.ToString("C")</td>
-                    <td>
-                        <form asp-action="AdicionarItem" method="post" class="d-flex">
-                            <input type="hidden" name="id" value="@produto.Id" />
-
-                            @if (produto.TipoMedida == "Kg")
-                            {
-                                <input type="text" id="pesoProduto" name="pesoRcebido" step="0.01" min="0.01" class="form-control-sm col-3 campo-peso" placeholder="Peso (Kg)" />
-                            }
-                            else
-                            {
-                                <input type="number" name="quantidade" step="1" min="1"
-                                       value="@produto.Quantidade"
-                                       class="form-control-sm col-3 campo-quantidade" placeholder="Quantidade" />
-                            }
-
-                            @* <button type="submit" class="btn btn-success btn-sm ms-2">Adicionar </button> *@
-                        </form>
-                    </td>
-                </tr>
-            }
-        </tbody>
-    </table>
-}
-
-<h4>Itens da Comanda</h4>
-
-@if (Model.ItensCarrinho != null && Model.ItensCarrinho.Any())
-{
-    <form asp-action="SalvarComanda" asp-controller="Comanda" method="post" id="formComanda">
-        <input type="hidden" id="formaPagamentoHidden" name="Comanda.RefFormasPagamento.Id" value="0" />
-        <input type="hidden" name="Comanda.Desconto" id="inputDesconto" />
-
-        <div class="form-group row">
-            <label for="NomeCliente" class="col-form-label col-sm-3">Nome do Cliente:</label>
-            <div class="col-sm-6">
-                <input type="text" id="NomeCliente" name="Comanda.NomeCliente" class="form-control form-control-sm" />
-            </div>
-        </div>
-
-        <div class="row">
-            <div class="col-md-9">
-                <table class="table">
-                    <thead>
-                        <tr>
-                            <th>Código</th>
-                            <th>Nome</th>
-                            <th>Peso (kg)</th>
-                            <th>Preço Unitário</th>
-                            <th>Subtotal</th>
-                            <th>Ação</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @{
-                            decimal totalComanda = 0;
-                        }
-                        @foreach (var item in Model.ItensCarrinho)
-                        {
-                            var subtotal = item.peso > 0 ? item.peso * item.PrecoUn : Convert.ToDecimal(item.Quantidade * item.PrecoUn);
-                            ViewBag.TotalComanda = totalComanda += subtotal;
-
-                            <tr>
-                                <td>@item.Id</td>
-                                <td>@item.Descricao</td>
-                                <td>
-                                    @if (@item.peso > 0)
-                                    {
-                                        @item.peso.ToString("N3") @:Kg
-                                    }
-                                    else
-                                    {
-                                        @item.Quantidade @:Un
-                                    }
-                                </td>
-                                <td>@item.PrecoUn.ToString("C")</td>
-                                <td>@subtotal.ToString("C")</td>
-                                @if (_colaborador.GetColaborador() != null && _colaborador.GetColaborador().Tipo == ColaboradorTipoConstant.Gerente)
-                                {
-                                    <td class="text-right">
-                                        <a asp-controller="Comanda" asp-action="RemoverItem" asp-route-id="@item.Id" class="btn btn-outline-danger">× Remover</a>
-                                    </td>
-                                }
-                            </tr>
-                        }
-                    </tbody>
-                </table>
-
-                <div id="formaPagamentoPrincipal" class="alert alert-secondary mt-3">
-                    Forma de Pagamento: <span id="formaPagamentoSelecionadaPrincipal">Não selecionada</span>
-                </div>
-
-                <div class="alert alert-info">
-                    <h4>Total da Comanda: <span id="totalComandaDisplay">@totalComanda.ToString("C")</span></h4>
-                </div>
-
-                <div class="offset-sm-1 col-md-10 d-flex flex-wrap align-items-center gap-1">
-                    <button type="button" id="btnExibirPagamento" class="btn btn-outline-success">
-                        Fechar Pedido (Alt + 5)
-                    </button>
-                    <button type="submit" id="btnSalvarComanda"
-                            class="btn btn-outline-info" onclick="limparFormaPagamento()">
-                        Salvar Comanda (Alt + S)
-                    </button>
-                    <a asp-controller="Comanda" asp-action="limpaConada"
-                       class="btn btn-outline-danger"
-                       onclick="return confirm('Deseja realmente Remover?')">
-                        Remover (Alt + I)
-                    </a>
-                </div>
-            </div>
-
-            <div class="col-md-3">
-                <div id="cardPagamento" class="card border-primary shadow" style="display: none;">
-                    <div class="card-header bg-primary text-white">
-                        <strong>Forma de Pagamento</strong>
-                    </div>
-                    <div class="card-body">
-                        @foreach (var forma in ViewBag.FormaPagamento as SelectList)
-                        {
-                            <div class="form-check mb-2">
-                                <input class="form-check-input" type="radio" name="formaPagamentoId" value="@forma.Value" id="forma@forma.Value" />
-                                <label class="form-check-label" for="forma@forma.Value">@forma.Text</label>
-                            </div>
-                        }
-
-                        <div id="pagamentoDinheiro" style="display: none;">
-                            <dl class="dlist-align" id="campoValorPago" style="display: none;">
-                                <dt>Valor Pago:</dt>
-                                <dd>
-                                    <input id="valorPago" class="form-control form-control-sm dineiro"
-                                           type="text" style="width: 100px;" placeholder="0,00" />
-                                </dd>
-                            </dl>
-                            <dl class="dlist-align" id="campoTroco" style="display: none;">
-                                <dt>Troco:</dt>
-                                <dd>
-                                    <input id="troco" class="form-control form-control-sm dineiro"
-                                           type="text" style="width: 100px;" placeholder="0,00" readonly />
-                                </dd>
-                            </dl>
-                        </div>
-
-                        <dl class="dlist-align">
-                            <dt>Desconto:</dt>
-                            <dd>
-                                <input asp-for="Comanda.Desconto" id="desconto"
-                                       class="form-control form-control-sm dineiro"
-                                       type="text"
-                                       style="width: 100px;"
-                                       placeholder="0,00" />
-                            </dd>
-                        </dl>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <br />
-    </form>
-}
-else
-{
-    <p>Nenhum item no carrinho.</p>
-}
-
-@section Scripts {
-    <script>
-        let modoManual = false;
-        const campoPeso = document.getElementById('pesoProduto');
-        if (campoPeso) {
-            campoPeso.addEventListener('input', () => {
-                if (campoPeso.value.trim() !== "" && parseFloat(campoPeso.value.replace(',', '.')) !== 0) {
-                    modoManual = true;
-                }
-            });
-            campoPeso.addEventListener('blur', () => {
-                if (campoPeso.value.trim() === "" || parseFloat(campoPeso.value.replace(',', '.')) === 0) {
-                    modoManual = false;
-                }
-            });
-            setInterval(() => {
-                fetch('/Admin/api/balanca')
-                    .then(response => response.json())
-                    .then(data => {
-                        if (!modoManual) {
-                            campoPeso.value = data.peso;
-                        }
-                    });
-            }, 1000);
-        }
-    </script>
-
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            // Lógica para mostrar/ocultar o card de pagamento
-            const btnExibirPagamento = document.getElementById('btnExibirPagamento');
-            const cardPagamento = document.getElementById('cardPagamento');
-            const formaPagamentoRadios = document.querySelectorAll('input[name="formaPagamentoId"]');
-            const formComanda = document.getElementById('formComanda');
-
-            if (btnExibirPagamento && cardPagamento) {
-                btnExibirPagamento.addEventListener('click', function () {
-                    // Exibe o card de pagamento
-                    cardPagamento.style.display = 'block';
-
-                    // Muda o tipo do botão para submit
-                    this.type = 'submit';
-
-                    // Remove o event listener para evitar submissões múltiplas
-                    this.removeEventListener('click', arguments.callee);
-
-                    // Adiciona a validação antes da submissão
-                    formComanda.addEventListener('submit', function (event) {
-                        const formaSelecionada = document.querySelector('input[name="formaPagamentoId"]:checked');
-                        if (!formaSelecionada) {
-                            alert('Por favor, selecione uma forma de pagamento.');
-                            event.preventDefault(); // Impede a submissão do formulário
-                        }
-                    });
-                });
-            }
-
-            // Lógica para o campo Nome do Cliente
-            const nomeClienteInput = document.getElementById('NomeCliente');
-            formComanda.addEventListener('submit', function () {
-                if (nomeClienteInput.value.trim() === '') {
-                    nomeClienteInput.value = 'Não Informado';
-                }
-            });
-        });
-    </script>
-
-    <script>
-        document.addEventListener('keydown', function (e) {
-            const modalAberto = document.getElementById('modalPagamento')?.classList.contains('show');
-
-            // Alt + P – Abrir Modal de Pagamento
-            if (e.altKey && e.key.toLowerCase() === 'p') {
-                const btnPagamento = document.querySelector('button[data-bs-target="#modalPagamento"]');
-                if (btnPagamento && !btnPagamento.disabled) {
-                    e.preventDefault();
-                    btnPagamento.click();
-                }
-            }
-
-            // Alt + C – Confirmar pagamento
-            if (modalAberto && e.altKey && e.key.toLowerCase() === 'c') {
-                const btnConfirmar = document.getElementById('confirmarPagamento');
-                if (btnConfirmar) {
-                    e.preventDefault();
-                    btnConfirmar.click();
-                }
-            }
-
-            // Alt + X – Cancelar pagamento
-            if (modalAberto && e.altKey && e.key.toLowerCase() === 'x') {
-                const btnFechar = document.querySelector('#modalPagamento .btn-close');
-                if (btnFechar) {
-                    e.preventDefault();
-                    btnFechar.click();
-                }
-            }
-
-            // Alt + S – Salvar Comanda
-            if (e.altKey && e.key.toLowerCase() === 's') {
-                const btnSalvar = document.getElementById('btnSalvarComanda');
-                if (btnSalvar) {
-                    e.preventDefault();
-                    btnSalvar.click();
-                }
-            }
-
-            // Alt + 5 – Fechar Pedido
-            if (e.altKey && e.key === '5') {
-                const btnFecharPedido = document.getElementById('btnExibirPagamento');
-                if (btnFecharPedido) {
-                    e.preventDefault();
-                    btnFecharPedido.click();
-                }
-            }
-
-            // Alt + I – Remover Itens
-            if (e.altKey && e.key.toLowerCase() === 'i') {
-                const btnRemover = document.querySelector('a[href*="limpaConada"]');
-                if (btnRemover) {
-                    e.preventDefault();
-                    const confirmar = confirm("Deseja realmente Remover?");
-                    if (confirmar) {
-                        window.location.href = btnRemover.href;
-                    }
-                }
-            }
-        });
-    </script>
-
-    <script>
-        $(document).ready(function () {
-            const totalComandaElemento = $('#totalComandaDisplay');
-            const descontoInput = $('#desconto');
-            const valorPagoInput = $('#valorPago');
-            const trocoInput = $('#troco');
-            const formaPagamentoRadios = $('input[name="formaPagamentoId"]');
-            const formaPagamentoHidden = $('#formaPagamentoHidden');
-            const inputDescontoHidden = $('#inputDesconto');
-
-            let totalOriginal = parseFloat('@(ViewBag.TotalComanda?.ToString(System.Globalization.CultureInfo.InvariantCulture) ?? "0")');
-            let totalComDesconto = totalOriginal;
-
-            function formatarMoeda(valor) {
-                if (isNaN(valor)) return "R$ 0,00";
-                return valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
-            }
-
-            function atualizarTotal() {
-                const desconto = parseFloat(descontoInput.val().replace(/[^0-9,]/g, '').replace(',', '.')) || 0;
-                inputDescontoHidden.val(desconto);
-                totalComDesconto = totalOriginal - desconto;
-                if (totalComDesconto < 0) totalComDesconto = 0;
-                totalComandaElemento.text(formatarMoeda(totalComDesconto));
-                calcularTroco();
-            }
-
-            function calcularTroco() {
-                const valorPago = parseFloat(valorPagoInput.val().replace(/[^0-9,]/g, '').replace(',', '.')) || 0;
-                const troco = valorPago - totalComDesconto;
-                trocoInput.val(formatarMoeda(troco));
-            }
-
-            function atualizarVisibilidadeDinheiro() {
-                const formaSelecionada = $('input[name="formaPagamentoId"]:checked').next('label').text().trim().toLowerCase();
-                if (formaSelecionada === 'dinheiro') {
-                    $('#pagamentoDinheiro').show();
-                    $('#campoValorPago').show();
-                    $('#campoTroco').show();
-                } else {
-                    $('#pagamentoDinheiro').hide();
-                    $('#campoValorPago').hide();
-                    $('#campoTroco').hide();
-                    valorPagoInput.val('');
-                    trocoInput.val('');
-                }
-            }
-
-            // Eventos
-            descontoInput.on('input', atualizarTotal);
-            valorPagoInput.on('input', calcularTroco);
-            formaPagamentoRadios.on('change', function () {
-                const id = $(this).val();
-                const texto = $(this).next('label').text();
-                formaPagamentoHidden.val(id);
-                $('#formaPagamentoSelecionadaPrincipal').text(texto);
-                atualizarVisibilidadeDinheiro();
-            });
-
-            $('#btnSalvarComanda').on('click', function () {
-                formaPagamentoHidden.val(0); // Garante que o ID da forma de pagamento seja 0 para "Salvar Comanda"
-            });
-
-            // Adicionado novo botão para Fechar Pedido
-            $('#btnExibirPagamento').on('click', function () {
-                $('#cardPagamento').show();
-            });
-
-            atualizarTotal();
-            atualizarVisibilidadeDinheiro();
-        });
-    </script>
-
-    <script>
-    $(document).ready(function () {
-        // Se existirem produtos, foca no primeiro campo de quantidade ou peso visível
-        const primeiroCampo = $('.campo-quantidade:visible, .campo-peso:visible').first();
-        if (primeiroCampo.length > 0) {
-            primeiroCampo.focus();
-            primeiroCampo.select(); // opcional: seleciona o conteúdo do campo
-        }
-    });
-</script>
-
-<script>
-    document.addEventListener('keydown', function (e) {
-        if (e.key === "Escape") {
-            const campoBusca = document.getElementById('termo');
-            const formBusca = campoBusca?.closest('form');
-
-            if (campoBusca && formBusca) {
-                campoBusca.value = "";      // Limpa o campo
-                campoBusca.focus();         // Foca novamente
-                formBusca.submit();         // Submete o formulário com termo vazio
-            }
-        }
-    });
-</script>
-
-<script>
-document.addEventListener('DOMContentLoaded', function () {
-  const formBusca = document.querySelector('form[method="get"]');
-  const inputTermo = document.getElementById('termo');
-
-  if (!formBusca || !inputTermo) return;
-
-  formBusca.addEventListener('submit', function () {
-    if (!formBusca.querySelector('input[name="auto"]')) {
-      const h = document.createElement('input');
-      h.type = 'hidden';
-      h.name = 'auto';
-      h.value = '1';
-      formBusca.appendChild(h);
-    }
-  });
-});
-</script>
-
-<script>
-document.addEventListener('DOMContentLoaded', function () {
-  const params = new URLSearchParams(window.location.search);
-  if (params.get('auto') !== '1') return;
-
-  const termoBruto = (params.get('termo') || '').trim();
-  if (!termoBruto) return;
-
-  function parseTermo(t) {
-    const [codRaw, qtdRaw] = t.split('*');
-    const codigo = (codRaw || '').trim();
-    let qtd = 1;
-    if ((qtdRaw || '').trim() !== '') {
-      const n = parseFloat(qtdRaw.replace(',', '.'));
-      if (!isNaN(n) && n > 0) qtd = n;
-    }
-    return { codigo, qtd };
-  }
-
-  async function obterPesoDaBalanca(tentativas = 3, intervaloMs = 300) {
-    for (let i = 0; i < tentativas; i++) {
-      try {
-        const resp = await fetch('/Admin/api/balanca', { cache: 'no-store' });
-        if (!resp.ok) continue;
-        const data = await resp.json();
-        // Aceita número (com , ou .) e garante três casas
-        let valor = 0;
-        if (typeof data?.peso === 'string') {
-          valor = parseFloat(String(data.peso).replace(',', '.'));
-        } else if (typeof data?.peso === 'number') {
-          valor = data.peso;
-        }
-        if (!isNaN(valor) && valor > 0) {
-          // arredonda para 3 casas (ex.: 0.250)
-          return Math.round(valor * 1000) / 1000;
-        }
-      } catch (e) { /* ignora e tenta de novo */ }
-      if (i < tentativas - 1) await new Promise(r => setTimeout(r, intervaloMs));
-    }
-    return null; // não conseguiu peso válido
-  }
-
-  const { codigo, qtd } = parseTermo(termoBruto);
-
-  // linhas logo após o <h3> Produto
-  const linhas = document.querySelectorAll('h3 + table.table tbody tr');
-  if (!linhas.length) return;
-
-  let alvo = null;
-  if (codigo) {
-    linhas.forEach(tr => {
-      const codCell = tr.querySelector('td:first-child');
-      if (codCell && codCell.textContent.trim() === codigo) {
-        alvo = tr;
-      }
-    });
-  }
-  if (!alvo) alvo = linhas[0];
-
-  const formAdd = alvo.querySelector('form[method="post"]');
-  if (!formAdd) return;
-
-  const qtdInput  = formAdd.querySelector('input[name="quantidade"]');
-  const pesoInput = formAdd.querySelector('input[name="pesoRcebido"]');
-
-  (async () => {
-    if (qtdInput) {
-      // Produto por unidade → usa qtd (inteiro >=1)
-      const inteiro = Number.isInteger(qtd) ? qtd : Math.max(1, Math.round(qtd));
-      qtdInput.value = inteiro;
-      formAdd.submit();
-      return;
-    }
-
-    if (pesoInput) {
-      // Produto por Kg → tenta pegar peso da balança
-      let peso = await obterPesoDaBalanca(4, 250); // até ~1s total
-      if (peso === null) {
-        // fallback: se o usuário digitou algo como codigo*0,250, usa isso
-        peso = (typeof qtd === 'number' && qtd > 0) ? qtd : 0;
-      }
-      if (peso <= 0) {
-        alert('Não foi possível obter o peso da balança. Verifique a balança ou informe o peso manualmente.');
-        // foca o campo para edição manual
-        pesoInput.focus();
-        return;
-      }
-      // form aceita vírgula — converte e garante 3 casas
-      const textoPeso = String(peso.toFixed(3)).replace('.', ',');
-      pesoInput.value = textoPeso;
-      formAdd.submit();
-      return;
-    }
-  })();
-});
-</script>
-
-
-}
-
-@* @model SistemaAcai_II.Models.VendasViewModel
+﻿ 
+@model SistemaAcai_II.Models.VendasViewModel
 @using SistemaAcai_II.Models.Constants
 @inject SistemaAcai_II.Libraries.Login.LoginColaborador _colaborador
 @{
@@ -779,6 +224,45 @@ else
 @section Scripts {
     <script>
         document.addEventListener('DOMContentLoaded', function () {
+            // Lógica para mostrar/ocultar o card de pagamento
+            const btnExibirPagamento = document.getElementById('btnExibirPagamento');
+            const cardPagamento = document.getElementById('cardPagamento');
+            const formaPagamentoRadios = document.querySelectorAll('input[name="formaPagamentoId"]');
+            const formComanda = document.getElementById('formComanda');
+
+            if (btnExibirPagamento && cardPagamento) {
+                btnExibirPagamento.addEventListener('click', function () {
+                    // Exibe o card de pagamento
+                    cardPagamento.style.display = 'block';
+
+                    // Muda o tipo do botão para submit
+                    this.type = 'submit';
+
+                    // Remove o event listener para evitar submissões múltiplas
+                    this.removeEventListener('click', arguments.callee);
+
+                    // Adiciona a validação antes da submissão
+                    formComanda.addEventListener('submit', function (event) {
+                        const formaSelecionada = document.querySelector('input[name="formaPagamentoId"]:checked');
+                        if (!formaSelecionada) {
+                            alert('Por favor, selecione uma forma de pagamento.');
+                            event.preventDefault(); // Impede a submissão do formulário
+                        }
+                    });
+                });
+            }
+
+            // Lógica para o campo Nome do Cliente
+            const nomeClienteInput = document.getElementById('NomeCliente');
+            formComanda.addEventListener('submit', function () {
+                if (nomeClienteInput.value.trim() === '') {
+                    nomeClienteInput.value = 'Não Informado';
+                }
+            });
+        });
+    </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
             // Referências para os elementos do DOM
             const formComanda = document.getElementById('formComanda');
             const btnSalvarComanda = document.getElementById('btnSalvarComanda');
@@ -789,7 +273,7 @@ else
             const btnConfirmarPagamento = document.getElementById('btnConfirmarPagamento');
 
             // --- Lógica para o botão "Salvar Comanda" ---
-            if (btnSalvarComanda || btnFecharPedido ) {
+            if (btnSalvarComanda) {
                 btnSalvarComanda.addEventListener('click', function () {
                     // Se o campo do nome do cliente estiver vazio, define "Não Informado"
                     if (nomeClienteInput.value.trim() === '') {
@@ -1003,4 +487,4 @@ else
             atualizarVisibilidadeDinheiro();
         });
     </script>
-} *@
+}

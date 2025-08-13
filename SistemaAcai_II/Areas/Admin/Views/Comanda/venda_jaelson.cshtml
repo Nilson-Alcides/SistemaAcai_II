@@ -1,4 +1,4 @@
-﻿@* @model SistemaAcai_II.Models.VendasViewModel
+﻿@model SistemaAcai_II.Models.VendasViewModel
 @using SistemaAcai_II.Models.Constants
 @inject SistemaAcai_II.Libraries.Login.LoginColaborador _colaborador
 @{
@@ -57,7 +57,7 @@
                                        class="form-control-sm col-3 campo-quantidade" placeholder="Quantidade" />
                             }
 
-                            <button type="submit" class="btn btn-success btn-sm ms-2">Adicionar </button>
+                            @* <button type="submit" class="btn btn-success btn-sm ms-2">Adicionar </button> *@
                         </form>
                     </td>
                 </tr>
@@ -405,17 +405,156 @@ else
             });
 
             atualizarTotal();
-            atualizarVisibilidadeDinheiro(); 
+            atualizarVisibilidadeDinheiro();
         });
     </script>
-} *@
+
+    <script>
+    $(document).ready(function () {
+        // Se existirem produtos, foca no primeiro campo de quantidade ou peso visível
+        const primeiroCampo = $('.campo-quantidade:visible, .campo-peso:visible').first();
+        if (primeiroCampo.length > 0) {
+            primeiroCampo.focus();
+            primeiroCampo.select(); // opcional: seleciona o conteúdo do campo
+        }
+    });
+</script>
+
+<script>
+    document.addEventListener('keydown', function (e) {
+        if (e.key === "Escape") {
+            const campoBusca = document.getElementById('termo');
+            const formBusca = campoBusca?.closest('form');
+
+            if (campoBusca && formBusca) {
+                campoBusca.value = "";      // Limpa o campo
+                campoBusca.focus();         // Foca novamente
+                formBusca.submit();         // Submete o formulário com termo vazio
+            }
+        }
+    });
+</script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  const formBusca = document.querySelector('form[method="get"]');
+  const inputTermo = document.getElementById('termo');
+
+  if (!formBusca || !inputTermo) return;
+
+  formBusca.addEventListener('submit', function () {
+    if (!formBusca.querySelector('input[name="auto"]')) {
+      const h = document.createElement('input');
+      h.type = 'hidden';
+      h.name = 'auto';
+      h.value = '1';
+      formBusca.appendChild(h);
+    }
+  });
+});
+</script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  const params = new URLSearchParams(window.location.search);
+  if (params.get('auto') !== '1') return;
+
+  const termoBruto = (params.get('termo') || '').trim();
+  if (!termoBruto) return;
+
+  function parseTermo(t) {
+    const [codRaw, qtdRaw] = t.split('*');
+    const codigo = (codRaw || '').trim();
+    let qtd = 1;
+    if ((qtdRaw || '').trim() !== '') {
+      const n = parseFloat(qtdRaw.replace(',', '.'));
+      if (!isNaN(n) && n > 0) qtd = n;
+    }
+    return { codigo, qtd };
+  }
+
+  async function obterPesoDaBalanca(tentativas = 3, intervaloMs = 300) {
+    for (let i = 0; i < tentativas; i++) {
+      try {
+        const resp = await fetch('/Admin/api/balanca', { cache: 'no-store' });
+        if (!resp.ok) continue;
+        const data = await resp.json();
+        // Aceita número (com , ou .) e garante três casas
+        let valor = 0;
+        if (typeof data?.peso === 'string') {
+          valor = parseFloat(String(data.peso).replace(',', '.'));
+        } else if (typeof data?.peso === 'number') {
+          valor = data.peso;
+        }
+        if (!isNaN(valor) && valor > 0) {
+          // arredonda para 3 casas (ex.: 0.250)
+          return Math.round(valor * 1000) / 1000;
+        }
+      } catch (e) { /* ignora e tenta de novo */ }
+      if (i < tentativas - 1) await new Promise(r => setTimeout(r, intervaloMs));
+    }
+    return null; // não conseguiu peso válido
+  }
+
+  const { codigo, qtd } = parseTermo(termoBruto);
+
+  // linhas logo após o <h3> Produto
+  const linhas = document.querySelectorAll('h3 + table.table tbody tr');
+  if (!linhas.length) return;
+
+  let alvo = null;
+  if (codigo) {
+    linhas.forEach(tr => {
+      const codCell = tr.querySelector('td:first-child');
+      if (codCell && codCell.textContent.trim() === codigo) {
+        alvo = tr;
+      }
+    });
+  }
+  if (!alvo) alvo = linhas[0];
+
+  const formAdd = alvo.querySelector('form[method="post"]');
+  if (!formAdd) return;
+
+  const qtdInput  = formAdd.querySelector('input[name="quantidade"]');
+  const pesoInput = formAdd.querySelector('input[name="pesoRcebido"]');
+
+  (async () => {
+    if (qtdInput) {
+      // Produto por unidade → usa qtd (inteiro >=1)
+      const inteiro = Number.isInteger(qtd) ? qtd : Math.max(1, Math.round(qtd));
+      qtdInput.value = inteiro;
+      formAdd.submit();
+      return;
+    }
+
+    if (pesoInput) {
+      // Produto por Kg → tenta pegar peso da balança
+      let peso = await obterPesoDaBalanca(4, 250); // até ~1s total
+      if (peso === null) {
+        // fallback: se o usuário digitou algo como codigo*0,250, usa isso
+        peso = (typeof qtd === 'number' && qtd > 0) ? qtd : 0;
+      }
+      if (peso <= 0) {
+        alert('Não foi possível obter o peso da balança. Verifique a balança ou informe o peso manualmente.');
+        // foca o campo para edição manual
+        pesoInput.focus();
+        return;
+      }
+      // form aceita vírgula — converte e garante 3 casas
+      const textoPeso = String(peso.toFixed(3)).replace('.', ',');
+      pesoInput.value = textoPeso;
+      formAdd.submit();
+      return;
+    }
+  })();
+});
+</script>
 
 
+}
 
-
-
- 
-@model SistemaAcai_II.Models.VendasViewModel
+@* @model SistemaAcai_II.Models.VendasViewModel
 @using SistemaAcai_II.Models.Constants
 @inject SistemaAcai_II.Libraries.Login.LoginColaborador _colaborador
 @{
@@ -640,45 +779,6 @@ else
 @section Scripts {
     <script>
         document.addEventListener('DOMContentLoaded', function () {
-            // Lógica para mostrar/ocultar o card de pagamento
-            const btnExibirPagamento = document.getElementById('btnExibirPagamento');
-            const cardPagamento = document.getElementById('cardPagamento');
-            const formaPagamentoRadios = document.querySelectorAll('input[name="formaPagamentoId"]');
-            const formComanda = document.getElementById('formComanda');
-
-            if (btnExibirPagamento && cardPagamento) {
-                btnExibirPagamento.addEventListener('click', function () {
-                    // Exibe o card de pagamento
-                    cardPagamento.style.display = 'block';
-
-                    // Muda o tipo do botão para submit
-                    this.type = 'submit';
-
-                    // Remove o event listener para evitar submissões múltiplas
-                    this.removeEventListener('click', arguments.callee);
-
-                    // Adiciona a validação antes da submissão
-                    formComanda.addEventListener('submit', function (event) {
-                        const formaSelecionada = document.querySelector('input[name="formaPagamentoId"]:checked');
-                        if (!formaSelecionada) {
-                            alert('Por favor, selecione uma forma de pagamento.');
-                            event.preventDefault(); // Impede a submissão do formulário
-                        }
-                    });
-                });
-            }
-
-            // Lógica para o campo Nome do Cliente
-            const nomeClienteInput = document.getElementById('NomeCliente');
-            formComanda.addEventListener('submit', function () {
-                if (nomeClienteInput.value.trim() === '') {
-                    nomeClienteInput.value = 'Não Informado';
-                }
-            });
-        });
-    </script>
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
             // Referências para os elementos do DOM
             const formComanda = document.getElementById('formComanda');
             const btnSalvarComanda = document.getElementById('btnSalvarComanda');
@@ -689,7 +789,7 @@ else
             const btnConfirmarPagamento = document.getElementById('btnConfirmarPagamento');
 
             // --- Lógica para o botão "Salvar Comanda" ---
-            if (btnSalvarComanda) {
+            if (btnSalvarComanda || btnFecharPedido ) {
                 btnSalvarComanda.addEventListener('click', function () {
                     // Se o campo do nome do cliente estiver vazio, define "Não Informado"
                     if (nomeClienteInput.value.trim() === '') {
@@ -903,4 +1003,4 @@ else
             atualizarVisibilidadeDinheiro();
         });
     </script>
-}
+} *@
