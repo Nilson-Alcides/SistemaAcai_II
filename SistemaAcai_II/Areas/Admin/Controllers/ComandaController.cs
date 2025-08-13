@@ -203,7 +203,12 @@ namespace SistemaAcai_II.Controllers
         [TypeFilter(typeof(CaixaAutorizacaoAttribute))]
         public IActionResult SalvarComanda(Comanda comanda)
         {
-            if(comanda.RefFormasPagamento.Id != null)
+            if (comanda.NomeCliente == null)
+            {
+                comanda.NomeCliente = "Não informado";
+            }
+
+            if (comanda.RefFormasPagamento.Id != null)
             {
                 var listPagamentos = _formasPagamentoRepository.ObterTodasFormasPagamentos();
                 ViewBag.FormaPagamento = new SelectList(listPagamentos, "Id", "Nome");
@@ -303,6 +308,10 @@ namespace SistemaAcai_II.Controllers
         [HttpPost]
         public IActionResult FechadaComanda(Comanda comanda)
         {
+            if(comanda.NomeCliente == null)
+            {
+                comanda.NomeCliente = "Não informado";
+            }
 
             if (comanda.RefFormasPagamento.Id != null)
             {
