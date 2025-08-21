@@ -100,16 +100,16 @@
                         }
                         @foreach (var item in Model.ItensCarrinho)
                         {
-                            var subtotal = item.peso > 0 ? item.peso * item.PrecoUn : Convert.ToDecimal(item.Quantidade * item.PrecoUn);
+                            var subtotal = item.Peso > 0 ? item.Peso * item.PrecoUn : Convert.ToDecimal(item.Quantidade * item.PrecoUn);
                             ViewBag.TotalComanda = totalComanda += subtotal;
 
                             <tr>
                                 <td>@item.Id</td>
                                 <td>@item.Descricao</td>
                                 <td>
-                                    @if (@item.peso > 0)
+                                    @if (@item.Peso > 0)
                                     {
-                                        @item.peso.ToString("N3") @:Kg
+                                        @item.Peso.ToString("N3") @:Kg
                                     }
                                     else
                                     {

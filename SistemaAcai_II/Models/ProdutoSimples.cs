@@ -1,4 +1,9 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System;
+using System.ComponentModel.DataAnnotations;
+using SistemaAcai_II.Models.Constants;
+using TipoMedidaEnumType = SistemaAcai_II.Models.Constants.TipoMedida;
+
+
 
 namespace SistemaAcai_II.Models
 {
@@ -8,21 +13,27 @@ namespace SistemaAcai_II.Models
         public int Id { get; set; }
 
         [Display(Name = "Produto", Description = "Produto")]
-        [Required(ErrorMessage = "A Descrição é obrigatório.")]
+        [Required(ErrorMessage = "A Descrição é obrigatória.")]
         public string Descricao { get; set; }
 
         [Display(Name = "Valor", Description = "Valor.")]
-        [Required(ErrorMessage = "A valor é obrigatória")]
-
+        [Required(ErrorMessage = "O valor é obrigatório.")]
         public decimal PrecoUn { get; set; }
 
+        [Display(Name = "Tipo de Medida", Description = "Tipo de Medida")]
+        [Required(ErrorMessage = "O Tipo de Medida é obrigatório.")]
+        public string TipoMedida { get; set; }   // vem do banco: "Unidade" ou "Kg"
 
-        [Display(Name = "TipoMedida", Description = "TipoMedida")]
-        [Required(ErrorMessage = "A Descrição é obrigatório.")]
+        // 🔹 Propriedade auxiliar que converte a string em enum
+        public TipoMedidaEnumType TipoMedidaEnum =>
+            string.Equals(TipoMedida, "Kg", StringComparison.OrdinalIgnoreCase)
+                ? TipoMedidaEnumType.Kg
+                : TipoMedidaEnumType.Unidade;
 
-        public string TipoMedida { get; set; }
+
         public int? Quantidade { get; set; }
 
-        public decimal peso { get; set; }
+        [Display(Name = "Peso", Description = "Peso")]
+        public decimal Peso { get; set; }
     }
 }

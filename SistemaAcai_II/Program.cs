@@ -10,6 +10,7 @@ using System.Net.Mail;
 using System.Net;
 using SistemaAcai_II.Libraries.Email;
 using SistemaAcai_II.Libraries.Filtro;
+using SistemaAcai_II.Services;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -76,6 +77,8 @@ builder.Services.AddSession(options =>
 {
 
 });
+
+builder.Services.AddSingleton<SistemaAcai_II.Services.IScaleService, SistemaAcai_II.Services.ScaleService>();
 
 var app = builder.Build();
 

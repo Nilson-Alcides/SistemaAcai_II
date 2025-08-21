@@ -111,8 +111,8 @@
                         }
                         @foreach (var item in Model.ItensCarrinho)
                         {
-                            var subtotal = item.peso * item.PrecoUn;
-                            @if (item.peso <= 0)
+                            var subtotal = item.Peso * item.PrecoUn;
+                            @if (item.Peso <= 0)
                             {
                                 subtotal = Convert.ToDecimal(item.Quantidade * item.PrecoUn);
                             }
@@ -122,9 +122,9 @@
                             <tr>
                                 <td>@item.Id</td>
                                 <td>@item.Descricao</td>
-                                @if (@item.peso > 0)
+                                @if (@item.Peso > 0)
                                 {
-                                    <td>@item.peso.ToString("N3") Kg</td>
+                                    <td>@item.Peso.ToString("N3") Kg</td>
                                 }
                                 else
                                 {

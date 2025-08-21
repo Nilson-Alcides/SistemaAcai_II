@@ -28,7 +28,7 @@ namespace SistemaAcai_II.Areas.Admin.Controllers
 
             _logger.LogInformation($"Peso recebido via API: {modelo.PesoAutomatico}");
 
-            _memoryCache.Set(ChavePeso, modelo.PesoAutomatico, TimeSpan.FromSeconds(30)); // expira após 10 segundos
+            _memoryCache.Set(ChavePeso, modelo.PesoAutomatico, TimeSpan.FromSeconds(10)); // expira após 10 segundos
 
             return Ok(new { status = "sucesso", pesoRecebido = modelo.PesoAutomatico });
         }
