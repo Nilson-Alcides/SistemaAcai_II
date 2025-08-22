@@ -408,7 +408,7 @@ namespace SistemaAcai_II.Controllers
             return View(_comandaRepository.ObterTodasComandasFechadas(pagina, pesquisa));
         }
         [HttpGet]
-        public IActionResult FechadaComanda(int id)
+        public IActionResult FecharComanda(int id)
         {
             var listPagamentos = _formasPagamentoRepository.ObterTodasFormasPagamentos();
             ViewBag.FormaPagamento = new SelectList(listPagamentos, "Id", "Nome");
@@ -417,7 +417,7 @@ namespace SistemaAcai_II.Controllers
         }
 
         [HttpPost]
-        public IActionResult FechadaComanda(Comanda comanda)
+        public IActionResult FecharComanda(Comanda comanda)
         {
             if (comanda.NomeCliente == null)
             {

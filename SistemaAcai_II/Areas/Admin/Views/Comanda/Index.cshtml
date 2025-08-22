@@ -46,7 +46,7 @@
                         <td>@comanda.ValorTotal.ToString("C")</td>
 
                         <td>
-                            <a asp-action="FechadaComanda" asp-route-id="@comanda.Id" class="btn btn-success">Fechar Comanda</a>
+                            <a asp-action="FecharComanda" asp-route-id="@comanda.Id" class="btn btn-success">Finalizar</a>
                             <a asp-action="ItensComanda" asp-route-id="@comanda.Id" class="btn btn-warning">Itens da Comanda</a>
                             <a asp-action="CancelarComanda" asp-route-id="@comanda.Id" class="btn btn-danger" onclick="return confirm('Deseja realmente cancelar?')">Cancelar</a>
                             @* <a asp-action="Excluir" asp-route-id="@colaborador.Id" class="btn btn-danger"

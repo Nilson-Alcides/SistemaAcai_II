@@ -1,0 +1,172 @@
+﻿@model SistemaAcai_II.Models.Comanda
+@using SistemaAcai_II.Models.Constants
+@inject SistemaAcai_II.Libraries.Login.LoginColaborador _colaborador
+
+@{
+    ViewData["Title"] = "Fechar Pedido";
+    decimal totalComanda = Model.ValorTotal;
+}
+
+<h1>Fechar Pedido</h1>
+<h4>N° da Comanda # @Model.Id </h4>
+
+<form asp-action="FecharComanda" asp-controller="Comanda" method="post" id="formFecharComanda">
+    <input type="hidden" name="RefFormasPagamento.Id" id="formaPagamentoId" />
+    <input type="hidden" asp-for="Desconto" id="inputDesconto" />
+    <input type="hidden" asp-for="Id" />
+
+    <div class="row">
+        <div class="col-md-6">
+            <div class="form-group mb-2">
+                <label asp-for="NomeCliente"></label>
+                <input asp-for="NomeCliente" class="form-control" readonly />
+            </div>
+            <div class="form-group mb-2">
+                <label asp-for="DataAbertura"></label>
+                <input asp-for="DataAbertura" type="date" class="form-control" readonly />
+            </div>
+            <div class="form-group mb-2">
+                <label asp-for="ValorTotal"></label>
+                <input asp-for="ValorTotal" class="form-control" readonly />
+            </div>
+
+            <div id="formaPagamentoPrincipal" class="alert alert-secondary mt-3">
+                Forma de Pagamento: <span id="formaPagamentoSelecionadaPrincipal">Não selecionada</span>
+            </div>
+
+            <div class="alert alert-info">
+                <h4>Total da Comanda: <span id="totalComandaDisplay">@totalComanda.ToString("C")</span></h4>
+            </div>
+
+            <div class="d-flex gap-2 mb-3">
+                <button type="button" class="btn btn-outline-primary" id="btnAbrirPagamento">
+                    Pagamento (Alt + P)
+                </button>
+                <button type="submit" class="btn btn-outline-success" id="btnSalvarComanda" disabled>
+                    Fechar Pedido (Alt + 5)
+                </button>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div id="cardPagamento" class="card border-primary shadow" style="display: none;">
+                <div class="card-header bg-primary text-white">
+                    <strong>Forma de Pagamento</strong>
+                </div>
+                <div class="card-body">
+                    @foreach (var forma in ViewBag.FormaPagamento as SelectList)
+                    {
+                        <div class="form-check mb-2">
+                            <input class="form-check-input formaPagamentoRadio" type="radio" name="radioFormaPagamento" value="@forma.Value" id="forma@forma.Value" />
+                            <label class="form-check-label" for="forma@forma.Value">@forma.Text</label>
+                        </div>
+                    }
+
+                    <div id="pagamentoDinheiro" style="display: none;">
+                        <dl class="dlist-align">
+                            <dt>Valor Pago:</dt>
+                            <dd>
+                                <input id="valorPago" class="form-control form-control-sm dineiro"
+                                       type="text" style="width: 100px;" placeholder="0,00" />
+                            </dd>
+                        </dl>
+                        <dl class="dlist-align">
+                            <dt>Troco:</dt>
+                            <dd>
+                                <input id="troco" class="form-control form-control-sm dineiro"
+                                       type="text" style="width: 100px;" placeholder="0,00" readonly />
+                            </dd>
+                        </dl>
+                    </div>
+
+                    <dl class="dlist-align">
+                        <dt>Desconto:</dt>
+                        <dd>
+                            <input asp-for="Desconto" id="desconto"
+                                   class="form-control form-control-sm dineiro"
+                                   type="text" style="width: 100px;" placeholder="0,00" />
+                        </dd>
+                    </dl>
+                </div>
+                <div class="card-footer">
+                    <button type="button" class="btn btn-secondary w-100" id="btnConfirmarPagamento">
+                        Cancelar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            const form = $('#formFecharComanda');
+            const btnSalvar = $('#btnSalvarComanda');
+            const btnAbrirPagamento = $('#btnAbrirPagamento');
+            const btnConfirmar = $('#btnConfirmarPagamento');
+            const cardPagamento = $('#cardPagamento');
+            const formaPagamentoRadios = $('.formaPagamentoRadio');
+            const formaPagamentoId = $('#formaPagamentoId');
+            const formaPagamentoSelecionadaPrincipal = $('#formaPagamentoSelecionadaPrincipal');
+            const valorPagoInput = $('#valorPago');
+            const trocoInput = $('#troco');
+            const descontoInput = $('#desconto');
+            const totalDisplay = $('#totalComandaDisplay');
+
+            let totalOriginal = parseFloat('@totalComanda'.replace(',', '.')) || 0;
+            let totalComDesconto = totalOriginal;
+
+            function formatarMoeda(valor) {
+                return isNaN(valor) ? "R$ 0,00" : valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+            }
+
+            function atualizarTotal() {
+                const desconto = parseFloat(descontoInput.val().replace(/[^0-9,]/g, '').replace(',', '.')) || 0;
+                $('#inputDesconto').val(desconto);
+                totalComDesconto = Math.max(totalOriginal - desconto, 0);
+                totalDisplay.text(formatarMoeda(totalComDesconto));
+                calcularTroco();
+            }
+
+            function calcularTroco() {
+                const valorPago = parseFloat(valorPagoInput.val().replace(/[^0-9,]/g, '').replace(',', '.')) || 0;
+                const troco = valorPago - totalComDesconto;
+                trocoInput.val(formatarMoeda(troco));
+            }
+
+            function atualizarVisibilidadeDinheiro() {
+                const formaSelecionadaTexto = $('input[name="radioFormaPagamento"]:checked').next('label').text().toLowerCase();
+                if (formaSelecionadaTexto.includes('dinheiro')) {
+                    $('#pagamentoDinheiro').show();
+                } else {
+                    $('#pagamentoDinheiro').hide();
+                    valorPagoInput.val('');
+                    trocoInput.val('');
+                }
+            }
+
+            // Abrir/Fechar card pagamento
+            btnAbrirPagamento.click(() => cardPagamento.toggle());
+
+            // Seleção de forma de pagamento
+            formaPagamentoRadios.change(function () {
+                formaPagamentoId.val($(this).val());
+                formaPagamentoSelecionadaPrincipal.text($(this).next('label').text());
+                atualizarVisibilidadeDinheiro();
+                btnSalvar.prop('disabled', !formaPagamentoId.val());
+            });
+
+            // Inputs
+            descontoInput.on('input', atualizarTotal);
+            valorPagoInput.on('input', calcularTroco);
+
+            // Confirmar pagamento (popula campos e fecha card)
+            btnConfirmar.click(() => {
+                atualizarTotal();
+                atualizarVisibilidadeDinheiro();
+                cardPagamento.hide();
+            });
+        });
+    </script>
+}
