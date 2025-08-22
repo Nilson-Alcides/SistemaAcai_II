@@ -163,6 +163,12 @@
                     <button type="button" id="btnSalvarComanda" class="btn btn-outline-info">
                         Salvar (Alt + S)
                     </button>
+
+                    <a asp-controller="Comanda" asp-action="Index"
+                   class="btn btn-outline-warning">
+                        Abertas (Alt + 4)
+                    </a>
+
                     <a asp-controller="Comanda" asp-action="limpaConada"
                        class="btn btn-outline-danger"
                        onclick="return confirm('Deseja realmente Remover?')">

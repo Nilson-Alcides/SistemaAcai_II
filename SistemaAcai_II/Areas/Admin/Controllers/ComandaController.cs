@@ -102,8 +102,6 @@ namespace SistemaAcai_II.Controllers
         }
 
 
-
-
         public IActionResult Vendas(string termo)
         {
             var listPagamentos = _formasPagamentoRepository.ObterTodasFormasPagamentos();
