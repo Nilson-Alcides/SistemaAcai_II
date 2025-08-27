@@ -6,5 +6,6 @@
         public IEnumerable<ProdutoSimples> ItensCarrinho { get; set; } = new List<ProdutoSimples>();
         public Comanda Comanda { get; set; } = new Comanda();
         public ItemComanda ItemComanda { get; set; } = new ItemComanda();
+        public IEnumerable<ItemComanda> ItensComanda { get; set; } = new List<ItemComanda>();
     }
 }

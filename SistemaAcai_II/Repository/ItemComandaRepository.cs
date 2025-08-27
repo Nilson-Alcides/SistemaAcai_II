@@ -145,7 +145,7 @@ namespace SistemaAcai_II.Repository
                         Id = Convert.ToInt32(dr["IdItem"]),
 
                         Quantidade = dr["Quantidade"] != DBNull.Value ? Convert.ToInt32(dr["Quantidade"]) : 0,
-                        Peso = dr["Peso"] != DBNull.Value ? Convert.ToDecimal(dr["Peso"]) : 0m,
+                        Peso = dr["Peso"] != DBNull.Value ? Convert.ToDecimal(dr["Peso"]) : 0m, 
 
                         RefProduto = new ProdutoSimples
                         {

@@ -7,8 +7,10 @@ using TipoMedidaEnumType = SistemaAcai_II.Models.Constants.TipoMedida;
 
 namespace SistemaAcai_II.Models
 {
+
     public class ProdutoSimples
     {
+
         [Display(Name = "Código", Description = "Código.")]
         public int Id { get; set; }
 
@@ -35,5 +37,8 @@ namespace SistemaAcai_II.Models
 
         [Display(Name = "Peso", Description = "Peso")]
         public decimal Peso { get; set; }
+
     }
+
 }
+
