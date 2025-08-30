@@ -277,6 +277,7 @@ namespace SistemaAcai_II.Controllers
             var novoItem = new ProdutoSimples
             {
                 Id = id,
+                IdItensGuid = Guid.NewGuid(),
                 Descricao = produto.Descricao,
                 Peso = peso,
                 Quantidade = quantidade,
@@ -305,9 +306,9 @@ namespace SistemaAcai_II.Controllers
 
 
 
-        public IActionResult RemoverItem(int id)
+        public IActionResult RemoverItem(Guid Id)
         {
-            _cookiePedidoCompra.Remover(new ProdutoSimples() { Id = id });
+            _cookiePedidoCompra.Remover(new ProdutoSimples() { IdItensGuid = Id });
             return RedirectToAction(nameof(Vendas));
         }
 

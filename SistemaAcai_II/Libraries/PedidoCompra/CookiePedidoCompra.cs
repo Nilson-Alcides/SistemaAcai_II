@@ -79,7 +79,7 @@ namespace SistemaAcai_II.Libraries.PedidoCompra
         public void Remover(ProdutoSimples item)
         {
             var Lista = Consultar();
-            var ItemLocalizado = Lista.FirstOrDefault(a => a.Id == item.Id);
+            var ItemLocalizado = Lista.FirstOrDefault(a => a.IdItensGuid == item.IdItensGuid);
 
             if (ItemLocalizado != null)
             {

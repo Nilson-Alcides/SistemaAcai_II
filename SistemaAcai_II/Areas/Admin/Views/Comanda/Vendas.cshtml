@@ -125,6 +125,7 @@
 
                             <tr>
                                 <td>@item.Id</td>
+                                <td style="display:none">@item.IdItensGuid</td>
                                 <td>@item.Descricao</td>
                                 <td>
                                     @if (@item.Peso > 0)
@@ -139,7 +140,7 @@
                                 <td>@item.PrecoUn.ToString("C")</td>
                                 <td>@subtotal.ToString("C")</td>
                                 <td class="text-right">
-                                    <a asp-controller="Comanda" asp-action="RemoverItem" asp-route-id="@item.Id" class="btn btn-outline-danger">× Remover</a>
+                                    <a asp-controller="Comanda" asp-action="RemoverItem" asp-route-id="@item.IdItensGuid" class="btn btn-outline-danger">× Remover</a>
                                 </td>
                             </tr>
                         }
