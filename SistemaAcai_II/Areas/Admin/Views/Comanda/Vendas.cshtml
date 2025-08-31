@@ -237,6 +237,13 @@ else
 }
 @section Scripts {
     <script>
+                // --- Função utilitária para sempre pegar o peso atualizado da API ---
+        async function getPesoAtual() {
+            const r = await fetch('/Admin/api/balanca', { cache: 'no-store' });
+            const j = await r.json();
+            return parseFloat(String(j.peso).replace(',', '.')) || 0;
+        }
+
         document.addEventListener('DOMContentLoaded', function () {
             // Referências principais
             const formComanda = document.getElementById('formComanda');
@@ -283,7 +290,7 @@ else
             let pesoDaBalanca = 0;
             let balancaDisponivel = false;
             setInterval(() => {
-                fetch('/Admin/api/balanca')
+                fetch('/Admin/api/balanca', { cache: 'no-store' })
                     .then(response => response.json())
                     .then(data => {
                         pesoDaBalanca = parseFloat(data.peso.replace(',', '.')) || 0;
@@ -388,10 +395,17 @@ else
           if (!produto) { alert('Produto não encontrado.'); return; }
 
           const tipo = (produto.tipoMedida || '').toLowerCase();
+          // if (tipo === 'kg') {
+          //   if (balancaDisponivel) adicionarProduto(termo, pesoDaBalanca, 0);
+          //   else alert('Produto por Kg: nenhum peso disponível na balança.');
+          // } 
           if (tipo === 'kg') {
-            if (balancaDisponivel) adicionarProduto(termo, pesoDaBalanca, 0);
-            else alert('Produto por Kg: nenhum peso disponível na balança.');
-          } else {
+               
+                const peso = await getPesoAtual();   // <-- leitura no momento do Enter
+                adicionarProduto(termo, peso, 0);
+            }
+
+          else {
             // unidade padrão = 1
             adicionarProduto(termo, 0, 1);
           }
@@ -432,6 +446,19 @@ else
             //         }
             //     });
             // }
+                // --- Força leitura da balança nos botões "Adicionar" de cada produto ---
+    document.querySelectorAll('form[id^="adicionar-form-"]').forEach(f => {
+        f.addEventListener('submit', async (e) => {
+            const pesoInput = f.querySelector('.campo-peso');
+            if (pesoInput) {
+                e.preventDefault();
+                const peso = await getPesoAtual();
+                pesoInput.value = peso.toFixed(3); // força o valor lido agora
+                f.submit(); // reenvia o form com o valor certo
+            }
+        });
+    });
+
 
             // --- Atalhos ---
             document.addEventListener('keydown', function (e) {
