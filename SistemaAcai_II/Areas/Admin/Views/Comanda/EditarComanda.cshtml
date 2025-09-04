@@ -1,30 +1,34 @@
 ﻿@model SistemaAcai_II.Models.VendasViewModel
+@using SistemaAcai_II.Models.Constants
+@inject SistemaAcai_II.Libraries.Login.LoginColaborador _colaborador
+
 @{
-    ViewData["Title"] = "Editar Comanda";
+    decimal totalComandaItens = 0M;
 }
 
 <div class="container mt-4">
     <h2>Editar Comanda #@Model.Comanda.Id</h2>
 
-    <!-- 🔎 Formulário de busca -->
-    <form method="get" asp-action="EditarComanda" asp-controller="Comanda" class="mb-3">
-        <input type="hidden" name="id" value="@Model.Comanda.Id" />
-        <div class="input-group">
-            <input type="text" name="termo" class="form-control" placeholder="Buscar produto por nome ou código" />
-            <button type="submit" class="btn btn-primary">Pesquisar</button>
+    <form asp-action="EditarComanda" method="get" id="formBusca" class="form-group row">
+        <label for="termo" class="col-sm-2 col-form-label">Pesquisar Produto</label>
+        <div class="col-sm-6">
+            <input type="text" name="termo" id="termo" class="form-control" placeholder="Digite o nome, código ou peso*código..." autofocus value="@ViewBag.Termo" />
+        </div>
+        <div class="col-sm-4">
+            <button type="submit" id="btnBuscar" class="btn btn-primary">Buscar</button>
         </div>
     </form>
 
-    <!-- 📋 Lista de produtos encontrados -->
     @if (Model.Produtos != null && Model.Produtos.Any())
     {
-        <h4>Produtos Encontrados</h4>
-        <table class="table table-bordered">
+        <h3>Produtos encontrados</h3>
+        <table class="table table-bordered table-sm">
             <thead>
                 <tr>
-                    <th>Código</th>
+                    <th>#Código</th>
                     <th>Nome</th>
-                    <th>Preço</th>
+                    <th>Preço Unitário</th>
+                    <th>Medida</th>
                     <th>Ação</th>
                 </tr>
             </thead>
@@ -36,24 +40,17 @@
                         <td>@produto.Descricao</td>
                         <td>@produto.PrecoUn.ToString("C")</td>
                         <td>
-                            @if (produto.Peso > 0)
+                            @if (produto.TipoMedidaEnum == TipoMedida.Kg)
                             {
-                                <!-- Produto vendido por peso -->
-                                <input type="number" step="0.001" min="0" id="peso_@produto.Id" placeholder="Peso (Kg)" />
-                                <button type="button" class="btn btn-success btn-sm"
-                                        onclick="adicionarProduto(@produto.Id, document.getElementById('peso_@produto.Id').value, 0)">
-                                    Adicionar
-                                </button>
+                                <input type="text" class="form-control-sm col-3 pesoItemProduto" value="0" />
                             }
                             else
                             {
-                                <!-- Produto vendido por unidade -->
-                                <input type="number" min="1" value="1" id="qtd_@produto.Id" />
-                                <button type="button" class="btn btn-success btn-sm"
-                                        onclick="adicionarProduto(@produto.Id, 0, document.getElementById('qtd_@produto.Id').value)">
-                                    Adicionar
-                                </button>
+                                <input type="number" class="form-control-sm col-3 quantidadeItemProduto" value="1" min="1" />
                             }
+                        </td>
+                        <td>
+                            <button type="button" class="btn btn-success btn-sm btn-adicionar-produto" data-id="@produto.Id" data-nome="@produto.Descricao" data-preco="@produto.PrecoUn" data-tipomedida="@produto.TipoMedidaEnum">Adicionar</button>
                         </td>
                     </tr>
                 }
@@ -61,82 +58,535 @@
         </table>
     }
 
-    <!-- 🛒 Itens da comanda -->
-    <h4 class="mt-4">Itens da Comanda</h4>
-    <table class="table table-striped">
-        <thead>
-            <tr>
-                <th>Produto</th>
-                <th>Quantidade/Peso</th>
-                <th>Preço Unit.</th>
-                <th>Subtotal</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var item in Model.ItensComanda)
-            {
-                var subtotal = (item.Peso > 0 ? item.Peso * item.RefProduto.PrecoUn : item.Quantidade * item.RefProduto.PrecoUn);
-                <tr>
-                    <td>@item.RefProduto.Descricao</td>
-                    <td>
-                        @if (item.RefProduto.Peso > 0)
+    <div class="row">
+        <div class="col-md-9">
+            <h4>Itens da Comanda</h4>
+            <div class="table-responsive">
+                <table class="table table-bordered table-sm" id="tabelaItens">
+                    <thead>
+                        <tr>
+                            <th>Código</th>
+                            <th>Descrição</th>
+                            <th>Quantidade/Peso</th>
+                            <th>Preço</th>
+                            <th>Subtotal</th>
+                            <th>Ação</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model.ItensComanda)
                         {
-                            @(item.Peso.HasValue ? item.Peso.Value.ToString("N3") + " Kg" : "")
+                            var subtotal = item.Peso > 0 ? (decimal)item.Peso * item.RefProduto.PrecoUn : Convert.ToDecimal(item.Quantidade * item.RefProduto.PrecoUn);
+                            totalComandaItens += subtotal;
+
+                            <tr data-id="@item.RefProduto.Id" data-guid="@item.RefProduto.IdItensGuid" data-porpeso="@(item.Peso > 0 ? "true" : "false")">
+                                <td>@item.RefProduto.Id</td>
+                                <td class="col-md-4">@item.RefProduto.Descricao</td>
+                                <td class="col-md-3">
+                                    @if (item.Peso > 0)
+                                    {
+                                        <div class="input-group">
+                                            <input type="text" class="form-control-sm col-5 campo-peso pesoItem" value="@item.Peso.GetValueOrDefault().ToString("F3").Replace('.', ',')" />
+                                            <span class="input-group-text">Kg</span>
+                                        </div>
+                                    }
+                                    else
+                                    {
+                                        <div class="input-group">
+                                            <input type="number" class="form-control-sm col-5 campo-peso quantidadeItem" value="@item.Quantidade" min="1" />
+                                            <span class="input-group-text">Un</span>
+                                        </div>
+                                    }
+                                </td>
+                                <td class="col-md-3 precoUnitario" data-preco="@item.RefProduto.PrecoUn">@item.RefProduto.PrecoUn.ToString("C")</td>
+                                <td class="col-md-3 totalItem">@subtotal.ToString("C")</td>
+                                <td class="text-center">
+                                    <button type="button" class="btn btn-outline-danger btn-sm btn-remover-item" data-guid="@item.RefProduto.IdItensGuid">Remover</button>
+                                </td>
+                            </tr>
                         }
-                        else
-                        {
-                            @item.Quantidade
-                        }
-                    </td>
-                    <td>@item.RefProduto.PrecoUn.ToString("C")</td>
-                    <td class="totalItem">@subtotal.GetValueOrDefault().ToString("C")</td>
-                </tr>
-            }
-        </tbody>
-    </table>
+                    </tbody>
+                </table>
+            </div>
+            <div id="formaPagamentoPrincipal" class="alert alert-secondary mt-3">
+                Forma de Pagamento: <span id="formaPagamentoSelecionadaPrincipal">Não selecionada</span>
+            </div>
+            <div class="alert alert-info mt-3">
+                <h4>Total da Comanda: <span id="totalComandaDisplay">@totalComandaItens.ToString("C")</span></h4>
+            </div>
 
-    <!-- 💰 Totais -->
-    <div class="d-flex justify-content-end">
-        <h4>Total: @Model.ItensComanda.Sum(i => (i.Peso > 0 ? i.Peso * i.RefProduto.PrecoUn : i.Quantidade * i.RefProduto.PrecoUn)).GetValueOrDefault().ToString("C")</h4>
-    </div>
-
-    <!-- 💾 Formulário para salvar alterações -->
-    <form asp-action="SalvarEdicaoComanda" asp-controller="Comanda" method="post" class="mt-3">
-        <input type="hidden" name="id" value="@Model.Comanda.Id" />
-
-        <div class="mb-3">
-            <label for="FormaPagamento">Forma de Pagamento</label>
-            <select asp-for="Comanda.RefFormasPagamento.Id" asp-items="ViewBag.FormaPagamento" class="form-select"></select>
         </div>
 
-        <button type="submit" class="btn btn-primary">Salvar Alterações</button>
-        <a asp-action="Index" class="btn btn-secondary">Voltar</a>
-    </form>
-</div>
+        <div class="col-md-3">
+            <form asp-action="FecharComanda" asp-controller="Comanda" method="post" id="formFecharComanda">
+                <input type="hidden" name="RefFormasPagamento.Id" id="formaPagamentoId" />
+                <input type="hidden" asp-for="Comanda.Desconto" id="inputDesconto" />
+                <input type="hidden" asp-for="Comanda.Id" />
+                <input type="hidden" id="itensJson" name="itensJson" />
 
-@section Scripts {
-    <script>
-        function adicionarProduto(id, peso, quantidade) {
-            const url = '@Url.Action("AdicionarItem", "Comanda")';
-            const formData = new URLSearchParams();
-            formData.append('id', id);
-            formData.append('pesoRcebido', peso ?? 0);
-            formData.append('quantidade', quantidade ?? 0);
-            formData.append('comandaId', '@Model.Comanda.Id'); // ID da comanda em edição
+                <div class="form-group mb-2">
+                    <label asp-for="Comanda.NomeCliente"></label>
+                    <input asp-for="Comanda.NomeCliente" class="form-control" />
+                </div>
 
-            fetch(url, {
-                method: 'POST',
-                body: formData,
-                headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
-            }).then(response => {
-                if (response.ok) {
-                    window.location.reload(); // recarrega a página para atualizar a tabela
-                } else {
-                    response.text().then(text => {
-                        alert('Erro ao adicionar item: ' + text);
+                <div id="cardPagamento" class="card border-primary shadow">
+                    <div class="card-header bg-primary text-white">
+                        <strong>Forma de Pagamento</strong>
+                    </div>
+                    <div class="card-body">
+                        @foreach (var forma in ViewBag.FormaPagamento as SelectList)
+                        {
+                            <div class="form-check mb-2">
+                                <input class="form-check-input formaPagamentoRadio" type="radio" name="radioFormaPagamento" value="@forma.Value" id="forma@forma.Value"
+                                @(Model.Comanda.RefFormasPagamento != null && Model.Comanda.RefFormasPagamento.Id.ToString() == forma.Value ? "checked" : "") />
+                                <label class="form-check-label" for="forma@forma.Value">@forma.Text</label>
+                            </div>
+                        }
+
+                        <div id="pagamentoDinheiro" style="display: none;">
+                            <dl class="dlist-align">
+                                <dt>Valor Pago:</dt>
+                                <dd>
+                                    <input id="valorPago" class="form-control form-control-sm dinheiro"
+                                           type="text" style="width: 100px;" placeholder="0,00" />
+                                </dd>
+                            </dl>
+                            <dl class="dlist-align">
+                                <dt>Troco:</dt>
+                                <dd>
+                                    <input id="troco" class="form-control form-control-sm dinheiro"
+                                           type="text" style="width: 100px;" placeholder="0,00" readonly />
+                                </dd>
+                            </dl>
+                        </div>
+
+                        <dl style="display:none" class="dlist-align">
+                            <dt>Desconto:</dt>
+                            <dd>
+                                <input asp-for="Comanda.Desconto" id="desconto"
+                                       class="form-control form-control-sm dinheiro"
+                                       type="text" style="width: 100px;" placeholder="0,00" />
+                            </dd>
+                        </dl>
+                    </div>
+                </div>
+
+            </form>
+
+        </div>
+        <div class="d-flex gap-2 mt-3">
+            <button type="button" class="btn btn-outline-primary" id="btnAbrirPagamento">
+                Pagamento (Alt + P)
+            </button>
+            <button type="submit" class="btn btn-outline-success" id="btnSalvarComanda" disabled>
+                Finalizar (Alt + 5)
+            </button>
+            <a asp-action="Index" class="btn btn-secondary">Cancelar</a>
+
+
+        </div>
+        <div>
+        </div>
+
+    </div>
+
+    @section Scripts {
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                // Referências principais
+                const btnSalvarComanda = document.getElementById('btnSalvarComanda');
+                const nomeClienteInput = document.getElementById('Comanda_NomeCliente');
+                const campoPesquisa = document.getElementById('termo');
+                const formBusca = document.getElementById('formBusca');
+                const tabelaItens = document.querySelector('#tabelaItens tbody');
+                const totalComandaDisplay = document.getElementById('totalComandaDisplay');
+                const descontoInput = document.getElementById('desconto');
+
+                // Salvar Comanda (com envio de JSON)
+                if (btnSalvarComanda) {
+                    btnSalvarComanda.addEventListener('click', function (event) {
+                        event.preventDefault(); // Previne o envio padrão do formulário
+
+                        if (nomeClienteInput && nomeClienteInput.value.trim() === '') {
+                            nomeClienteInput.value = 'Não Informado';
+                        }
+
+                        const itens = [];
+                        if (tabelaItens) {
+                            tabelaItens.querySelectorAll('tr').forEach(tr => {
+                                const quantidadeInput = tr.querySelector('.quantidadeItem');
+                                const pesoInput = tr.querySelector('.pesoItem');
+                                itens.push({
+                                    ProdutoId: tr.dataset.id,
+                                    IdItensGuid: tr.dataset.guid,
+                                    Quantidade: quantidadeInput ? parseInt(quantidadeInput.value) : 0,
+                                    Peso: pesoInput ? parseFloat(pesoInput.value.replace(',', '.')) : 0
+                                });
+                            });
+                        }
+
+                        document.getElementById('itensJson').value = JSON.stringify(itens);
+                        document.getElementById('formFecharComanda').submit();
                     });
                 }
+
+                // --- Balança (Leitura em tempo real) ---
+                let pesoDaBalanca = 0;
+                let balancaDisponivel = false;
+                setInterval(() => {
+                    fetch('@Url.Action("LerPeso", "Comanda")')
+                        .then(response => response.json())
+                        .then(data => {
+                            pesoDaBalanca = parseFloat(data.peso.replace(',', '.')) || 0;
+                            balancaDisponivel = pesoDaBalanca > 0;
+                        });
+                }, 500);
+
+                // --- Lógica de Busca e Adição de Produto (Com "Enter") ---
+                if (formBusca) {
+                    // Previne o comportamento padrão do botão "Buscar"
+                    formBusca.addEventListener('submit', async (e) => {
+                        e.preventDefault();
+                    });
+
+                    // Adiciona o evento de keydown no campo de pesquisa
+                    if (campoPesquisa) {
+                        campoPesquisa.addEventListener('keydown', async (e) => {
+                            if (e.key === 'Enter') {
+                                e.preventDefault(); // Evita que o formulário seja submetido da forma padrão
+                                const termo = campoPesquisa.value.trim();
+                                if (!termo) return;
+
+                                const partes = termo.split(/[*xX]/).map(s => s.trim()).filter(Boolean);
+                                let codigo = null;
+                                let valor = null;
+
+                                if (partes.length === 2) {
+                                    // Caso peso*codigo ou quantidade*codigo
+                                    const p1IsDigits = /^\d+$/.test(partes[0]);
+                                    const p2IsDigits = /^\d+$/.test(partes[1]);
+                                    const p1IsDecimal = /^\d+[,.]\d+$/.test(partes[0]);
+                                    const p2IsDecimal = /^\d+[,.]\d+$/.test(partes[1]);
+
+                                    if ((p1IsDigits || p1IsDecimal) && p2IsDigits) {
+                                        // Assume valor*codigo
+                                        valor = partes[0].replace(',', '.');
+                                        codigo = partes[1];
+                                    } else if (p1IsDigits && (p2IsDigits || p2IsDecimal)) {
+                                        // Assume codigo*valor
+                                        codigo = partes[0];
+                                        valor = partes[1].replace(',', '.');
+                                    } else {
+                                        // Se a regra não se aplica, trata como busca por termo
+                                        formBusca.submit();
+                                        return;
+                                    }
+
+                                } else if (/^\d+$/.test(termo)) {
+                                    // Caso apenas código
+                                    codigo = termo;
+                                } else {
+                                    // Caso busca por nome
+                                    formBusca.submit();
+                                    return;
+                                }
+
+                                if (codigo) {
+                                    try {
+                                        const produto = await fetch(`@Url.Action("ObterProdutoPorId", "Comanda")?id=${codigo}`).then(res => res.json());
+                                        if (!produto) {
+                                            alert('Produto não encontrado.');
+                                            campoPesquisa.value = '';
+                                            return;
+                                        }
+
+                                        const tipo = (produto.tipoMedida || '').toLowerCase();
+                                        let quantidade = 0;
+                                        let peso = 0;
+
+                                        if (tipo === 'kg') {
+                                            if (valor) {
+                                                peso = parseFloat(valor);
+                                                if (isNaN(peso) || peso <= 0) { alert('Peso inválido.'); return; }
+                                            } else {
+                                                if (balancaDisponivel) {
+                                                    peso = pesoDaBalanca;
+                                                } else {
+                                                    alert('Produto por Kg: nenhum peso disponível na balança.');
+                                                    return;
+                                                }
+                                            }
+                                        } else { // Unidade
+                                            if (valor) {
+                                                quantidade = parseInt(valor);
+                                                if (isNaN(quantidade) || quantidade <= 0) { alert('Quantidade inválida.'); return; }
+                                            } else {
+                                                quantidade = 1;
+                                            }
+                                        }
+
+                                        // Adiciona o item via AJAX (sem recarregar a página)
+                                        await adicionarItem(produto.id, peso, quantidade);
+                                        campoPesquisa.value = '';
+                                    } catch (error) {
+                                        console.error("Erro na busca por ID:", error);
+                                        alert('Erro ao buscar produto.');
+                                    }
+                                }
+                            }
+                        });
+                    }
+                }
+
+                // Evento de clique no botão "Adicionar" dos produtos pesquisados
+                document.querySelectorAll('.btn-adicionar-produto').forEach(btn => {
+                    btn.addEventListener('click', async (e) => {
+                        e.preventDefault();
+                        const produtoId = e.target.dataset.id;
+                        const tipoMedida = e.target.dataset.tipomedida.toLowerCase();
+                        let quantidade = 0;
+                        let peso = 0;
+                        const row = e.target.closest('tr');
+
+                        if (tipoMedida === 'kg') {
+                            const inputPeso = row.querySelector('.pesoItemProduto');
+                            peso = parseFloat(inputPeso.value.replace(',', '.')) || 0;
+                            if (peso <= 0) {
+                                alert('Informe um peso válido.');
+                                return;
+                            }
+                        } else { // Unidade
+                            const inputQuantidade = row.querySelector('.quantidadeItemProduto');
+                            quantidade = parseInt(inputQuantidade.value) || 1;
+                            if (quantidade <= 0) {
+                                alert('Informe uma quantidade válida.');
+                                return;
+                            }
+                        }
+                        await adicionarItem(produtoId, peso, quantidade);
+                    });
+                });
+
+                // --- Função de adicionar item via fetch e renderização na tela ---
+                async function adicionarItem(id, peso, quantidade) {
+                    const url = `@Url.Action("AdicionarItemNovo", "Comanda", new { comandaId = Model.Comanda.Id })`;
+                    const formData = new URLSearchParams();
+                    formData.append('id', id);
+                    formData.append('pesoRcebido', peso > 0 ? peso.toFixed(3) : '0');
+                    formData.append('quantidade', quantidade);
+
+                    try {
+                        const response = await fetch(url, { method: 'POST', body: formData });
+
+                        if (response.ok) {
+                            const novoItem = await response.json();
+                            renderizarNovoItemNaTabela(novoItem);
+                            atualizarTotais();
+                        } else {
+                            const text = await response.text();
+                            alert('Erro ao adicionar item: ' + text);
+                        }
+                    } catch (error) {
+                        console.error("Erro ao adicionar item:", error);
+                        alert('Erro na comunicação com o servidor ao adicionar o item.');
+                    }
+                }
+
+                // --- Função que renderiza o novo item na tabela ---
+                function renderizarNovoItemNaTabela(item) {
+                    const newRow = document.createElement('tr');
+                    newRow.dataset.id = item.refProduto.id;
+                    newRow.dataset.guid = item.refProduto.idItensGuid;
+                    newRow.dataset.porpeso = item.peso > 0 ? "true" : "false";
+
+                    // Pega o valor do JSON e converte para número
+                    const precoUnitario = parseFloat(item.refProduto.precoUn.replace(',', '.'));
+                    const subtotal = item.peso > 0 ? (item.peso * precoUnitario) : (item.quantidade * precoUnitario);
+
+                    newRow.innerHTML = `
+                                            <td>${item.refProduto.id}</td>
+                                            <td>${item.refProduto.descricao}</td>
+                                            <td>
+                                                <div class="input-group">
+                                                    ${item.peso > 0
+                            ? `<input type="text" class="form-control-sm col-5 campo-peso pesoItem" value="${item.peso.toFixed(3).replace('.', ',')}" />
+                                                           <span class="input-group-text">Kg</span>`
+                            : `<input type="number" class="form-control-sm col-5 campo-peso quantidadeItem" value="${item.quantidade}" min="1" />
+                                                           <span class="input-group-text">Un</span>`
+                        }
+                                                </div>
+                                            </td>
+                                            <td class="precoUnitario" data-preco="${precoUnitario.toString().replace('.', ',')}">R$ ${item.refProduto.precoUn}</td>
+                                            <td class="totalItem">${subtotal.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</td>
+                                            <td class="text-center">
+                                                            <button type="button" class="btn btn-outline-danger btn-sm btn-remover-item" data-guid="${item.refProduto.idItensGuid}">Remover</button>
+                                            </td>
+                                        `;
+
+                    tabelaItens.appendChild(newRow);
+                }
+
+                // --- Atualizar totais ---
+                function atualizarTotais() {
+                    let subtotal = 0;
+                    const linhas = tabelaItens ? tabelaItens.querySelectorAll('tr') : [];
+
+                    linhas.forEach(tr => {
+                        const precoStr = tr.querySelector('.precoUnitario')?.dataset.preco || "0";
+                        const preco = parseFloat(precoStr.replace(',', '.'));
+
+                        const quantidadeInput = tr.querySelector('.quantidadeItem');
+                        const pesoInput = tr.querySelector('.pesoItem');
+                        let linhaSubtotal = 0;
+
+                        if (pesoInput) {
+                            const peso = parseFloat(pesoInput.value.replace(',', '.')) || 0;
+                            if (peso > 0) linhaSubtotal = peso * preco;
+                        } else if (quantidadeInput) {
+                            const quantidade = parseInt(quantidadeInput.value) || 0;
+                            if (quantidade > 0) linhaSubtotal = quantidade * preco;
+                        }
+
+                        const totalItem = tr.querySelector('.totalItem');
+                        if (totalItem) {
+                            totalItem.innerText = linhaSubtotal.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+                        }
+
+                        subtotal += linhaSubtotal;
+                    });
+
+                    let descontoTxt = descontoInput ? descontoInput.value.trim() : '';
+                    let desconto = 0;
+
+                    if (descontoTxt.includes('%')) {
+                        let perc = parseFloat(descontoTxt.replace('%', '').replace(',', '.')) || 0;
+                        desconto = subtotal * (perc / 100);
+                    } else {
+                        desconto = parseFloat(descontoTxt.replace(',', '.')) || 0;
+                    }
+
+                    let totalFinal = subtotal - desconto;
+                    if (totalFinal < 0) totalFinal = 0;
+
+                    if (totalComandaDisplay) {
+                        totalComandaDisplay.innerText = totalFinal.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+                    }
+                }
+
+                // --- Funções de Conversão ---
+                function toNumber(valor) {
+                    if (!valor) return 0;
+                    valor = valor.trim();
+                    valor = valor.replace(/\./g, '').replace(',', '.');
+                    let num = parseFloat(valor);
+                    return isNaN(num) ? 0 : num;
+                }
+
+                // --- Eventos da tabela ---
+                if (tabelaItens) {
+                    tabelaItens.addEventListener('click', function (e) {
+                        if (e.target.classList.contains('btn-remover-item')) {
+                            const guid = e.target.dataset.guid;
+                            if (guid) {
+                                const url = `@Url.Action("RemoverItem", "Comanda")?id=${guid}&comandaId=@Model.Comanda.Id`;
+                                fetch(url, { method: 'GET' })
+                                    .then(response => {
+                                        if (response.ok) {
+                                            e.target.closest('tr').remove();
+                                            atualizarTotais();
+                                        } else { alert('Erro ao remover o item.'); }
+                                    })
+                                    .catch(error => { console.error(error); alert('Erro na comunicação com o servidor.'); });
+                            }
+                        }
+                    });
+
+                    tabelaItens.addEventListener('input', function (e) {
+                        if (e.target.classList.contains('quantidadeItem') || e.target.classList.contains('pesoItem')) {
+                            atualizarTotais();
+                        }
+                    });
+                }
+
+                if (descontoInput) {
+                    descontoInput.addEventListener('input', atualizarTotais);
+                }
+
+                // --- Máscaras ---
+                $(document).ready(function () {
+                    $('.dinheiro').mask("#.##0,00", { reverse: true });
+
+                    // Inicialização dos totais e do card de pagamento
+                    let totalOriginal = parseFloat('@totalComandaItens'.replace(',', '.')) || 0;
+                    let totalComDesconto = totalOriginal;
+                    const valorPagoInput = $('#valorPago');
+                    const trocoInput = $('#troco');
+                    const formaPagamentoRadios = $('input[name="radioFormaPagamento"]');
+                    const formaPagamentoId = $('#formaPagamentoId');
+                    const formaPagamentoSelecionadaPrincipal = $('#formaPagamentoSelecionadaPrincipal');
+                    const btnSalvar = $('#btnSalvarComanda');
+                    const btnAbrirPagamento = $('#btnAbrirPagamento');
+                    const cardPagamento = $('#cardPagamento');
+
+                    function formatarMoeda(valor) {
+                        return isNaN(valor) ? "R$ 0,00" : valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+                    }
+
+                    function atualizarTotal() {
+                        const desconto = parseFloat(descontoInput.val().replace(/[^0-9,]/g, '').replace(',', '.')) || 0;
+                        $('#inputDesconto').val(desconto);
+                        totalComDesconto = Math.max(totalOriginal - desconto, 0);
+                        totalComandaDisplay.innerText = formatarMoeda(totalComDesconto);
+                        calcularTroco();
+                    }
+
+                    function calcularTroco() {
+                        const valorPago = parseFloat(valorPagoInput.val().replace(/[^0-9,]/g, '').replace(',', '.')) || 0;
+                        const troco = valorPago - totalComDesconto;
+                        trocoInput.val(formatarMoeda(troco));
+                    }
+
+                    function atualizarVisibilidadeDinheiro() {
+                        const formaSelecionadaTexto = $('input[name="radioFormaPagamento"]:checked').next('label').text().toLowerCase();
+                        if (formaSelecionadaTexto.includes('dinheiro')) {
+                            $('#pagamentoDinheiro').show();
+                        } else {
+                            $('#pagamentoDinheiro').hide();
+                            valorPagoInput.val('');
+                            trocoInput.val('');
+                        }
+                    }
+
+                    // Funções para inicialização
+                    function inicializarFormaPagamento() {
+                        const checkedRadio = $('input[name="radioFormaPagamento"]:checked');
+                        if (checkedRadio.length > 0) {
+                            formaPagamentoId.val(checkedRadio.val());
+                            formaPagamentoSelecionadaPrincipal.text(checkedRadio.next('label').text());
+                            btnSalvar.prop('disabled', false);
+                            atualizarVisibilidadeDinheiro();
+                        }
+                    }
+
+                    // Abrir/Fechar card pagamento
+                    btnAbrirPagamento.click(() => cardPagamento.toggle());
+
+                    // Seleção de forma de pagamento
+                    formaPagamentoRadios.change(function () {
+                        formaPagamentoId.val($(this).val());
+                        formaPagamentoSelecionadaPrincipal.text($(this).next('label').text());
+                        atualizarVisibilidadeDinheiro();
+                        btnSalvar.prop('disabled', !formaPagamentoId.val());
+                    });
+
+                    // Inputs
+                    descontoInput.addEventListener('input', atualizarTotal);
+                    valorPagoInput.on('input', calcularTroco);
+
+                    // Chamada da função de inicialização
+                    inicializarFormaPagamento();
+                    atualizarTotais(); // Garante que os totais iniciais sejam calculados
+                });
             });
-        }
-    </script>
-}
+        </script>
+    }

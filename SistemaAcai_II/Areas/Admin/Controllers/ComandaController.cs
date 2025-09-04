@@ -291,6 +291,83 @@ namespace SistemaAcai_II.Controllers
             // Redireciona para a página de vendas
             return RedirectToAction(nameof(Vendas));
         }
+
+        [HttpPost]
+        public IActionResult AdicionarItemNovo(int id, string? pesoRcebido, int? quantidade, int? comandaId, Guid IdGuid)
+        {
+            // Converte o peso recebido para decimal
+            decimal peso = 0;
+            if (pesoRcebido != null)
+            {
+                try
+                {
+                    peso = Convert.ToDecimal(pesoRcebido.Replace(".", ","), CultureInfo.CurrentCulture);
+                }
+                catch
+                {
+                    // Em caso de erro, retorne um status de erro e uma mensagem.
+                    // O front-end vai capturar isso.
+                    return BadRequest("Peso inválido. Use números no formato 0,200.");
+                }
+            }
+
+            // Valida se o peso/quantidade é maior que zero
+            if (peso <= 0 && (quantidade.HasValue && quantidade.Value <= 0))
+            {
+                // Em caso de erro, retorne um status de erro e uma mensagem.
+                return BadRequest("O peso ou a quantidade deve ser maior que zero.");
+            }
+
+            // Obtém o produto do repositório
+            var produto = _produtoRepository.ObterProduto(id);
+            if (produto == null)
+            {
+                // Em caso de erro, retorne um status de erro e uma mensagem.
+                return NotFound("Produto não encontrado.");
+            }
+
+            // Recupera a lista de itens do cookie
+            var itensCarrinho = _cookiePedidoCompra.Consultar();
+
+            // Cria o novo item a ser adicionado
+            var novoItem = new ProdutoSimples
+            {
+                Id = id,
+                // É crucial usar o Guid.NewGuid() aqui para o novo item
+                IdItensGuid = Guid.NewGuid(),
+                Descricao = produto.Descricao,
+                Peso = peso,
+                Quantidade = quantidade,
+                PrecoUn = produto.PrecoUn
+            };
+
+            itensCarrinho.Add(novoItem);
+            // Salva a lista atualizada no cookie
+            _cookiePedidoCompra.Salvar(itensCarrinho);
+
+
+            var itemRetorno = new
+            {
+                idItensGuid = novoItem.IdItensGuid,
+                quantidade = novoItem.Quantidade,
+                peso = novoItem.Peso,
+                refProduto = new
+                {
+                    id = novoItem.Id,
+                    descricao = novoItem.Descricao,
+                    // Formata o preço para o padrão brasileiro para que o JavaScript o interprete corretamente.
+                    precoUn = novoItem.PrecoUn.ToString("N2", new CultureInfo("pt-BR"))
+                    // precoUn = novoItem.PrecoUn.ToString("C", new CultureInfo("pt-BR"))
+                }
+            };
+
+            // Retorna um objeto JSON com o status 200 OK.
+            return Ok(itemRetorno);
+        }
+
+
+
+
         [HttpGet]
         public IActionResult ObterProdutoPorId(int id)
         {
