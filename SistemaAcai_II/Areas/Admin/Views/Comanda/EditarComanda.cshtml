@@ -19,8 +19,8 @@
         </div>
     </form>
 
-    @if (Model.Produtos != null && Model.Produtos.Any())
-    {
+@if (Model.Produtos != null && Model.Produtos.Any())
+{
         <h3>Produtos encontrados</h3>
         <table class="table table-bordered table-sm">
             <thead>
@@ -56,7 +56,7 @@
                 }
             </tbody>
         </table>
-    }
+}
 
     <div class="row">
         <div class="col-md-9">
@@ -138,7 +138,7 @@
                         {
                             <div class="form-check mb-2">
                                 <input class="form-check-input formaPagamentoRadio" type="radio" name="radioFormaPagamento" value="@forma.Value" id="forma@forma.Value"
-                                @(Model.Comanda.RefFormasPagamento != null && Model.Comanda.RefFormasPagamento.Id.ToString() == forma.Value ? "checked" : "") />
+                                       @(Model.Comanda.RefFormasPagamento != null && Model.Comanda.RefFormasPagamento.Id.ToString() == forma.Value ? "checked" : "") />
                                 <label class="form-check-label" for="forma@forma.Value">@forma.Text</label>
                             </div>
                         }
@@ -182,15 +182,11 @@
                 Finalizar (Alt + 5)
             </button>
             <a asp-action="Index" class="btn btn-secondary">Cancelar</a>
-
-
         </div>
-        <div>
-        </div>
-
+        <div></div>
     </div>
 
-    @section Scripts {
+@section Scripts {
         <script>
             document.addEventListener('DOMContentLoaded', function () {
                 // Referências principais
@@ -205,7 +201,7 @@
                 // Salvar Comanda (com envio de JSON)
                 if (btnSalvarComanda) {
                     btnSalvarComanda.addEventListener('click', function (event) {
-                        event.preventDefault(); // Previne o envio padrão do formulário
+                        event.preventDefault();
 
                         if (nomeClienteInput && nomeClienteInput.value.trim() === '') {
                             nomeClienteInput.value = 'Não Informado';
@@ -231,112 +227,125 @@
                 }
 
                 // --- Balança (Leitura em tempo real) ---
-                let pesoDaBalanca = 0;
-                let balancaDisponivel = false;
+                window.pesoDaBalanca = 0;
+                window.balancaDisponivel = false;
                 setInterval(() => {
                     fetch('@Url.Action("LerPeso", "Comanda")')
                         .then(response => response.json())
                         .then(data => {
-                            pesoDaBalanca = parseFloat(data.peso.replace(',', '.')) || 0;
-                            balancaDisponivel = pesoDaBalanca > 0;
+                            window.pesoDaBalanca = parseFloat(data.peso.replace(',', '.')) || 0;
+                            window.balancaDisponivel = window.pesoDaBalanca > 0;
                         });
                 }, 500);
 
-                // --- Lógica de Busca e Adição de Produto (Com "Enter") ---
+                // =====================================================================
+                // === LÓGICA DE BUSCA E ADIÇÃO (igual Vendas) — SEM cloneNode        ===
+                // =====================================================================
                 if (formBusca) {
-                    // Previne o comportamento padrão do botão "Buscar"
+                    function parseNum(s) {
+                        if (typeof s !== 'string') return NaN;
+                        const v = parseFloat(s.replace(',', '.'));
+                        return isNaN(v) ? NaN : v;
+                    }
+
+                    async function obterProdutoPorId(codigo) {
+                        const url = `@Url.Action("ObterProdutoPorId", "Comanda")?id=${encodeURIComponent(codigo)}`;
+                        const resp = await fetch(url, { cache: 'no-store' });
+                        if (!resp.ok) return null;
+                        return resp.json();
+                    }
+
                     formBusca.addEventListener('submit', async (e) => {
+                        const campo = document.getElementById('termo'); // pega o input atual
+                        const termo = (campo?.value || '').trim();
+
+                        if (!termo) return; // vazio -> deixa busca textual seguir
+
+                        const temSep = /[*xX]/.test(termo);
+                        const ehSoDigitos = /^\d+$/.test(termo);
+                        const ehBuscaTextual = !temSep && !ehSoDigitos;
+
+                        if (ehBuscaTextual) {
+                            // descrição / nome -> NÃO previne
+                            return;
+                        }
+
+                        // A partir daqui é adição direta
                         e.preventDefault();
-                    });
 
-                    // Adiciona o evento de keydown no campo de pesquisa
-                    if (campoPesquisa) {
-                        campoPesquisa.addEventListener('keydown', async (e) => {
-                            if (e.key === 'Enter') {
-                                e.preventDefault(); // Evita que o formulário seja submetido da forma padrão
-                                const termo = campoPesquisa.value.trim();
-                                if (!termo) return;
+                        try {
+                            let codigo = null, quantidade = 0, peso = 0;
 
+                            if (temSep) {
                                 const partes = termo.split(/[*xX]/).map(s => s.trim()).filter(Boolean);
-                                let codigo = null;
-                                let valor = null;
+                                const p1 = partes[0] || '';
+                                const p2 = partes[1] || '';
+                                const p1IsDigits = /^\d+$/.test(p1);
+                                const p2IsDigits = /^\d+$/.test(p2);
 
-                                if (partes.length === 2) {
-                                    // Caso peso*codigo ou quantidade*codigo
-                                    const p1IsDigits = /^\d+$/.test(partes[0]);
-                                    const p2IsDigits = /^\d+$/.test(partes[1]);
-                                    const p1IsDecimal = /^\d+[,.]\d+$/.test(partes[0]);
-                                    const p2IsDecimal = /^\d+[,.]\d+$/.test(partes[1]);
+                                if (p1IsDigits) {
+                                    // p1 = código
+                                    codigo = p1;
+                                    const prod = await obterProdutoPorId(codigo);
+                                    if (!prod) throw new Error('Produto não encontrado.');
+                                    const tipo = ((prod.tipoMedida || prod.tipoMedidaEnum || '') + '').toLowerCase();
 
-                                    if ((p1IsDigits || p1IsDecimal) && p2IsDigits) {
-                                        // Assume valor*codigo
-                                        valor = partes[0].replace(',', '.');
-                                        codigo = partes[1];
-                                    } else if (p1IsDigits && (p2IsDigits || p2IsDecimal)) {
-                                        // Assume codigo*valor
-                                        codigo = partes[0];
-                                        valor = partes[1].replace(',', '.');
+                                    if (tipo === 'kg') {
+                                        const w = parseNum(p2);
+                                        peso = (!isNaN(w) && w > 0) ? w : (window.balancaDisponivel ? (window.pesoDaBalanca || 0) : 0);
+                                        quantidade = 0;
                                     } else {
-                                        // Se a regra não se aplica, trata como busca por termo
-                                        formBusca.submit();
-                                        return;
+                                        const q = parseNum(p2);
+                                        quantidade = (!isNaN(q) && q > 0) ? Math.round(q) : 1;
+                                        peso = 0;
                                     }
+                                } else if (p2IsDigits) {
+                                    // p2 = código
+                                    codigo = p2;
+                                    const prod = await obterProdutoPorId(codigo);
+                                    if (!prod) throw new Error('Produto não encontrado.');
+                                    const tipo = ((prod.tipoMedida || prod.tipoMedidaEnum || '') + '').toLowerCase();
 
-                                } else if (/^\d+$/.test(termo)) {
-                                    // Caso apenas código
-                                    codigo = termo;
+                                    if (tipo === 'kg') {
+                                        const w = parseNum(p1);
+                                        peso = (!isNaN(w) && w > 0) ? w : (window.balancaDisponivel ? (window.pesoDaBalanca || 0) : 0);
+                                        quantidade = 0;
+                                    } else {
+                                        const q = parseNum(p1);
+                                        quantidade = (!isNaN(q) && q > 0) ? Math.round(q) : 1;
+                                        peso = 0;
+                                    }
                                 } else {
-                                    // Caso busca por nome
-                                    formBusca.submit();
-                                    return;
+                                    throw new Error('Formato inválido. Use "codigo*qtd" ou "peso*código".');
                                 }
+                            } else {
+                                // Sem separador: só código numérico
+                                codigo = termo;
+                                const prod = await obterProdutoPorId(codigo);
+                                if (!prod) throw new Error('Produto não encontrado.');
+                                const tipo = ((prod.tipoMedida || prod.tipoMedidaEnum || '') + '').toLowerCase();
 
-                                if (codigo) {
-                                    try {
-                                        const produto = await fetch(`@Url.Action("ObterProdutoPorId", "Comanda")?id=${codigo}`).then(res => res.json());
-                                        if (!produto) {
-                                            alert('Produto não encontrado.');
-                                            campoPesquisa.value = '';
-                                            return;
-                                        }
-
-                                        const tipo = (produto.tipoMedida || '').toLowerCase();
-                                        let quantidade = 0;
-                                        let peso = 0;
-
-                                        if (tipo === 'kg') {
-                                            if (valor) {
-                                                peso = parseFloat(valor);
-                                                if (isNaN(peso) || peso <= 0) { alert('Peso inválido.'); return; }
-                                            } else {
-                                                if (balancaDisponivel) {
-                                                    peso = pesoDaBalanca;
-                                                } else {
-                                                    alert('Produto por Kg: nenhum peso disponível na balança.');
-                                                    return;
-                                                }
-                                            }
-                                        } else { // Unidade
-                                            if (valor) {
-                                                quantidade = parseInt(valor);
-                                                if (isNaN(quantidade) || quantidade <= 0) { alert('Quantidade inválida.'); return; }
-                                            } else {
-                                                quantidade = 1;
-                                            }
-                                        }
-
-                                        // Adiciona o item via AJAX (sem recarregar a página)
-                                        await adicionarItem(produto.id, peso, quantidade);
-                                        campoPesquisa.value = '';
-                                    } catch (error) {
-                                        console.error("Erro na busca por ID:", error);
-                                        alert('Erro ao buscar produto.');
-                                    }
+                                if (tipo === 'kg') {
+                                    peso = window.balancaDisponivel ? (window.pesoDaBalanca || 0) : 0;
+                                    quantidade = 0;
+                                } else {
+                                    quantidade = 1;
+                                    peso = 0;
                                 }
                             }
-                        });
-                    }
+
+                            await adicionarItem(codigo, peso, quantidade);
+
+                            if (campo) {
+                                campo.value = '';
+                                campo.focus();
+                            }
+                        } catch (err) {
+                            alert(err.message || 'Erro ao processar a busca/adicionar item.');
+                        }
+                    });
                 }
+                // =====================================================================
 
                 // Evento de clique no botão "Adicionar" dos produtos pesquisados
                 document.querySelectorAll('.btn-adicionar-produto').forEach(btn => {
@@ -396,32 +405,31 @@
                 function renderizarNovoItemNaTabela(item) {
                     const newRow = document.createElement('tr');
                     newRow.dataset.id = item.refProduto.id;
-                    newRow.dataset.guid = item.refProduto.idItensGuid;
+                    newRow.dataset.guid = item.idItensGuid; // GUID correto vem na raiz
                     newRow.dataset.porpeso = item.peso > 0 ? "true" : "false";
 
-                    // Pega o valor do JSON e converte para número
                     const precoUnitario = parseFloat(item.refProduto.precoUn.replace(',', '.'));
                     const subtotal = item.peso > 0 ? (item.peso * precoUnitario) : (item.quantidade * precoUnitario);
 
                     newRow.innerHTML = `
-                                            <td>${item.refProduto.id}</td>
-                                            <td>${item.refProduto.descricao}</td>
-                                            <td>
-                                                <div class="input-group">
-                                                    ${item.peso > 0
-                            ? `<input type="text" class="form-control-sm col-5 campo-peso pesoItem" value="${item.peso.toFixed(3).replace('.', ',')}" />
-                                                           <span class="input-group-text">Kg</span>`
-                            : `<input type="number" class="form-control-sm col-5 campo-peso quantidadeItem" value="${item.quantidade}" min="1" />
-                                                           <span class="input-group-text">Un</span>`
-                        }
-                                                </div>
-                                            </td>
-                                            <td class="precoUnitario" data-preco="${precoUnitario.toString().replace('.', ',')}">R$ ${item.refProduto.precoUn}</td>
-                                            <td class="totalItem">${subtotal.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</td>
-                                            <td class="text-center">
-                                                            <button type="button" class="btn btn-outline-danger btn-sm btn-remover-item" data-guid="${item.refProduto.idItensGuid}">Remover</button>
-                                            </td>
-                                        `;
+                        <td>${item.refProduto.id}</td>
+                        <td>${item.refProduto.descricao}</td>
+                        <td>
+                            <div class="input-group">
+                                ${item.peso > 0
+                                    ? `<input type="text" class="form-control-sm col-5 campo-peso pesoItem" value="${item.peso.toFixed(3).replace('.', ',')}" />
+                                       <span class="input-group-text">Kg</span>`
+                                    : `<input type="number" class="form-control-sm col-5 campo-peso quantidadeItem" value="${item.quantidade}" min="1" />
+                                       <span class="input-group-text">Un</span>`
+                                }
+                            </div>
+                        </td>
+                        <td class="precoUnitario" data-preco="${precoUnitario.toString().replace('.', ',')}">R$ ${item.refProduto.precoUn}</td>
+                        <td class="totalItem">${subtotal.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</td>
+                        <td class="text-center">
+                            <button type="button" class="btn btn-outline-danger btn-sm btn-remover-item" data-guid="${item.idItensGuid}">Remover</button>
+                        </td>
+                    `;
 
                     tabelaItens.appendChild(newRow);
                 }
@@ -473,23 +481,14 @@
                     }
                 }
 
-                // --- Funções de Conversão ---
-                function toNumber(valor) {
-                    if (!valor) return 0;
-                    valor = valor.trim();
-                    valor = valor.replace(/\./g, '').replace(',', '.');
-                    let num = parseFloat(valor);
-                    return isNaN(num) ? 0 : num;
-                }
-
                 // --- Eventos da tabela ---
                 if (tabelaItens) {
                     tabelaItens.addEventListener('click', function (e) {
                         if (e.target.classList.contains('btn-remover-item')) {
                             const guid = e.target.dataset.guid;
                             if (guid) {
-                                const url = `@Url.Action("RemoverItem", "Comanda")?id=${guid}&comandaId=@Model.Comanda.Id`;
-                                fetch(url, { method: 'GET' })
+                                const url = `@Url.Action("RemoverItemAjax", "Comanda")?id=${guid}`;
+                                fetch(url, { method: 'DELETE' })
                                     .then(response => {
                                         if (response.ok) {
                                             e.target.closest('tr').remove();
@@ -512,7 +511,7 @@
                     descontoInput.addEventListener('input', atualizarTotais);
                 }
 
-                // --- Máscaras ---
+                // --- Máscaras e inicializações ---
                 $(document).ready(function () {
                     $('.dinheiro').mask("#.##0,00", { reverse: true });
 
@@ -533,8 +532,8 @@
                     }
 
                     function atualizarTotal() {
-                        const desconto = parseFloat(descontoInput.val().replace(/[^0-9,]/g, '').replace(',', '.')) || 0;
-                        $('#inputDesconto').val(desconto);
+                        const desconto = parseFloat(descontoInput.value.replace(/[^0-9,]/g, '').replace(',', '.')) || 0;
+                        document.getElementById('inputDesconto').value = desconto;
                         totalComDesconto = Math.max(totalOriginal - desconto, 0);
                         totalComandaDisplay.innerText = formatarMoeda(totalComDesconto);
                         calcularTroco();
@@ -557,7 +556,6 @@
                         }
                     }
 
-                    // Funções para inicialização
                     function inicializarFormaPagamento() {
                         const checkedRadio = $('input[name="radioFormaPagamento"]:checked');
                         if (checkedRadio.length > 0) {
@@ -583,10 +581,10 @@
                     descontoInput.addEventListener('input', atualizarTotal);
                     valorPagoInput.on('input', calcularTroco);
 
-                    // Chamada da função de inicialização
+                    // Inicializações
                     inicializarFormaPagamento();
-                    atualizarTotais(); // Garante que os totais iniciais sejam calculados
+                    atualizarTotais();
                 });
             });
         </script>
-    }
+}

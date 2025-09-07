@@ -292,12 +292,87 @@ namespace SistemaAcai_II.Controllers
             return RedirectToAction(nameof(Vendas));
         }
 
+
+        // alterado pelo suegerido pela IA 06/09/2025
+        //[HttpPost]
+        //public IActionResult AdicionarItemNovo(int id, string? pesoRcebido, int? quantidade, int? comandaId, Guid IdGuid)
+        //{
+        //    // Converte o peso recebido para decimal
+        //    decimal peso = 0;
+        //    if (pesoRcebido != null)
+        //    {
+        //        try
+        //        {
+        //            peso = Convert.ToDecimal(pesoRcebido.Replace(".", ","), CultureInfo.CurrentCulture);
+        //        }
+        //        catch
+        //        {
+        //            // Em caso de erro, retorne um status de erro e uma mensagem.
+        //            // O front-end vai capturar isso.
+        //            return BadRequest("Peso inválido. Use números no formato 0,200.");
+        //        }
+        //    }
+
+        //    // Valida se o peso/quantidade é maior que zero
+        //    if (peso <= 0 && (quantidade.HasValue && quantidade.Value <= 0))
+        //    {
+        //        // Em caso de erro, retorne um status de erro e uma mensagem.
+        //        return BadRequest("O peso ou a quantidade deve ser maior que zero.");
+        //    }
+
+        //    // Obtém o produto do repositório
+        //    var produto = _produtoRepository.ObterProduto(id);
+        //    if (produto == null)
+        //    {
+        //        // Em caso de erro, retorne um status de erro e uma mensagem.
+        //        return NotFound("Produto não encontrado.");
+        //    }
+
+        //    // Recupera a lista de itens do cookie
+        //    var itensCarrinho = _cookiePedidoCompra.Consultar();
+
+        //    // Cria o novo item a ser adicionado
+        //    var novoItem = new ProdutoSimples
+        //    {
+        //        Id = id,
+        //        // É crucial usar o Guid.NewGuid() aqui para o novo item
+        //        IdItensGuid = Guid.NewGuid(),
+        //        Descricao = produto.Descricao,
+        //        Peso = peso,
+        //        Quantidade = quantidade,
+        //        PrecoUn = produto.PrecoUn
+        //    };
+
+        //    itensCarrinho.Add(novoItem);
+        //    // Salva a lista atualizada no cookie
+        //    _cookiePedidoCompra.Salvar(itensCarrinho);
+
+
+        //    var itemRetorno = new
+        //    {
+        //        idItensGuid = novoItem.IdItensGuid,
+        //        quantidade = novoItem.Quantidade,
+        //        peso = novoItem.Peso,
+        //        refProduto = new
+        //        {
+        //            id = novoItem.Id,
+        //            descricao = novoItem.Descricao,
+        //            // Formata o preço para o padrão brasileiro para que o JavaScript o interprete corretamente.
+        //            precoUn = novoItem.PrecoUn.ToString("N2", new CultureInfo("pt-BR"))
+        //            // precoUn = novoItem.PrecoUn.ToString("C", new CultureInfo("pt-BR"))
+        //        }
+        //    };
+
+        //    // Retorna um objeto JSON com o status 200 OK.
+        //    return Ok(itemRetorno);
+        //}
+
         [HttpPost]
-        public IActionResult AdicionarItemNovo(int id, string? pesoRcebido, int? quantidade, int? comandaId, Guid IdGuid)
+        public IActionResult AdicionarItemNovo(int id, string? pesoRcebido, int? quantidade, int? comandaId /*, Guid IdGuid - não usado */)
         {
-            // Converte o peso recebido para decimal
+            // Converte peso
             decimal peso = 0;
-            if (pesoRcebido != null)
+            if (!string.IsNullOrWhiteSpace(pesoRcebido))
             {
                 try
                 {
@@ -305,47 +380,34 @@ namespace SistemaAcai_II.Controllers
                 }
                 catch
                 {
-                    // Em caso de erro, retorne um status de erro e uma mensagem.
-                    // O front-end vai capturar isso.
                     return BadRequest("Peso inválido. Use números no formato 0,200.");
                 }
             }
 
-            // Valida se o peso/quantidade é maior que zero
-            if (peso <= 0 && (quantidade.HasValue && quantidade.Value <= 0))
-            {
-                // Em caso de erro, retorne um status de erro e uma mensagem.
-                return BadRequest("O peso ou a quantidade deve ser maior que zero.");
-            }
+            // Validação correta: se peso <= 0 E (quantidade não informada OU <= 0) => erro
+            if (peso <= 0m && (!quantidade.HasValue || quantidade.Value <= 0))
+                return BadRequest("Informe um peso (>0) para itens por Kg ou uma quantidade (>0) para itens por Unidade.");
 
-            // Obtém o produto do repositório
             var produto = _produtoRepository.ObterProduto(id);
             if (produto == null)
-            {
-                // Em caso de erro, retorne um status de erro e uma mensagem.
                 return NotFound("Produto não encontrado.");
-            }
 
-            // Recupera a lista de itens do cookie
+            // Adiciona ao cookie (sem persistir no banco aqui)
             var itensCarrinho = _cookiePedidoCompra.Consultar();
 
-            // Cria o novo item a ser adicionado
             var novoItem = new ProdutoSimples
             {
                 Id = id,
-                // É crucial usar o Guid.NewGuid() aqui para o novo item
                 IdItensGuid = Guid.NewGuid(),
                 Descricao = produto.Descricao,
                 Peso = peso,
                 Quantidade = quantidade,
                 PrecoUn = produto.PrecoUn
             };
-
             itensCarrinho.Add(novoItem);
-            // Salva a lista atualizada no cookie
             _cookiePedidoCompra.Salvar(itensCarrinho);
 
-
+            // Retorno no formato que a view espera
             var itemRetorno = new
             {
                 idItensGuid = novoItem.IdItensGuid,
@@ -355,30 +417,50 @@ namespace SistemaAcai_II.Controllers
                 {
                     id = novoItem.Id,
                     descricao = novoItem.Descricao,
-                    // Formata o preço para o padrão brasileiro para que o JavaScript o interprete corretamente.
                     precoUn = novoItem.PrecoUn.ToString("N2", new CultureInfo("pt-BR"))
-                    // precoUn = novoItem.PrecoUn.ToString("C", new CultureInfo("pt-BR"))
                 }
             };
 
-            // Retorna um objeto JSON com o status 200 OK.
             return Ok(itemRetorno);
         }
 
 
+        [HttpDelete]
+        public IActionResult RemoverItemAjax(Guid id /*, int? comandaId */)
+        {
+            // Hoje você remove do COOKIE pelo Guid
+            _cookiePedidoCompra.Remover(new ProdutoSimples { IdItensGuid = id });
+            return Ok();
+        }
 
+
+        // codigo abaixo alterado pelo da IA 06/09/2025
+        //[HttpGet]
+        //public IActionResult ObterProdutoPorId(int id)
+        //{
+        //    var produto = _produtoRepository.ObterProduto(id);
+        //    if (produto == null)
+        //    {
+        //        return NotFound("Produto não encontrado.");
+        //    }
+
+        //    // Retorna apenas os dados necessários em formato JSON
+        //    return Json(new { id = produto.Id, tipoMedida = produto.TipoMedida });
+        //}
 
         [HttpGet]
         public IActionResult ObterProdutoPorId(int id)
         {
             var produto = _produtoRepository.ObterProduto(id);
             if (produto == null)
-            {
                 return NotFound("Produto não encontrado.");
-            }
 
-            // Retorna apenas os dados necessários em formato JSON
-            return Json(new { id = produto.Id, tipoMedida = produto.TipoMedida });
+            return Json(new
+            {
+                id = produto.Id,
+                tipoMedida = produto.TipoMedida,                 // "Unidade" / "Kg" (string do banco)
+                tipoMedidaEnum = produto.TipoMedidaEnum.ToString() // "Unidade" / "Kg" (enum)
+            });
         }
 
 
@@ -602,29 +684,95 @@ namespace SistemaAcai_II.Controllers
         //    return View(viewModel);
         //}
 
+        // codigo abaixo alterado pelo gerado pela IA 06/09/2025
+
+        //public IActionResult EditarComanda(int id, string termo)
+        //{
+        //    var listPagamentos = _formasPagamentoRepository.ObterTodasFormasPagamentos();
+        //    ViewBag.FormaPagamento = new SelectList(listPagamentos, "Id", "Nome");
+
+        //    int quantidadeDigitada = 1;
+        //    string termoBusca = termo;
+
+        //    int? codigo, qtd;
+        //    (codigo, qtd) = TryParseCodigoQuantidade(termo ?? string.Empty);
+
+        //    // Se veio quantidade informada no termo, guarde
+        //    if (qtd.HasValue && qtd.Value > 0) quantidadeDigitada = qtd.Value;
+
+        //    // Se veio só código, mantenha o "termoBusca" como código para buscar
+        //    if (codigo.HasValue) termoBusca = codigo.Value.ToString();
+
+        //    // Busca (por nome ou código, como já faz)
+        //    var produtos = string.IsNullOrWhiteSpace(termoBusca)
+        //        ? new List<ProdutoSimples>()
+        //        : _produtoRepository.BuscarPorNome(termoBusca);
+
+        //    // Aplica a quantidade só para produtos por Unidade
+        //    foreach (var produto in produtos)
+        //    {
+        //        if (produto.TipoMedidaEnum == SistemaAcai_II.Models.Constants.TipoMedida.Unidade)
+        //            produto.Quantidade = quantidadeDigitada;
+        //        else
+        //            produto.Quantidade = 0; // Kg usa balança
+        //    }
+
+        //    var itensCarrinho = _cookiePedidoCompra.Consultar();
+        //    ViewBag.QuantidadeDigitada = quantidadeDigitada;
+
+
+
+
+        //    var comanda = _comandaRepository.ObterComandaPorId(id);
+
+        //    if (comanda == null)
+        //    {
+        //        return NotFound();
+        //    }
+
+        //    ViewBag.FormaPagamento = new SelectList(
+        //        _formasPagamentoRepository.ObterTodasFormasPagamentos(),
+        //        "Id",
+        //        "Nome"
+        //    );
+
+        //    var itensCarrinhoComanda = _itensComandaRepository.ObterItensPorComanda(id);
+
+        //    var viewModel = new VendasViewModel
+        //    {
+        //        Comanda = comanda,
+        //        Produtos = itensCarrinho,
+        //        ItensComanda = itensCarrinhoComanda
+        //    };
+
+        //    return View(viewModel);
+        //}
+
+
         public IActionResult EditarComanda(int id, string termo)
         {
-            var listPagamentos = _formasPagamentoRepository.ObterTodasFormasPagamentos();
-            ViewBag.FormaPagamento = new SelectList(listPagamentos, "Id", "Nome");
+            // Formas de pagamento
+            ViewBag.FormaPagamento = new SelectList(
+                _formasPagamentoRepository.ObterTodasFormasPagamentos(),
+                "Id",
+                "Nome"
+            );
 
+            // Busca com a MESMA regra do Vendas (codigo*qtd etc.)
             int quantidadeDigitada = 1;
             string termoBusca = termo;
 
             int? codigo, qtd;
             (codigo, qtd) = TryParseCodigoQuantidade(termo ?? string.Empty);
 
-            // Se veio quantidade informada no termo, guarde
             if (qtd.HasValue && qtd.Value > 0) quantidadeDigitada = qtd.Value;
-
-            // Se veio só código, mantenha o "termoBusca" como código para buscar
             if (codigo.HasValue) termoBusca = codigo.Value.ToString();
 
-            // Busca (por nome ou código, como já faz)
             var produtos = string.IsNullOrWhiteSpace(termoBusca)
                 ? new List<ProdutoSimples>()
                 : _produtoRepository.BuscarPorNome(termoBusca);
 
-            // Aplica a quantidade só para produtos por Unidade
+            // Pré-preenche quantidade para itens por Unidade (igual Vendas)
             foreach (var produto in produtos)
             {
                 if (produto.TipoMedidaEnum == SistemaAcai_II.Models.Constants.TipoMedida.Unidade)
@@ -633,36 +781,25 @@ namespace SistemaAcai_II.Controllers
                     produto.Quantidade = 0; // Kg usa balança
             }
 
-            var itensCarrinho = _cookiePedidoCompra.Consultar();
-            ViewBag.QuantidadeDigitada = quantidadeDigitada;
-
-
-
-
+            // Carrega comanda e itens já existentes no banco
             var comanda = _comandaRepository.ObterComandaPorId(id);
+            if (comanda == null) return NotFound();
 
-            if (comanda == null)
-            {
-                return NotFound();
-            }
-
-            ViewBag.FormaPagamento = new SelectList(
-                _formasPagamentoRepository.ObterTodasFormasPagamentos(),
-                "Id",
-                "Nome"
-            );
-
-            var itensCarrinhoComanda = _itensComandaRepository.ObterItensPorComanda(id);
+            var itensComandaBanco = _itensComandaRepository.ObterItensPorComanda(id);
 
             var viewModel = new VendasViewModel
             {
                 Comanda = comanda,
-                Produtos = itensCarrinho,
-                ItensComanda = itensCarrinhoComanda
+                Produtos = produtos,                // <<<<<<<<<< AQUI: produtos da busca
+                ItensComanda = itensComandaBanco    // itens já existentes
             };
+
+            ViewBag.QuantidadeDigitada = quantidadeDigitada;
+            ViewBag.Termo = termo;
 
             return View(viewModel);
         }
+
         //public IActionResult EditarComanda(int id)
         //{
         //    var comanda = _comandaRepository.ObterComandaPorId(id); // método que retorna a comanda com itens
