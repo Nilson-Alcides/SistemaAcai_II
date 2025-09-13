@@ -24,4 +24,5 @@ Sistema desenvolvido para gestão de vendas de açaí, permitindo o controle de 
 - Jaelson S. de Oliveira
 - Nilson J. Alcides
 - Infinite System - Empresa de desenvolvimento de sistemas
+  
 📅 Ano: 2025
