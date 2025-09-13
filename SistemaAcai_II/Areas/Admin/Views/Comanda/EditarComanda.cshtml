@@ -119,9 +119,10 @@
 
         <div class="col-md-3">
             <form asp-action="FecharComanda" asp-controller="Comanda" method="post" id="formFecharComanda">
-                <input type="hidden" name="RefFormasPagamento.Id" id="formaPagamentoId" />
+                <input type="text" name="Comanda.RefFormasPagamento.Id" id="formaPagamentoId" />
                 <input type="hidden" asp-for="Comanda.Desconto" id="inputDesconto" />
                 <input type="hidden" asp-for="Comanda.Id" />
+                <input type="hidden" asp-for="Comanda.ValorTotal" id="totalComandaDisplay" />
                 <input type="hidden" id="itensJson" name="itensJson" />
 
                 <div class="form-group mb-2">
@@ -160,7 +161,7 @@
                             </dl>
                         </div>
 
-                        <dl style="display:none" class="dlist-align">
+                        <dl class="dlist-align">
                             <dt>Desconto:</dt>
                             <dd>
                                 <input asp-for="Comanda.Desconto" id="desconto"
@@ -170,7 +171,9 @@
                         </dl>
                     </div>
                 </div>
-
+                @* <div class="alert alert-info mt-3">
+                    <h4>Total da Comanda: <span id="totalComandaDisplay">@totalComandaItens.ToString("C")</span></h4>
+                </div> *@
             </form>
 
         </div>
