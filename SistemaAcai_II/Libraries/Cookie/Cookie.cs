@@ -35,7 +35,8 @@ namespace SistemaAcai_II.Libraries.Cookie
         public void Cadastrar(string Key, string Valor)
         {
             CookieOptions Options = new CookieOptions();
-            Options.Expires = DateTime.Now.AddDays(7);
+            //Options.Expires = DateTime.Now.AddDays(7);
+            Options.Expires = DateTime.Now.AddMinutes(20);
             Options.IsEssential = true;
 
             _context.HttpContext.Response.Cookies.Append(Key, Valor, Options);
