@@ -429,13 +429,14 @@ namespace SistemaAcai_II.Repository
                         // 1. Atualizar Comanda
                         MySqlCommand cmdComanda = new MySqlCommand(@"
                         UPDATE Comanda SET Desconto = @Desconto, ValorTotal = @ValorTotal, 
-                        Situacao = @Situacao, IdForma = @IdForma 
+                        Situacao = @Situacao, IdForma = @IdForma, NomeCliente = @NomeCliente 
                         WHERE IdComanda = @IdComanda", conexao, transacao);
 
                         cmdComanda.Parameters.Add("@Desconto", MySqlDbType.Decimal).Value = comanda.Desconto;
                         cmdComanda.Parameters.Add("@ValorTotal", MySqlDbType.Decimal).Value = comanda.ValorTotal;
                         cmdComanda.Parameters.Add("@IdForma", MySqlDbType.Int32).Value = comanda.RefFormasPagamento?.Id ?? 0;
                         cmdComanda.Parameters.Add("@Situacao", MySqlDbType.VarChar).Value = Situacao;
+                        cmdComanda.Parameters.Add("@NomeCliente", MySqlDbType.VarChar).Value = comanda.NomeCliente;
                         cmdComanda.Parameters.Add("@IdComanda", MySqlDbType.Int32).Value = comanda.Id;
 
                         cmdComanda.ExecuteNonQuery();
@@ -449,8 +450,6 @@ namespace SistemaAcai_II.Repository
                         // 3. Inserir itens atualizados
                         foreach (var item in itens)
                         {
-                            
- 
                              MySqlCommand cmdInsertItem = new MySqlCommand(@"
                              INSERT INTO ItemComanda (IdComanda, IdProd, Peso, Quantidade, Subtotal) 
                              VALUES (@IdComanda, @IdProd, @Peso, @Quantidade, @Subtotal)", conexao, transacao);
