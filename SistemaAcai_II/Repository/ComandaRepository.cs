@@ -1,16 +1,19 @@
-﻿using SistemaAcai_II.Models;
-using SistemaAcai_II.Repository.Contract;
+﻿using DocumentFormat.OpenXml.Office.Word;
+using DocumentFormat.OpenXml.Office2010.Excel;
+using DocumentFormat.OpenXml.Office2016.Drawing.ChartDrawing;
 using MySql.Data.MySqlClient;
+using Mysqlx.Crud;
+using SistemaAcai_II.Models;
+using SistemaAcai_II.Models.Contants;
+using SistemaAcai_II.Repository.Contract;
+using SkiaSharp;
 using System;
 using System.Collections.Generic;
 using System.Data;
-using SistemaAcai_II.Models.Contants;
 using System.Globalization;
-using static Org.BouncyCastle.Math.EC.ECCurve;
-using X.PagedList.Extensions;
 using X.PagedList;
-using DocumentFormat.OpenXml.Office2010.Excel;
-using SkiaSharp;
+using X.PagedList.Extensions;
+using static Org.BouncyCastle.Math.EC.ECCurve;
 
 namespace SistemaAcai_II.Repository
 {
@@ -411,6 +414,67 @@ namespace SistemaAcai_II.Repository
             }
 
             return comandas;
-        }        
+        }
+        public void AtualizarComandaEItens(Comanda comanda, List<ItemComanda> itens)
+        {
+            string Situacao = SituacaoConstant.Fechada;
+
+            using (var conexao = new MySqlConnection(_conexaoMySQL))
+            {
+                conexao.Open();
+                using (var transacao = conexao.BeginTransaction())
+                {
+                    try
+                    {
+                        // 1. Atualizar Comanda
+                        MySqlCommand cmdComanda = new MySqlCommand(@"
+                        UPDATE Comanda SET Desconto = @Desconto, ValorTotal = @ValorTotal, 
+                        Situacao = @Situacao, IdForma = @IdForma 
+                        WHERE IdComanda = @IdComanda", conexao, transacao);
+
+                        cmdComanda.Parameters.Add("@Desconto", MySqlDbType.Decimal).Value = comanda.Desconto;
+                        cmdComanda.Parameters.Add("@ValorTotal", MySqlDbType.Decimal).Value = comanda.ValorTotal;
+                        cmdComanda.Parameters.Add("@IdForma", MySqlDbType.Int32).Value = comanda.RefFormasPagamento?.Id ?? 0;
+                        cmdComanda.Parameters.Add("@Situacao", MySqlDbType.VarChar).Value = Situacao;
+                        cmdComanda.Parameters.Add("@IdComanda", MySqlDbType.Int32).Value = comanda.Id;
+
+                        cmdComanda.ExecuteNonQuery();
+
+                        // 2. Excluir itens antigos da comanda
+                        MySqlCommand cmdDeleteItens = new MySqlCommand(
+                            "DELETE FROM ItemComanda WHERE IdComanda = @IdComanda", conexao, transacao);
+                        cmdDeleteItens.Parameters.Add("@IdComanda", MySqlDbType.Int32).Value = comanda.Id;
+                        cmdDeleteItens.ExecuteNonQuery();
+
+                        // 3. Inserir itens atualizados
+                        foreach (var item in itens)
+                        {
+                            
+ 
+                             MySqlCommand cmdInsertItem = new MySqlCommand(@"
+                             INSERT INTO ItemComanda (IdComanda, IdProd, Peso, Quantidade, Subtotal) 
+                             VALUES (@IdComanda, @IdProd, @Peso, @Quantidade, @Subtotal)", conexao, transacao);
+
+                            cmdInsertItem.Parameters.Add("@IdComanda", MySqlDbType.Int32).Value = comanda.Id;
+                            cmdInsertItem.Parameters.Add("@IdProd", MySqlDbType.Int32).Value = item.Id;                           
+                            cmdInsertItem.Parameters.Add("@Peso", MySqlDbType.Decimal).Value = item.Peso ?? 0;
+                            cmdInsertItem.Parameters.Add("@Quantidade", MySqlDbType.Decimal).Value = item.Quantidade ?? 0;
+                            cmdInsertItem.Parameters.Add("@Subtotal", MySqlDbType.Decimal).Value = Convert.ToDecimal(item.Subtotal, CultureInfo.InvariantCulture);
+
+
+                            cmdInsertItem.ExecuteNonQuery();
+                        }
+
+                        // Confirmar tudo
+                        transacao.Commit();
+                    }
+                    catch
+                    {
+                        transacao.Rollback();
+                        throw;
+                    }
+                }
+            }
+        }
     }
 }

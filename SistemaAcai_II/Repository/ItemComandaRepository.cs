@@ -94,7 +94,7 @@ namespace SistemaAcai_II.Repository
         }
         public void Cadastrar(ItemComanda itemComanda)
         {
-            using (var conexao = new MySqlConnection(_conexaoMySQL))
+            using (var conexao = new MySqlConnection(_conexaoMySQL)) 
             {
                 conexao.Open();
                 MySqlCommand cmd = new MySqlCommand("insert into ItemComanda(IdComanda, IdProd, Peso, Quantidade, Subtotal) " +

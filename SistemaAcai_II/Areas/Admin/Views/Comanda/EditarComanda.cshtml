@@ -126,8 +126,8 @@
         </div>
 
         <div class="col-md-3">
-            <form asp-action="FecharComanda" asp-controller="Comanda" method="post" id="formFecharComanda">
-                <input type="hidden" name="Comanda.RefFormasPagamento.Id" id="formaPagamentoId" />
+            <form asp-action="FecharComandaEditada" asp-controller="Comanda" method="post" id="formFecharComanda">
+                <input type="text" name="Comanda.RefFormasPagamento.Id" id="formaPagamentoId" />
                 <input type="hidden" asp-for="Comanda.Desconto" id="inputDesconto" />
                 <input type="hidden" asp-for="Comanda.Id" />
                 <input type="hidden" asp-for="Comanda.ValorTotal" id="totalComandaDisplay" />
@@ -222,7 +222,7 @@
                                 const pesoInput = tr.querySelector('.pesoItem');
                                 itens.push({
                                     ProdutoId: tr.dataset.id,
-                                    IdItensGuid: tr.dataset.guid,
+                                    IdItensGuid: tr.dataset.guid,                                   
                                     Quantidade: quantidadeInput ? parseInt(quantidadeInput.value) : 0,
                                     Peso: pesoInput ? parseFloat(pesoInput.value.replace(',', '.')) : 0
                                 });

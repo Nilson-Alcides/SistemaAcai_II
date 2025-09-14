@@ -1,10 +1,12 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Newtonsoft.Json;
+using System.ComponentModel.DataAnnotations;
 
 namespace SistemaAcai_II.Models
 {
     public class ItemComanda
     {
         [Display(Name = "Código do Item")]
+        [JsonProperty("ProdutoId")]
         public int Id { get; set; }
 
         [Display(Name = "Comanda")]
