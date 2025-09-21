@@ -197,6 +197,21 @@
 
 @section Scripts {
         <script>
+
+                        // --- Leitura de peso da balança via API ---
+            async function getPesoAtual() {
+              try {
+                const r = await fetch('/Admin/api/balanca', { cache: 'no-store' });
+                if (!r.ok) throw new Error('HTTP ' + r.status);
+                const j = await r.json();
+                return parseFloat(String(j.peso).replace(',', '.')) || 0;
+              } catch (err) {
+                console.warn('Falha ao ler balança:', err);
+                return 0;
+              }
+            }
+
+
             document.addEventListener('DOMContentLoaded', function () {
                 // --------- Referências principais
                 const btnSalvarComanda = document.getElementById('btnSalvarComanda');
@@ -299,7 +314,8 @@
 
                                     if (tipo === 'kg') {
                                         const w = parseNum(p2);
-                                        peso = (!isNaN(w) && w > 0) ? w : (window.balancaDisponivel ? (window.pesoDaBalanca || 0) : 0);
+                                        //peso = (!isNaN(w) && w > 0) ? w : (window.balancaDisponivel ? (window.pesoDaBalanca || 0) : 0);
+                                        peso = (!isNaN(w) && w > 0) ? w : await getPesoAtual();
                                         quantidade = 0;
                                     } else {
                                         const q = parseNum(p2);
@@ -362,22 +378,38 @@
                         let peso = 0;
                         const row = e.target.closest('tr');
 
-                        if (tipoMedida === 'kg') {
-                            const inputPeso = row.querySelector('.pesoItemProduto');
-                            peso = parseFloat(inputPeso.value.replace(',', '.')) || 0;
-                            if (peso <= 0) {
-                                alert('Informe um peso válido.');
-                                return;
-                            }
-                        } else {
-                            const inputQuantidade = row.querySelector('.quantidadeItemProduto');
-                            quantidade = parseInt(inputQuantidade.value) || 1;
-                            if (quantidade <= 0) {
-                                alert('Informe uma quantidade válida.');
-                                return;
-                            }
-                        }
-                        await adicionarItem(produtoId, peso, quantidade);
+                                    if (tipoMedida === 'kg') {
+                const inputPeso = row.querySelector('.pesoItemProduto');
+                let valor = parseFloat(String(inputPeso?.value || '').replace(',', '.')) || 0;
+
+                // NOVO: se não informou peso, busca na balança
+                if (valor <= 0) {
+                    const lido = await getPesoAtual(); // precisa da função getPesoAtual() no seu <script>
+                    if (lido > 0) {
+                        valor = lido;
+                        // opcional: já preenche o campo da linha com o valor lido
+                        if (inputPeso) inputPeso.value = lido.toFixed(3);
+                    } else {
+                        alert('Produto por Kg: nenhum peso disponível na balança no momento.');
+                        return;
+                    }
+                }
+
+                peso = valor;            // define o peso final para enviar
+                quantidade = 1;          // por segurança (para produtos KG)
+            } else {
+                const inputQuantidade = row.querySelector('.quantidadeItemProduto');
+                quantidade = parseInt(inputQuantidade?.value) || 1;
+                if (quantidade <= 0) {
+                    alert('Informe uma quantidade válida.');
+                    return;
+                }
+                peso = 0;                // por segurança (para produtos por unidade)
+            }
+
+            // mantém esta linha como está:
+            await adicionarItem(produtoId, peso, quantidade);
+
                     });
                 });
 
