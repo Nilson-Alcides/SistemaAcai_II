@@ -9,7 +9,9 @@
 <div class="container mt-4">
     <h2>Editar Comanda #@Model.Comanda.Id</h2>
 
-    <form asp-action="EditarComanda" method="get" id="formBusca" class="form-group row">
+    <form asp-area="Admin"
+          asp-controller="Comanda" asp-action="EditarComanda" method="get" id="formBusca" class="form-group row">
+        <input type="hidden" name="id" value="@Model.Comanda.Id" />
         <label for="termo" class="col-sm-2 col-form-label">Pesquisar Produto</label>
         <div class="col-sm-6">
             <input type="text" name="termo" id="termo" class="form-control" placeholder="Digite o nome, código ou peso*código..." autofocus value="@ViewBag.Termo" />
@@ -221,6 +223,15 @@
                 const totalComandaDisplay = document.getElementById('totalComandaDisplay');
                 const descontoInput = document.getElementById('desconto');
 
+
+                            // FIXA o comandaId na URL para que F5 não saia da tela
+            const url = new URL(window.location.href);
+            if (!url.searchParams.has('comandaId')) {
+              url.searchParams.set('comandaId', '@Model.Comanda.Id'); // Razor injeta o ID aqui
+              history.replaceState(null, '', url.toString());
+            }
+
+
                 // --------- Salvar Comanda (com envio de JSON)
                 if (btnSalvarComanda) {
                     btnSalvarComanda.addEventListener('click', function (event) {
@@ -237,7 +248,7 @@
                                 const pesoInput = tr.querySelector('.pesoItem');
                                 itens.push({
                                     ProdutoId: tr.dataset.id,
-                                    IdItensGuid: tr.dataset.guid,                                   
+                                    IdItensGuid: tr.dataset.guid,
                                     Quantidade: quantidadeInput ? parseInt(quantidadeInput.value) : 0,
                                     Peso: pesoInput ? parseFloat(pesoInput.value.replace(',', '.')) : 0
                                 });
@@ -415,11 +426,22 @@
 
                 // --------- Adicionar item via fetch (POST) e render
                 async function adicionarItem(id, peso, quantidade) {
+                    // const url = `@Url.Action("AdicionarItemNovo", "Comanda", new { comandaId = Model.Comanda.Id })`;
+                    // const formData = new URLSearchParams();
+                    // formData.append('id', id);
+                    // formData.append('pesoRecebido', peso > 0 ? peso.toFixed(3) : '0');
+                    // formData.append('quantidade', quantidade);
+
                     const url = `@Url.Action("AdicionarItemNovo", "Comanda", new { comandaId = Model.Comanda.Id })`;
                     const formData = new URLSearchParams();
                     formData.append('id', id);
-                    formData.append('pesoRcebido', peso > 0 ? peso.toFixed(3) : '0');
-                    formData.append('quantidade', quantidade);
+
+                    // 👉 nome correto + cultura pt-BR
+                    const pesoStr = (peso > 0 ? peso.toFixed(3) : 0).toString().replace('.', ',');
+                    formData.append('pesoRecebido', pesoStr);
+
+                    formData.append('quantidade', String(quantidade));
+
 
                     try {
                         const response = await fetch(url, { method: 'POST', body: formData });
@@ -542,20 +564,28 @@
                 // --------- Eventos da tabela e UI
                 if (tabelaItens) {
                     tabelaItens.addEventListener('click', function (e) {
-                        if (e.target.classList.contains('btn-remover-item')) {
-                            const guid = e.target.dataset.guid;
-                            if (guid) {
-                                const url = `@Url.Action("RemoverItemAjax", "Comanda")?id=${guid}`;
-                                fetch(url, { method: 'DELETE' })
-                                    .then(response => {
-                                        if (response.ok) {
-                                            e.target.closest('tr').remove();
-                                            atualizarTotais();
-                                        } else { alert('Erro ao remover o item.'); }
-                                    })
-                                    .catch(error => { console.error(error); alert('Erro na comunicação com o servidor.'); });
-                            }
-                        }
+                        // if (e.target.classList.contains('btn-remover-item')) {
+                        //     const guid = e.target.dataset.guid;
+                        //     if (guid) {
+                        //         const url = `@Url.Action("RemoverItemAjax", "Comanda")?id=${guid}`;
+                        //         fetch(url, { method: 'DELETE' })
+                        //             .then(response => {
+                        //                 if (response.ok) {
+                        //                     e.target.closest('tr').remove();
+                        //                     atualizarTotais();
+                        //                 } else { alert('Erro ao remover o item.'); }
+                        //             })
+                        //             .catch(error => { console.error(error); alert('Erro na comunicação com o servidor.'); });
+                        //     }
+                        // }
+                                    if (e.target.classList.contains('btn-remover-item')) {
+              const guid = e.target.dataset.guid;
+              const url = `@Url.Action("RemoverItemAjax", "Comanda")?id=${guid}&comandaId=@Model.Comanda.Id`;
+              fetch(url, { method: 'DELETE' })
+                .then(r => { if (r.ok) { e.target.closest('tr').remove(); atualizarTotais(); } else alert('Erro ao remover o item.'); })
+                .catch(() => alert('Erro na comunicação com o servidor.'));
+            }
+
                     });
 
                     tabelaItens.addEventListener('input', function (e) {
