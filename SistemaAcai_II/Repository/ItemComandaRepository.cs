@@ -115,10 +115,30 @@ namespace SistemaAcai_II.Repository
         {
             throw new NotImplementedException();
         }
+        //public void Excluir(int Id)
+        //{
+        //    throw new NotImplementedException();
+        //}
+
         public void Excluir(int Id)
         {
-            throw new NotImplementedException();
+            using (var conexao = new MySqlConnection(_conexaoMySQL))
+            {
+                conexao.Open();
+
+                // IdItem = PK da tabela (ajuste se o nome for diferente)
+                var sql = @"DELETE FROM ItemComanda 
+                    WHERE IdItem = @IdItem
+                    LIMIT 1"; // segurança opcional no MySQL
+
+                using (var cmd = new MySqlCommand(sql, conexao))
+                {
+                    cmd.Parameters.AddWithValue("@IdItem", Id);
+                    cmd.ExecuteNonQuery();
+                }
+            }
         }
+
         public IEnumerable<ItemComanda> ObterItensPorComanda(int idComanda)
         {
             using (var conexao = new MySqlConnection(_conexaoMySQL))

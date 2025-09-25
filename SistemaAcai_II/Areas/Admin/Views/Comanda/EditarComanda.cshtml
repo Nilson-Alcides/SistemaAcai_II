@@ -213,6 +213,15 @@
               }
             }
 
+            function refreshEditarComanda() {
+  // Gera a URL limpinha da edição com o ID atual (sem manter o termo de busca)
+  const base = '@Url.Action("EditarComanda","Comanda")';
+  const url = new URL(base, window.location.origin);
+  url.searchParams.set('comandaId', '@Model.Comanda.Id'); // se sua action usa "id", troque aqui para "id"
+  window.location.assign(url.toString()); // navega (melhor que reload para garantir os params)
+}
+
+
 
             document.addEventListener('DOMContentLoaded', function () {
                 // --------- Referências principais
