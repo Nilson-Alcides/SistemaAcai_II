@@ -9,6 +9,7 @@ namespace SistemaAcai_II.Models
         [JsonProperty("ProdutoId")]
         public int Id { get; set; }
 
+        public Guid IdItensGuid { get; set; }
         [Display(Name = "Comanda")]
         public Comanda RefComanda { get; set; }
 

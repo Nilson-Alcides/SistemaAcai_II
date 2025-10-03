@@ -15,6 +15,7 @@ namespace SistemaAcai_II.Repository.Contract
         ItemComanda ObterItensPorId(int Id);
         
 
-        void Excluir(int Id);
+        void Excluir(int id);
+        void Excluir(ItemComanda itemComanda);
     }
 }

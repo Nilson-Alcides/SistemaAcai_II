@@ -329,24 +329,25 @@ namespace SistemaAcai_II.Controllers
             var guid = Guid.NewGuid();
             var novoItem = new ItemComanda
             {
+                IdItensGuid = guid,
                 RefComanda = new Comanda { Id = comandaId.Value },
-                RefProduto = new ProdutoSimples { Id = produto.Id, IdItensGuid = guid },
+                RefProduto = new ProdutoSimples { Id = produto.Id },
                 Peso = (peso > 0m) ? peso : (decimal?)null,
                 Quantidade = (peso > 0m) ? 0 : qtd,
                 Subtotal = subtotal
             };
-
+           // _cookiePedidoCompra.Salvar(novoItem);
             _itensComandaRepository.Cadastrar(novoItem);
 
             // retorna o JSON que a view espera
             return Ok(new
             {
-                idItensGuid = guid,
+                idItensGuid = novoItem.IdItensGuid.ToString(),
                 quantidade = novoItem.Quantidade,
                 peso = novoItem.Peso ?? 0,
                 refProduto = new
                 {
-                    id = produto.Id,
+                    id = produto.Id,                 
                     descricao = produto.Descricao,
                     precoUn = produto.PrecoUn.ToString("N2", new CultureInfo("pt-BR"))
                 }
@@ -394,7 +395,13 @@ namespace SistemaAcai_II.Controllers
                 tipoMedidaEnum = produto.TipoMedidaEnum.ToString() // "Unidade" / "Kg" (enum)
             });
         }
+       
+        public IActionResult RemoverItemEditado(Guid Id, int idComanda)
+        {
+            _itensComandaRepository.Excluir(new ItemComanda() { IdItensGuid = Id });
 
+            return RedirectToAction(nameof(EditarComanda), new { id = idComanda });
+        }
 
 
         public IActionResult RemoverItem(Guid Id)

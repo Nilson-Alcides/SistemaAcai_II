@@ -79,7 +79,7 @@ namespace SistemaAcai_II.Repository
             using (var cmdSafeOff = new MySqlCommand("SET SQL_SAFE_UPDATES = 0;", conexao))
             {
                 cmdSafeOff.ExecuteNonQuery();
-            }
+            } 
 
             var query = @" UPDATE Caixa SET situacao = 'F' WHERE situacao = 'A' AND DATE(DataAbertura) != CURDATE(); ";
 

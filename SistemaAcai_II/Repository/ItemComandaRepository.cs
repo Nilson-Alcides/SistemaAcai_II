@@ -1,4 +1,6 @@
-﻿using MySql.Data.MySqlClient;
+﻿using DocumentFormat.OpenXml.Bibliography;
+using DocumentFormat.OpenXml.Office2010.Excel;
+using MySql.Data.MySqlClient;
 using SistemaAcai_II.Models;
 using SistemaAcai_II.Repository.Contract;
 using System.Data;
@@ -97,12 +99,14 @@ namespace SistemaAcai_II.Repository
             using (var conexao = new MySqlConnection(_conexaoMySQL)) 
             {
                 conexao.Open();
-                MySqlCommand cmd = new MySqlCommand("insert into ItemComanda(IdComanda, IdProd, Peso, Quantidade, Subtotal) " +
-                                                    " values(@IdComanda, @IdProd, @Peso, @Quantidade,@Subtotal)", conexao);
+                MySqlCommand cmd = new MySqlCommand("insert into ItemComanda(IdComanda, IdProd, IdItensGuid, Peso, Quantidade, Subtotal) " +
+                                                    " values(@IdComanda, @IdProd, @IdItensGuid, @Peso, @Quantidade,@Subtotal)", conexao);
 
                 cmd.Parameters.Add("@IdComanda", MySqlDbType.VarChar).Value = itemComanda.RefComanda.Id;
                 cmd.Parameters.Add("@IdProd", MySqlDbType.VarChar).Value = itemComanda.RefProduto.Id;
+                cmd.Parameters.Add("@IdItensGuid", MySqlDbType.VarChar).Value = itemComanda.IdItensGuid;
                 cmd.Parameters.Add("@Peso", MySqlDbType.Decimal).Value = Convert.ToDecimal(itemComanda.Peso, CultureInfo.InvariantCulture);
+
                 //cmd.Parameters.Add("@Peso", MySqlDbType.Decimal).Value = Convert.ToDecimal(string.Format(CultureInfo.InvariantCulture, "{0:0.000}", itemComanda.Peso),
                 //CultureInfo.InvariantCulture) ;
                 cmd.Parameters.Add("@Quantidade", MySqlDbType.VarChar).Value = itemComanda.Quantidade;
@@ -115,9 +119,31 @@ namespace SistemaAcai_II.Repository
         {
             throw new NotImplementedException();
         }
-        public void Excluir(int Id)
+        public void Excluir(ItemComanda itemComanda)
         {
-            throw new NotImplementedException();
+            
+            using (var conexao = new MySqlConnection(_conexaoMySQL))
+            {
+                conexao.Open();
+                // Desativa o modo seguro
+                using (var cmdSafeOff = new MySqlCommand("SET SQL_SAFE_UPDATES = 0;", conexao))
+                {
+                    cmdSafeOff.ExecuteNonQuery();
+                }
+
+                
+                string query = "delete from itemcomanda where IdItensGuid  = @IdItensGuid";
+                MySqlCommand cmd = new MySqlCommand(query, conexao);
+                cmd.Parameters.AddWithValue("@IdItensGuid", itemComanda.IdItensGuid);
+                cmd.ExecuteNonQuery();
+
+                // (Opcional) Reativa o modo seguro
+                using (var cmdSafeOn = new MySqlCommand("SET SQL_SAFE_UPDATES = 1;", conexao))
+                {
+                    cmdSafeOn.ExecuteNonQuery();
+                }
+                conexao.Clone();
+            }
         }
         public IEnumerable<ItemComanda> ObterItensPorComanda(int idComanda)
         {
@@ -143,7 +169,8 @@ namespace SistemaAcai_II.Repository
                     var itemComanda = new ItemComanda
                     {
                         Id = Convert.ToInt32(dr["IdItem"]),
-
+                        //IdItensGuid = (Guid)dr["IdItensGuid"],                   
+                        IdItensGuid = Guid.TryParse(dr["IdItensGuid"]?.ToString(), out Guid idGuid) ? idGuid : Guid.NewGuid(),
                         Quantidade = dr["Quantidade"] != DBNull.Value ? Convert.ToInt32(dr["Quantidade"]) : 0,
                         Peso = dr["Peso"] != DBNull.Value ? Convert.ToDecimal(dr["Peso"]) : 0m, 
 
@@ -167,6 +194,10 @@ namespace SistemaAcai_II.Repository
                 return listaItens;
             }
         }
-        
+
+        public void Excluir(int id)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

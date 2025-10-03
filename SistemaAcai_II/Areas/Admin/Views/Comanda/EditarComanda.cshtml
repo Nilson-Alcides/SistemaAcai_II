@@ -108,11 +108,16 @@
                                         </div>
                                     }
                                 </td>
+                                <input type="hidden" name="id" value="@item.IdItensGuid" />
                                 <td class="col-md-3 precoUnitario" data-preco="@item.RefProduto.PrecoUn">@item.RefProduto.PrecoUn.ToString("C")</td>
                                 <td class="col-md-3 totalItem">@subtotal.ToString("C")</td>
-                                <td class="text-center">
-                                    <button type="button" class="btn btn-outline-danger btn-sm btn-remover-item" data-guid="@item.RefProduto.IdItensGuid">Remover</button>
+                              @*   <td class="text-center">
+                                    <button type="button" class="btn btn-outline-danger btn-sm btn-remover-item" data-guid="@item.IdItensGuid">Remover</button>
+                                </td> *@
+                                <td class="btn btn-outline-danger btn-sm btn-remover-item">
+                                    <a asp-controller="Comanda" asp-action="RemoverItemEditado" asp-route-idComanda="@Model.Comanda.Id" asp-route-id="@item.IdItensGuid" class="btn btn-outline-danger">Remover</a>
                                 </td>
+
                             </tr>
                         }
                     </tbody>
@@ -222,7 +227,8 @@
                 const tabelaItens = document.querySelector('#tabelaItens tbody');
                 const totalComandaDisplay = document.getElementById('totalComandaDisplay');
                 const descontoInput = document.getElementById('desconto');
-
+                    
+                var idComanda = @Model.Comanda.Id;
 
                             // FIXA o comandaId na URL para que F5 não saia da tela
             const url = new URL(window.location.href);
@@ -473,6 +479,7 @@
                     newRow.innerHTML = `
                         <td>${item.refProduto.id}</td>
                         <td>${item.refProduto.descricao}</td>
+                      
                         <td>
                             <div class="input-group">
                                 ${item.peso > 0
@@ -485,9 +492,8 @@
                         </td>
                         <td class="precoUnitario" data-preco="${precoUnitario.toString().replace('.', ',')}">R$ ${item.refProduto.precoUn}</td>
                         <td class="totalItem">${subtotal.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</td>
-                        <td class="text-center">
-                            <button type="button" class="btn btn-outline-danger btn-sm btn-remover-item" data-guid="${item.idItensGuid}">Remover</button>
-                        </td>
+                        
+                       
                     `;
 
                     tabelaItens.appendChild(newRow);
