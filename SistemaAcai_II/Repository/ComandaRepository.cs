@@ -455,7 +455,7 @@ namespace SistemaAcai_II.Repository
                              VALUES (@IdComanda, @IdProd, @Peso, @Quantidade, @Subtotal)", conexao, transacao);
 
                             cmdInsertItem.Parameters.Add("@IdComanda", MySqlDbType.Int32).Value = comanda.Id;
-                            cmdInsertItem.Parameters.Add("@IdProd", MySqlDbType.Int32).Value = item.Id;                           
+                            cmdInsertItem.Parameters.Add("@IdProd", MySqlDbType.Int32).Value = item.ProdutoId;                           
                             cmdInsertItem.Parameters.Add("@Peso", MySqlDbType.Decimal).Value = item.Peso ?? 0;
                             cmdInsertItem.Parameters.Add("@Quantidade", MySqlDbType.Decimal).Value = item.Quantidade ?? 0;
                             cmdInsertItem.Parameters.Add("@Subtotal", MySqlDbType.Decimal).Value = Convert.ToDecimal(item.Subtotal, CultureInfo.InvariantCulture);

@@ -5,15 +5,16 @@ namespace SistemaAcai_II.Models
 {
     public class ItemComanda
     {
-        [Display(Name = "Código do Item")]
-        [JsonProperty("ProdutoId")]
+        [Display(Name = "Código do Item")]       
         public int Id { get; set; }
+        public int ProdutoId { get; set; }
 
         public Guid IdItensGuid { get; set; }
         [Display(Name = "Comanda")]
         public Comanda RefComanda { get; set; }
 
         [Display(Name = "Produto")]
+        [JsonIgnore]
         public ProdutoSimples RefProduto { get; set; }
 
         [Display(Name = "Peso (Kg)")]
