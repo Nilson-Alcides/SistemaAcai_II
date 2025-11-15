@@ -86,14 +86,14 @@
                                     @if (item.Peso > 0)
                                     {
                                         <div class="input-group">
-                                            <input type="text" class="form-control-sm col-5 campo-peso pesoItem" value="@item.Peso.GetValueOrDefault().ToString("F3").Replace('.', ',')" />
+                                            <input type="text" class="form-control-sm col-5 campo-peso pesoItem" disabled value="@item.Peso.GetValueOrDefault().ToString("F3").Replace('.', ',')" />
                                             <span class="input-group-text">Kg</span>
                                         </div>
                                     }
                                     else
                                     {
                                         <div class="input-group">
-                                            <input type="number" class="form-control-sm col-5 campo-peso quantidadeItem" value="@item.Quantidade" min="1" />
+                                            <input type="number" class="form-control-sm col-5 campo-peso quantidadeItem" disabled value="@item.Quantidade" min="1" />
                                             <span class="input-group-text">Un</span>
                                         </div>
                                     }
@@ -101,7 +101,7 @@
                                 <td class="col-md-3 precoUnitario" data-preco="@item.RefProduto.PrecoUn">@item.RefProduto.PrecoUn.ToString("C")</td>
                                 <td class="col-md-3 totalItem">@subtotal.ToString("C")</td>
                                 <td class="text-center">
-                                    <button type="button" class="btn btn-outline-danger btn-sm btn-remover-item" data-guid="@item.RefProduto.IdItensGuid">Remover</button>
+                                    <button type="button" class="btn btn-outline-danger btn-sm btn-remover-item" data-guid="@item.RefProduto.IdItensGuid" disabled>Remover</button>
                                 </td>
                             </tr>
                         }

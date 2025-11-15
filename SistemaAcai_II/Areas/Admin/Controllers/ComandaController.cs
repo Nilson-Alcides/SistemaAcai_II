@@ -1,5 +1,4 @@
-﻿using DocumentFormat.OpenXml.Office2010.Excel;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Newtonsoft.Json;
 using SistemaAcai_II.Libraries.Filtro;
@@ -23,6 +22,7 @@ namespace SistemaAcai_II.Controllers
     {
         private readonly IComandaRepository _comandaRepository;
         private readonly CookiePedidoCompra _cookiePedidoCompra;
+        private readonly CookieEditarPedidoCompra _cookieEditarPedidoCompra;
         private readonly IProdutoSimplesRepository _produtoRepository;
         private readonly IItensComandaRepository _itensComandaRepository;
         private readonly IFormasPagamentoRepository _formasPagamentoRepository;
@@ -40,10 +40,11 @@ namespace SistemaAcai_II.Controllers
         //    _itensComandaRepository = itensComandaRepository;
         //    _formasPagamentoRepository = formasPagamentoRepository; 
         //}
-        public ComandaController(IComandaRepository comandaRepository, CookiePedidoCompra cookiePedidoCompra, IProdutoSimplesRepository produtoRepository, LoginColaborador loginColaborador, IItensComandaRepository itensComandaRepository, IFormasPagamentoRepository formasPagamentoRepository, IScaleService scale)
+        public ComandaController(IComandaRepository comandaRepository, CookiePedidoCompra cookiePedidoCompra, CookieEditarPedidoCompra cookieEditarPedidoCompra, IProdutoSimplesRepository produtoRepository, LoginColaborador loginColaborador, IItensComandaRepository itensComandaRepository, IFormasPagamentoRepository formasPagamentoRepository, IScaleService scale)
         {
             _comandaRepository = comandaRepository;
             _cookiePedidoCompra = cookiePedidoCompra;
+            _cookieEditarPedidoCompra = cookieEditarPedidoCompra;
             _produtoRepository = produtoRepository;
             _loginColaborador = loginColaborador;
             _itensComandaRepository = itensComandaRepository;
@@ -107,7 +108,7 @@ namespace SistemaAcai_II.Controllers
 
 
         public IActionResult Vendas(string termo)
-        {            
+        {
             var listPagamentos = _formasPagamentoRepository.ObterTodasFormasPagamentos();
             ViewBag.FormaPagamento = new SelectList(listPagamentos, "Id", "Nome");
 
@@ -148,6 +149,65 @@ namespace SistemaAcai_II.Controllers
 
             return View(model);
         }
+
+
+        //public IActionResult Vendas(string termo)
+        //{
+        //    var listPagamentos = _formasPagamentoRepository.ObterTodasFormasPagamentos();
+        //    ViewBag.FormaPagamento = new SelectList(listPagamentos, "Id", "Nome");
+
+        //    int quantidadeDigitada = 1;
+        //    string termoBusca = termo;
+
+        //    // Verifica se o termo está no formato "quantidade*código"
+        //    if (!string.IsNullOrWhiteSpace(termo) && termo.Contains("*"))
+        //    {
+        //        var partes = termo.Split('*');
+        //        if (partes.Length == 2)
+        //        {
+        //            // Agora a primeira parte é a quantidade e a segunda é o código
+        //            if (int.TryParse(partes[0], out int qtd))
+        //            {
+        //                quantidadeDigitada = qtd;
+        //            }
+
+        //            termoBusca = partes[1]; // agora a segunda parte é o código
+        //        }
+        //    }
+
+        //    // Realiza a busca por nome ou código
+        //    var produtos = string.IsNullOrWhiteSpace(termoBusca)
+        //        ? new List<ProdutoSimples>()
+        //        : _produtoRepository.BuscarPorNome(termoBusca);
+
+        //    // Aplica a quantidade apenas se o produto for por unidade
+        //    foreach (var produto in produtos)
+        //    {
+        //        if (produto.TipoMedida?.ToLower() == "unidade")
+        //        {
+        //            produto.Quantidade = quantidadeDigitada;
+        //        }
+        //        else
+        //        {
+        //            // Deixa como está para produtos por quilo
+        //            produto.Quantidade = 0; // ou null, conforme sua lógica de balança
+        //        }
+        //    }
+
+        //    var itensCarrinho = _cookiePedidoCompra.Consultar();
+
+        //    // ViewBag com quantidade pré-preenchida
+        //    ViewBag.QuantidadeDigitada = quantidadeDigitada;
+
+        //    var model = new VendasViewModel
+        //    {
+        //        Produtos = produtos,
+        //        ItensCarrinho = itensCarrinho
+        //    };
+
+        //    return View(model);
+        //}
+
         [HttpPost]
         public IActionResult AdicionarItem(int id, string? pesoRcebido, int? quantidade)
         {
@@ -235,149 +295,79 @@ namespace SistemaAcai_II.Controllers
             return RedirectToAction(nameof(Vendas));
         }
 
-        //[HttpPost]
-        //public IActionResult AdicionarItemNovo(int id, string? pesoRecebido, int? quantidade, int? comandaId /*, Guid IdGuid - não usado */)
-        //{
-        //    // Converte peso
-        //    decimal peso = 0;
-        //    if (!string.IsNullOrWhiteSpace(pesoRecebido))
-        //    {
-        //        try
-        //        {
-        //            peso = Convert.ToDecimal(pesoRecebido.Replace(".", ","), CultureInfo.CurrentCulture);
-        //        }
-        //        catch
-        //        {
-        //            return BadRequest("Peso inválido. Use números no formato 0,200.");
-        //        }
-        //    }
-
-        //    // Validação correta: se peso <= 0 E (quantidade não informada OU <= 0) => erro
-        //    if (peso <= 0m && (!quantidade.HasValue || quantidade.Value <= 0))
-        //        return BadRequest("Informe um peso (>0) para itens por Kg ou uma quantidade (>0) para itens por Unidade.");
-
-        //    var produto = _produtoRepository.ObterProduto(id);
-        //    if (produto == null)
-        //        return NotFound("Produto não encontrado.");
-
-        //    // Adiciona ao cookie (sem persistir no banco aqui)
-        //    var itensCarrinho = _cookiePedidoCompra.Consultar();
-
-        //    var novoItem = new ProdutoSimples
-        //    {
-        //        Id = id,
-        //        IdItensGuid = Guid.NewGuid(),
-        //        Descricao = produto.Descricao,
-        //        Peso = peso,
-        //        Quantidade = quantidade,
-        //        PrecoUn = produto.PrecoUn
-        //    };
-        //    itensCarrinho.Add(novoItem);
-        //    _cookiePedidoCompra.Salvar(itensCarrinho);
-
-        //    // Retorno no formato que a view espera
-        //    var itemRetorno = new
-        //    {
-        //        idItensGuid = novoItem.IdItensGuid,
-        //        quantidade = novoItem.Quantidade,
-        //        peso = novoItem.Peso,
-        //        refProduto = new
-        //        {
-        //            id = novoItem.Id,
-        //            descricao = novoItem.Descricao,
-        //            precoUn = novoItem.PrecoUn.ToString("N2", new CultureInfo("pt-BR"))
-        //        }
-        //    };
-
-        //    return Ok(itemRetorno);
-        //}
-
         [HttpPost]
-        public IActionResult AdicionarItemNovo(int id, string? pesoRecebido, int? quantidade, int? comandaId)
+        public IActionResult AdicionarItemNovo(int id, string? pesoRcebido, int? quantidade, int? comandaId, Guid IdGuid)
         {
-            // valida comanda
-            if (comandaId is null || comandaId <= 0)
-                return BadRequest("Comanda inválida.");
-
-            var comanda = _comandaRepository.ObterComandaPorId(comandaId.Value);
-            if (comanda == null)
-                return NotFound("Comanda não encontrada.");
-
-            // parse peso (pt-BR)
+            // Converte o peso recebido para decimal
             decimal peso = 0;
-            if (!string.IsNullOrWhiteSpace(pesoRecebido))
+            if (pesoRcebido != null)
             {
-                if (!decimal.TryParse(pesoRecebido.Replace(".", ","), NumberStyles.Any, new CultureInfo("pt-BR"), out peso))
+                try
+                {
+                    peso = Convert.ToDecimal(pesoRcebido.Replace(".", ","), CultureInfo.CurrentCulture);
+                }
+                catch
+                {
+                    // Em caso de erro, retorne um status de erro e uma mensagem.
+                    // O front-end vai capturar isso.
                     return BadRequest("Peso inválido. Use números no formato 0,200.");
+                }
             }
 
-            // regra: precisa de peso > 0 (para Kg) ou quantidade > 0 (para Unidade)
-            if (peso <= 0m && (!quantidade.HasValue || quantidade.Value <= 0))
-                return BadRequest("Informe um peso (>0) para itens por Kg ou uma quantidade (>0) para itens por Unidade.");
+            // Valida se o peso/quantidade é maior que zero
+            if (peso <= 0 && (quantidade.HasValue && quantidade.Value <= 0))
+            {
+                // Em caso de erro, retorne um status de erro e uma mensagem.
+                return BadRequest("O peso ou a quantidade deve ser maior que zero.");
+            }
 
+            // Obtém o produto do repositório
             var produto = _produtoRepository.ObterProduto(id);
             if (produto == null)
+            {
+                // Em caso de erro, retorne um status de erro e uma mensagem.
                 return NotFound("Produto não encontrado.");
+            }
 
-            // define quantidade/peso e subtotal
-            var qtd = (peso > 0m) ? 0 : Math.Max(1, quantidade ?? 0);
-            var subtotal = (peso > 0m)
-                ? (peso * produto.PrecoUn)
-                : (decimal)qtd * produto.PrecoUn;
+            // Recupera a lista de itens do cookie
+            var itensCarrinho = _cookiePedidoCompra.Consultar();
 
-            // cria item de comanda e persiste no BANCO
-            var guid = Guid.NewGuid();
-            var novoItem = new ItemComanda
+            // Cria o novo item a ser adicionado
+            var novoItem = new ProdutoSimples
             {
-                IdItensGuid = guid,
-                RefComanda = new Comanda { Id = comandaId.Value },
-                RefProduto = new ProdutoSimples { Id = produto.Id },
-                Peso = (peso > 0m) ? peso : (decimal?)null,
-                Quantidade = (peso > 0m) ? 0 : qtd,
-                Subtotal = subtotal
+                Id = id,
+                // É crucial usar o Guid.NewGuid() aqui para o novo item
+                IdItensGuid = Guid.NewGuid(),
+                Descricao = produto.Descricao,
+                Peso = peso,
+                Quantidade = quantidade,
+                PrecoUn = produto.PrecoUn
             };
-           // _cookiePedidoCompra.Salvar(novoItem);
-            _itensComandaRepository.Cadastrar(novoItem);
 
-            // retorna o JSON que a view espera
-            return Ok(new
+            itensCarrinho.Add(novoItem);
+            // Salva a lista atualizada no cookie
+            _cookiePedidoCompra.Salvar(itensCarrinho);
+
+
+            var itemRetorno = new
             {
-                idItensGuid = novoItem.IdItensGuid.ToString(),
+                idItensGuid = novoItem.IdItensGuid,
                 quantidade = novoItem.Quantidade,
-                peso = novoItem.Peso ?? 0,
+                peso = novoItem.Peso,
                 refProduto = new
                 {
-                    id = produto.Id,                 
-                    descricao = produto.Descricao,
-                    precoUn = produto.PrecoUn.ToString("N2", new CultureInfo("pt-BR"))
+                    id = novoItem.Id,
+                    descricao = novoItem.Descricao,
+                    // Formata o preço para o padrão brasileiro para que o JavaScript o interprete corretamente.
+                    precoUn = novoItem.PrecoUn.ToString("N2", new CultureInfo("pt-BR"))
+                    // precoUn = novoItem.PrecoUn.ToString("C", new CultureInfo("pt-BR"))
                 }
-            });
+            };
+
+            // Retorna um objeto JSON com o status 200 OK.
+            return Ok(itemRetorno);
         }
 
-
-
-
-        //[HttpDelete]
-        //public IActionResult RemoverItemAjax(Guid id /*, int? comandaId */)
-        //{
-        //    // Hoje você remove do COOKIE pelo Guid
-        //    _cookiePedidoCompra.Remover(new ProdutoSimples { IdItensGuid = id });
-        //    return Ok();
-        //}
-        [HttpDelete]
-        public IActionResult RemoverItemAjax(Guid id, int comandaId)
-        {
-            var item = _itensComandaRepository
-                .ObterItensPorComanda(comandaId)
-                .FirstOrDefault(i => i.RefProduto != null && i.RefProduto.IdItensGuid == id);
-
-            if (item == null) return NotFound("Item não encontrado.");
-
-            // ⬇️ Ajuste o nome da propriedade conforme seu modelo: Id, IdItem, IdItemComanda, etc.
-            _itensComandaRepository.Excluir(item.Id);
-
-            return Ok();
-        }
 
 
 
@@ -386,22 +376,14 @@ namespace SistemaAcai_II.Controllers
         {
             var produto = _produtoRepository.ObterProduto(id);
             if (produto == null)
-                return NotFound("Produto não encontrado.");
-
-            return Json(new
             {
-                id = produto.Id,
-                tipoMedida = produto.TipoMedida,                 // "Unidade" / "Kg" (string do banco)
-                tipoMedidaEnum = produto.TipoMedidaEnum.ToString() // "Unidade" / "Kg" (enum)
-            });
-        }
-       
-        public IActionResult RemoverItemEditado(Guid Id, int idComanda)
-        {
-            _itensComandaRepository.Excluir(new ItemComanda() { IdItensGuid = Id });
+                return NotFound("Produto não encontrado.");
+            }
 
-            return RedirectToAction(nameof(EditarComanda), new { id = idComanda });
+            // Retorna apenas os dados necessários em formato JSON
+            return Json(new { id = produto.Id, tipoMedida = produto.TipoMedida });
         }
+
 
 
         public IActionResult RemoverItem(Guid Id)
@@ -542,6 +524,165 @@ namespace SistemaAcai_II.Controllers
 
             return RedirectToAction(nameof(Index));
         }
+        //Cancelar Comanda
+        [HttpGet]
+        public IActionResult CancelarComanda(int id)
+        {
+            Comanda comanda = _comandaRepository.ObterComandaPorId(id);
+
+            _comandaRepository.Cancelar(comanda);
+
+            return RedirectToAction(nameof(Index));
+        }
+
+        public IActionResult ItensComanda(int id)
+        {
+            ViewBag.NunComanda = id;
+            var itens = _itensComandaRepository.ObterItensPorComanda(id);
+            return View(itens);
+        }
+
+        //controler que acessa o peso através de um serviço no windows que salva o peso no arquivo peso.txt - necessario instalar serviço no windows
+        [HttpGet]
+        public JsonResult LerPeso()
+        {
+            string caminhoPeso = @"C:\balanca\peso.txt";
+
+
+            if (System.IO.File.Exists(caminhoPeso))
+            {
+                var peso = System.IO.File.ReadAllText(caminhoPeso).Trim();
+                return Json(new { peso });
+            }
+
+            return Json(new { peso = "0" });
+        }
+        //public IActionResult EditarComanda(int id, string termo)
+        //{
+        //    // Busca a comanda
+        //    var comanda = _comandaRepository.ObterComandaPorId(id);
+        //    if (comanda == null) return NotFound();
+
+        //    // Forma de pagamento
+        //    ViewBag.FormaPagamento = new SelectList(_formasPagamentoRepository.ObterTodasFormasPagamentos(), "Id", "Nome");
+
+        //    // Interpreta termo "quantidade*código"
+        //    int quantidadeDigitada = 1;
+        //    int? codigo, qtd;
+        //    (codigo, qtd) = TryParseCodigoQuantidade(termo ?? string.Empty);
+        //    if (qtd.HasValue && qtd.Value > 0) quantidadeDigitada = qtd.Value;
+
+        //    string termoBusca = codigo.HasValue ? codigo.Value.ToString() : termo;
+
+        //    // Pesquisa produtos
+        //    var produtos = string.IsNullOrWhiteSpace(termoBusca)
+        //        ? new List<ProdutoSimples>()
+        //        : _produtoRepository.BuscarPorNome(termoBusca);
+
+        //    // Ajusta quantidade para produtos por unidade
+        //    foreach (var produto in produtos)
+        //    {
+        //        if (produto.TipoMedidaEnum == TipoMedida.Unidade)
+        //            produto.Quantidade = quantidadeDigitada;
+        //        else
+        //            produto.Quantidade = 0; // Kg usa balança
+        //    }
+
+        //    // Itens da comanda já existentes
+        //    var carrinhoComanda = _itensComandaRepository.ObterItensPorComanda(id);
+
+        //    // ViewModel usando o mesmo da Vendas
+        //    var viewModel = new VendasViewModel
+        //    {
+        //        Comanda = comanda,
+        //        Produtos = produtos,
+        //        ItensComanda = carrinhoComanda // nunca nulo
+        //    };
+
+        //    ViewBag.QuantidadeDigitada = quantidadeDigitada;
+        //    ViewBag.Termo = termo;
+
+        //    return View(viewModel);
+        //}
+
+        public IActionResult EditarComanda(int id, string termo)
+        {
+            var listPagamentos = _formasPagamentoRepository.ObterTodasFormasPagamentos();
+            ViewBag.FormaPagamento = new SelectList(listPagamentos, "Id", "Nome");
+
+            int quantidadeDigitada = 1;
+            string termoBusca = termo;
+
+            int? codigo, qtd;
+            (codigo, qtd) = TryParseCodigoQuantidade(termo ?? string.Empty);
+
+            // Se veio quantidade informada no termo, guarde
+            if (qtd.HasValue && qtd.Value > 0) quantidadeDigitada = qtd.Value;
+
+            // Se veio só código, mantenha o "termoBusca" como código para buscar
+            if (codigo.HasValue) termoBusca = codigo.Value.ToString();
+
+            // Busca (por nome ou código, como já faz)
+            var produtos = string.IsNullOrWhiteSpace(termoBusca)
+                ? new List<ProdutoSimples>()
+                : _produtoRepository.BuscarPorNome(termoBusca);
+
+            // Aplica a quantidade só para produtos por Unidade
+            foreach (var produto in produtos)
+            {
+                if (produto.TipoMedidaEnum == SistemaAcai_II.Models.Constants.TipoMedida.Unidade)
+                    produto.Quantidade = quantidadeDigitada;
+                else
+                    produto.Quantidade = 0; // Kg usa balança
+            }
+
+            var itensCarrinho = _cookieEditarPedidoCompra.Consultar();
+            ViewBag.QuantidadeDigitada = quantidadeDigitada;
+
+
+
+
+            var comanda = _comandaRepository.ObterComandaPorId(id);
+
+            if (comanda == null)
+            {
+                return NotFound();
+            }
+
+            ViewBag.FormaPagamento = new SelectList(
+                _formasPagamentoRepository.ObterTodasFormasPagamentos(),
+                "Id",
+                "Nome"
+            );
+
+            var itensCarrinhoComanda = _itensComandaRepository.ObterItensPorComanda(id);
+
+            var viewModel = new VendasViewModel
+            {
+                Comanda = comanda,
+                Produtos = itensCarrinho,
+                ItensComanda = itensCarrinhoComanda
+            };
+
+            return View(viewModel);
+        }
+        //public IActionResult EditarComanda(int id)
+        //{
+        //    var comanda = _comandaRepository.ObterComandaPorId(id); // método que retorna a comanda com itens
+        //    var itensCarrinho = _itensComandaRepository.ObterItensPorComanda(id);
+        //    ViewBag.FormaPagamento = new SelectList(_formasPagamentoRepository.ObterTodasFormasPagamentos(), "Id", "Nome");
+
+        //    return View(comanda);
+        //}
+
+        [HttpPost]
+        public IActionResult EditarComanda(Comanda comanda)
+        {
+            // Atualiza comanda no banco
+            _comandaRepository.Atualizar(comanda);
+
+            return RedirectToAction("FecharPedido", new { id = comanda.Id });
+        }
         public IActionResult FecharComandaEditada(int id)
         {
             _cookiePedidoCompra.RemoverTodos();
@@ -550,7 +691,6 @@ namespace SistemaAcai_II.Controllers
             Comanda comanda = _comandaRepository.ObterComandaPorId(id);
             return View(comanda);
         }
-
         [HttpPost]
         public IActionResult FecharComandaEditada(VendasViewModel model, string itensJson)
         {
@@ -644,160 +784,6 @@ namespace SistemaAcai_II.Controllers
                 ModelState.AddModelError("", $"Erro ao processar os itens: {ex.Message}");
                 return View("EditarComanda", model);
             }
-        }
-        //Cancelar Comanda
-        [HttpGet]
-        public IActionResult CancelarComanda(int id)
-        {
-            Comanda comanda = _comandaRepository.ObterComandaPorId(id);
-
-            _comandaRepository.Cancelar(comanda);
-
-            return RedirectToAction(nameof(Index));
-        }
-
-        public IActionResult ItensComanda(int id)
-        {
-            ViewBag.NunComanda = id;
-            var itens = _itensComandaRepository.ObterItensPorComanda(id);
-            return View(itens);
-        }
-
-        //controler que acessa o peso através de um serviço no windows que salva o peso no arquivo peso.txt - necessario instalar serviço no windows
-        [HttpGet]
-        public JsonResult LerPeso()
-        {
-            string caminhoPeso = @"C:\balanca\peso.txt";
-
-
-            if (System.IO.File.Exists(caminhoPeso))
-            {
-                var peso = System.IO.File.ReadAllText(caminhoPeso).Trim();
-                return Json(new { peso });
-            }
-
-            return Json(new { peso = "0" });
-        }
-
-        //public IActionResult EditarComanda(int id, string termo)
-        //{
-        //    // Formas de pagamento
-        //    ViewBag.FormaPagamento = new SelectList(
-        //        _formasPagamentoRepository.ObterTodasFormasPagamentos(),
-        //        "Id",
-        //        "Nome"
-        //    );
-
-        //    // Busca com a MESMA regra do Vendas (codigo*qtd etc.)
-        //    int quantidadeDigitada = 1;
-        //    string termoBusca = termo;
-
-        //    int? codigo, qtd;
-        //    (codigo, qtd) = TryParseCodigoQuantidade(termo ?? string.Empty);
-
-        //    if (qtd.HasValue && qtd.Value > 0) quantidadeDigitada = qtd.Value;
-        //    if (codigo.HasValue) termoBusca = codigo.Value.ToString();
-
-        //    var produtos = string.IsNullOrWhiteSpace(termoBusca)
-        //        ? new List<ProdutoSimples>()
-        //        : _produtoRepository.BuscarPorNome(termoBusca);
-
-        //    // Pré-preenche quantidade para itens por Unidade (igual Vendas)
-        //    foreach (var produto in produtos)
-        //    {
-        //        if (produto.TipoMedidaEnum == SistemaAcai_II.Models.Constants.TipoMedida.Unidade)
-        //            produto.Quantidade = quantidadeDigitada;
-        //        else
-        //            produto.Quantidade = 0; // Kg usa balança
-        //    }
-
-        //    // Carrega comanda e itens já existentes no banco
-        //    var comanda = _comandaRepository.ObterComandaPorId(id);
-        //    if (comanda == null) return NotFound();
-
-        //    var itensComandaBanco = _itensComandaRepository.ObterItensPorComanda(id);
-
-        //    var viewModel = new VendasViewModel
-        //    {
-        //        Comanda = comanda,
-        //        Produtos = produtos,                // <<<<<<<<<< AQUI: produtos da busca
-        //        ItensComanda = itensComandaBanco    // itens já existentes
-        //    };
-
-        //    ViewBag.QuantidadeDigitada = quantidadeDigitada;
-        //    ViewBag.Termo = termo;
-
-        //    return View(viewModel);
-        //}
-        public IActionResult EditarComanda(int id, string termo)
-        {
-            var listPagamentos = _formasPagamentoRepository.ObterTodasFormasPagamentos();
-            ViewBag.FormaPagamento = new SelectList(listPagamentos, "Id", "Nome");
-
-            int quantidadeDigitada = 1;
-            string termoBusca = termo;
-
-            int? codigo, qtd;
-            (codigo, qtd) = TryParseCodigoQuantidade(termo ?? string.Empty);
-
-            // Se veio quantidade informada no termo, guarde
-            if (qtd.HasValue && qtd.Value > 0) quantidadeDigitada = qtd.Value;
-
-            // Se veio só código, mantenha o "termoBusca" como código para buscar
-            if (codigo.HasValue) termoBusca = codigo.Value.ToString();
-
-            // Busca (por nome ou código, como já faz)
-            var produtos = string.IsNullOrWhiteSpace(termoBusca)
-                ? new List<ProdutoSimples>()
-                : _produtoRepository.BuscarPorNome(termoBusca);
-
-            // Aplica a quantidade só para produtos por Unidade
-            foreach (var produto in produtos)
-            {
-                if (produto.TipoMedidaEnum == SistemaAcai_II.Models.Constants.TipoMedida.Unidade)
-                    produto.Quantidade = quantidadeDigitada;
-                else
-                    produto.Quantidade = 0; // Kg usa balança
-            }
-
-            var itensCarrinho = _cookiePedidoCompra.Consultar();
-            ViewBag.QuantidadeDigitada = quantidadeDigitada;
-
-
-
-
-            var comanda = _comandaRepository.ObterComandaPorId(id);
-
-            if (comanda == null)
-            {
-                return NotFound();
-            }
-
-            ViewBag.FormaPagamento = new SelectList(
-                _formasPagamentoRepository.ObterTodasFormasPagamentos(),
-                "Id",
-                "Nome"
-            );
-
-            var itensCarrinhoComanda = _itensComandaRepository.ObterItensPorComanda(id);
-
-            var viewModel = new VendasViewModel
-            {
-                Comanda = comanda,
-                Produtos = itensCarrinho,
-                ItensComanda = itensCarrinhoComanda
-            };
-
-            return View(viewModel);
-        }
-        
-        [HttpPost]
-        public IActionResult EditarComanda(Comanda comanda)
-        {
-            // Atualiza comanda no banco
-            _comandaRepository.Atualizar(comanda);
-
-            return RedirectToAction("FecharPedido", new { id = comanda.Id });
         }
     }
 }

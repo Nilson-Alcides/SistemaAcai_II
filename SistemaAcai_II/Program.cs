@@ -40,6 +40,7 @@ builder.Services.AddScoped<ExportaArquivo>();
 
 builder.Services.AddScoped<SistemaAcai_II.Libraries.Cookie.Cookie>();
 builder.Services.AddScoped<SistemaAcai_II.Libraries.PedidoCompra.CookiePedidoCompra>();
+builder.Services.AddScoped<SistemaAcai_II.Libraries.PedidoCompra.CookieEditarPedidoCompra>();
 builder.Services.AddScoped<CaixaAutorizacaoAttribute>();
 
 /*

@@ -14,7 +14,7 @@ namespace SistemaAcai_II.Models
         [Display(Name = "Código", Description = "Código.")]
         public int Id { get; set; }
         //Gera Id aleatorio para remover itens do carrinho
-        public Guid IdItensGuid { get; set; }
+        public Guid? IdItensGuid { get; set; }
 
         [Display(Name = "Produto", Description = "Produto")]
         [Required(ErrorMessage = "A Descrição é obrigatória.")]
